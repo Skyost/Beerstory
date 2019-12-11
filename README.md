@@ -5,7 +5,9 @@ Don't forget it anymore with Beerstory ! Indeed, Beerstory is a little that allo
 
 Beerstory goes beyond saving your favorite beers because it also allows you to save your favorite beers, to have a beer history, etc...
 
-<img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/1.png" height="500" alt="Screenshot 1"> <img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/2.png" height="500" alt="Screenshot 2"> <img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/3.png" height="500" alt="Screenshot 3"> <img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/4.png" height="500" alt="Screenshot 4">
+<img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/1.png" height="500" alt="Screenshot 1"> <img src="https://github.com/Skyost/Beerstory/blob/master/screenshots/2.png" height="500" alt="Screenshot 2">
+
+[View gallery](https://github.com/Skyost/Beerstory/tree/master/screenshots)
 
 ## Features
 
