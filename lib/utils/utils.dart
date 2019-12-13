@@ -24,11 +24,14 @@ class Utils {
   }
 
   /// Transforms the given color to its hex code.
-  static String colorToHex(Color color, {bool alpha = false, bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha ? color.alpha.toRadixString(16) : ''}'
-      '${color.red.toRadixString(16)}'
-      '${color.green.toRadixString(16)}'
-      '${color.blue.toRadixString(16)}';
+  static String colorToHex(Color color, {bool alpha = false, bool leadingHashSign = true}) {
+    String value = color.value.toRadixString(16).padLeft(8);
+    if(!alpha) {
+      value = value.substring(2);
+    }
+
+    return (leadingHashSign ? '#' : '') + value;
+  }
 
   /// Moves a file to another path.
   static Future<File> moveFile(File sourceFile, String newPath) async {
