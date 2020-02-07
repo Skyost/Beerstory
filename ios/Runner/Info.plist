@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>fr</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -11,7 +16,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>beerstory</string>
+	<string>Beerstory</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -43,13 +48,11 @@
 	<false/>
 	<key>UIStatusBarHidden</key>
 	<true/>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires access to the photo library.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>This app requires access to the camera.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app requires access to your photo library.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app requires write access to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library in order to read your beer picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera in order to scan your product barcode.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app requires write access to your photo library in order to add beer pictures in your library.</string>
 </dict>
 </plist>
