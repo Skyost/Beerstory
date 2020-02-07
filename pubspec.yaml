@@ -1,6 +1,6 @@
 name: beerstory
 description: Save your favorite beers and find them back instantly !
-version: 0.1.1+2
+version: 0.1.2+3
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
