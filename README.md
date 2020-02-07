@@ -22,6 +22,9 @@ Here are some highlights :
 
 You want a beer library in your pocket ? Then install this app !
 
+* [Google Play](https://play.google.com/store/apps/details?id=fr.skyost.beerstory)
+* [App Store](https://itunes.apple.com/app/id1491556149)
+
 ## Contributions
 
 You have a lot of options to contribute to this project ! You can :
