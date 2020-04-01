@@ -9,13 +9,10 @@ import 'package:hive/hive.dart';
 part 'bar.g.dart';
 
 /// Represents a bar.
-@HiveType()
+@HiveType(typeId: 0)
 class Bar extends AppObject with Sortable {
   /// The bars Hive box.
   static const String HIVE_BOX = 'bars';
-
-  /// The adapter id.
-  static const int ADAPTER_ID = 0;
 
   /// The bar name.
   @HiveField(0)

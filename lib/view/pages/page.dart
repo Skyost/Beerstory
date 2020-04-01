@@ -76,9 +76,9 @@ abstract class HivePageState<T extends HiveObject> extends State<HivePage<T>> {
   @override
   Widget build(BuildContext context) => LoadingFutureBuilder<Box<T>>(
         future: _futureOpenBox,
-        builder: (_, box) => WatchBoxBuilder(
-          box: box,
-          builder: buildHiveWidget,
+        builder: (_, box) => ValueListenableBuilder(
+          valueListenable: box.listenable(),
+          builder: (context, box, child) => buildHiveWidget(context, box),
         ),
       );
 
@@ -86,11 +86,11 @@ abstract class HivePageState<T extends HiveObject> extends State<HivePage<T>> {
   Future<Box<T>> _openBox() async {
     if (!_hiveInitialized) {
       Hive.init((await getApplicationDocumentsDirectory()).path);
-      Hive.registerAdapter(BarAdapter(), Bar.ADAPTER_ID);
-      Hive.registerAdapter(BeerAdapter(), Beer.ADAPTER_ID);
-      Hive.registerAdapter(BeerPriceAdapter(), BeerPrice.ADAPTER_ID);
-      Hive.registerAdapter(HistoryEntryAdapter(), HistoryEntry.ADAPTER_ID);
-      Hive.registerAdapter(HistoryEntriesAdapter(), HistoryEntries.ADAPTER_ID);
+      Hive.registerAdapter(BarAdapter());
+      Hive.registerAdapter(BeerAdapter());
+      Hive.registerAdapter(BeerPriceAdapter());
+      Hive.registerAdapter(HistoryEntriesAdapter());
+      Hive.registerAdapter(HistoryEntryAdapter());
       _hiveInitialized = true;
     }
     return Hive.openBox<T>(widget.hiveBox);

@@ -12,13 +12,10 @@ import 'package:path_provider/path_provider.dart';
 part 'beer.g.dart';
 
 /// Represents a beer.
-@HiveType()
+@HiveType(typeId: 1)
 class Beer extends AppObject with Sortable {
   /// The beers Hive box.
   static const String HIVE_BOX = 'beers';
-
-  /// The adapter id.
-  static const int ADAPTER_ID = 1;
 
   /// The beer name.
   @HiveField(0)
@@ -107,11 +104,8 @@ class Beer extends AppObject with Sortable {
 }
 
 /// Represents a price associated with a bar.
-@HiveType()
+@HiveType(typeId: 2)
 class BeerPrice {
-  /// The adapter id.
-  static const int ADAPTER_ID = 2;
-
   /// The bar id.
   @HiveField(0)
   int barId;

@@ -8,6 +8,9 @@ part of 'bar.dart';
 
 class BarAdapter extends TypeAdapter<Bar> {
   @override
+  final typeId = 0;
+
+  @override
   Bar read(BinaryReader reader) {
     var numOfFields = reader.readByte();
     var fields = <int, dynamic>{

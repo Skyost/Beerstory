@@ -8,6 +8,9 @@ part of 'history.dart';
 
 class HistoryEntriesAdapter extends TypeAdapter<HistoryEntries> {
   @override
+  final typeId = 3;
+
+  @override
   HistoryEntries read(BinaryReader reader) {
     var numOfFields = reader.readByte();
     var fields = <int, dynamic>{
@@ -28,6 +31,9 @@ class HistoryEntriesAdapter extends TypeAdapter<HistoryEntries> {
 }
 
 class HistoryEntryAdapter extends TypeAdapter<HistoryEntry> {
+  @override
+  final typeId = 4;
+
   @override
   HistoryEntry read(BinaryReader reader) {
     var numOfFields = reader.readByte();

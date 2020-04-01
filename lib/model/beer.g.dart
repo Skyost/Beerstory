@@ -8,6 +8,9 @@ part of 'beer.dart';
 
 class BeerAdapter extends TypeAdapter<Beer> {
   @override
+  final typeId = 1;
+
+  @override
   Beer read(BinaryReader reader) {
     var numOfFields = reader.readByte();
     var fields = <int, dynamic>{
@@ -43,6 +46,9 @@ class BeerAdapter extends TypeAdapter<Beer> {
 }
 
 class BeerPriceAdapter extends TypeAdapter<BeerPrice> {
+  @override
+  final typeId = 2;
+
   @override
   BeerPrice read(BinaryReader reader) {
     var numOfFields = reader.readByte();

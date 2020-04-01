@@ -372,7 +372,7 @@ class _BeerEditorState extends FormDialogState<BeerEditor> {
 
             dynamic beer = await Beer.fromOpenFoodFacts(result);
             if (beer is Beer) {
-              Navigator.pop(context);
+              Navigator.pop(context); // TODO : Unhandled Exception: Looking up a deactivated widget's ancestor is unsafe. At this point the state of the widget's element tree is no longer stable. To safely refer to a widget's ancestor in its dispose() method, save a reference to the ancestor by calling dependOnInheritedWidgetOfExactType() in the widget's didChangeDependencies() method.
               BeerEditor.show(
                 context: context,
                 beer: beer,

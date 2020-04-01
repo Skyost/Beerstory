@@ -10,13 +10,10 @@ import 'beer.dart';
 part 'history.g.dart';
 
 /// Represents a list of history entries associated with a date.
-@HiveType()
+@HiveType(typeId: 3)
 class HistoryEntries extends HiveObject with Sortable {
   /// The history Hive box.
   static const String HIVE_BOX = 'history';
-
-  /// The adapter id.
-  static const int ADAPTER_ID = 3;
 
   /// The key date formatter.
   static DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -82,11 +79,8 @@ class HistoryEntries extends HiveObject with Sortable {
 }
 
 /// Represents an history entry.
-@HiveType()
+@HiveType(typeId: 4)
 class HistoryEntry extends AppObject {
-  /// The adapter id.
-  static const int ADAPTER_ID = 4;
-
   /// The beer id.
   @HiveField(0)
   int beerId;
