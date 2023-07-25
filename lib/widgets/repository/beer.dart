@@ -170,6 +170,7 @@ class _BeerRating extends StatelessWidget {
       ? const SizedBox.shrink()
       : RatingFormField(
           initialValue: beer.rating!,
+          size: 25,
           readOnly: true,
         );
 }

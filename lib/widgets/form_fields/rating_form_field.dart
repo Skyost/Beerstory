@@ -9,24 +9,29 @@ class RatingFormField extends FormField<double> {
     super.validator,
     super.onSaved,
     super.initialValue,
+    double size = 40,
     bool readOnly = false,
   }) : super(
           builder: (FormFieldState<double> state) => readOnly
               ? RatingBar.readOnly(
                   initialRating: initialValue ?? 0,
-                  size: 40,
+                  size: size,
                   filledIcon: Icons.star,
                   halfFilledIcon: Icons.star_half_outlined,
                   emptyIcon: Icons.star_border,
+                  filledColor: Theme.of(state.context).colorScheme.primary,
+                  halfFilledColor: Theme.of(state.context).colorScheme.primary,
                   isHalfAllowed: true,
                 )
               : RatingBar(
                   initialRating: initialValue ?? 0,
-                  size: 40,
+                  size: size,
                   filledIcon: Icons.star,
                   halfFilledIcon: Icons.star_half_outlined,
                   emptyIcon: Icons.star_border,
                   onRatingChanged: (rating) => state.didChange(rating),
+                  filledColor: Theme.of(state.context).colorScheme.primary,
+                  halfFilledColor: Theme.of(state.context).colorScheme.primary,
                   isHalfAllowed: true,
                 ),
         );
