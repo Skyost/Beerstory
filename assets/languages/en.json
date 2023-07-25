@@ -18,17 +18,17 @@
         "search": "Search..."
     },
     "formDialog": {
-        "success": "{element} added with success.",
+        "success": "{element} added with success. Thanks OpenFoodFacts !",
         "beer": "Beer",
         "bar": "Bar"
     },
     "barDialog": {
         "name": {
-            "label": "Bar name :",
+            "label": "Bar name",
             "hint": "Name"
         },
         "address": {
-            "label": "Bar address :",
+            "label": "Bar address",
             "hint": "Address"
         },
         "added": "Bar added with success."
@@ -42,23 +42,23 @@
             "remove": "Remove image"
         },
         "name": {
-            "label": "Beer name :",
+            "label": "Beer name",
             "hint": "Name"
         },
         "degrees": {
-            "label": "Beer degrees :",
+            "label": "Beer degrees",
             "hint": "Degrees"
         },
         "rating": {
-            "label": "Beer rating :"
+            "label": "Beer rating"
         },
         "tags": {
-            "label": "Beer tags :",
+            "label": "Beer tags",
             "hint": "Enter a tag",
             "empty": "No tag"
         },
         "prices": {
-            "label": "Beer prices :",
+            "label": "Beer prices",
             "hint": "Price (50cl)",
             "empty": "No price",
             "noBar": "No bar",
@@ -68,10 +68,10 @@
     },
     "historyEntryDialog": {
         "beer": {
-            "label": "Beer :"
+            "label": "Beer"
         },
         "quantity": {
-            "label": "Quantity :",
+            "label": "Quantity",
             "hint": "Quantity (in cl)",
             "empty": "No quantity",
             "quantities": {
@@ -82,20 +82,14 @@
             }
         },
         "times": {
-            "label": "Times drunk :"
+            "label": "Times drunk"
         },
         "moreThanQuantity": {
-            "label": "More than current quantity ?"
+            "label": "More than the displayed quantity ?"
         }
-    },
-    "successDialog": {
-        "history": "View history",
-        "close": "Close"
     },
     "error": {
         "addBeerFirst": "You must add a beer in the app first.",
-        "notFilled": "You must fill this field.",
-        "invalidNumber": "Please enter a valid number.",
         "openFoodFactsNotFound": "Cannot find your beer on OpenFoodFacts servers using this barcode.",
         "openFoodFactsGenericError": "An error occurred while finding your beer on OpenFoodFacts.\nPlease try again later."
     },
