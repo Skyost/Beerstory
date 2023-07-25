@@ -18,7 +18,6 @@ dependencies:
   uuid: ^3.0.7
   flutter_riverpod: ^2.3.6
   openfoodfacts: ^2.7.3
-  custom_rating_bar: ^2.0.5
   http: ^0.13.6
   lottie: ^2.5.0
 
