@@ -24,7 +24,7 @@ jobs:
     - name: Build ⚙️
       run: flutter build web --web-renderer canvaskit --base-href "/Beerstory/"
     - name: Copy privacy policy ‍⚖️
-      run: cp "./privacy_policy.pdf" "./build/web/privacy_policy.pdf"
+      run: cp "./docs/privacy_policy.pdf" "./build/web/privacy_policy.pdf"
     - name: Deploy 🚀
       uses: peaceiris/actions-gh-pages@v3
       with:
