@@ -1,4 +1,5 @@
 import 'package:beerstory/model/beer/repository.dart';
+import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/history_entry_editor_dialog.dart';
 import 'package:ez_localization/ez_localization.dart';
@@ -64,7 +65,7 @@ class _PageScaffoldState extends State<PageScaffold> with SingleTickerProviderSt
       floatingActionButton: _FloatingActionButton(),
       floatingActionButtonLocation: widget.pages.length > 1 ? FloatingActionButtonLocation.centerDocked : FloatingActionButtonLocation.centerFloat,
       body: widget.pages.length == 1
-          ? widget.pages[0]
+          ? widget.pages.first
           : TabBarView(
               controller: tabController,
               children: widget.pages,
@@ -100,6 +101,7 @@ class _FloatingActionButton extends ConsumerWidget {
         focusElevation: 0,
         hoverElevation: 0,
         highlightElevation: 0,
+        heroTag: currentPlatform.isDesktop ? null : runtimeType.toString(),
         backgroundColor: Theme.of(context).colorScheme.darkPrimary,
         onPressed: () {
           BeerRepository repository = ref.read(beerRepositoryProvider);
@@ -115,9 +117,7 @@ class _FloatingActionButton extends ConsumerWidget {
             beer: repository.objects.first,
           );
         },
-        child: SvgPicture.asset(
-          'assets/images/add.svg',
-        ),
+        child: SvgPicture.asset('assets/images/add.svg'),
       );
 }
 

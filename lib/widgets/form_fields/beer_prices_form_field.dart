@@ -1,6 +1,7 @@
 import 'package:beerstory/model/bar/bar.dart';
 import 'package:beerstory/model/bar/repository.dart';
 import 'package:beerstory/model/beer/beer.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/large_button.dart';
 import 'package:ez_localization/ez_localization.dart';
 import 'package:flutter/material.dart';
@@ -118,7 +119,7 @@ class _BeerPricesFormFieldWidget extends ConsumerWidget {
                         ),
                         child: TextField(
                           decoration: InputDecoration(hintText: context.getString('beerDialog.prices.hint')),
-                          controller: TextEditingController(text: (price.price ?? '').toString()),
+                          controller: TextEditingController(text: (price.price?.toIntIfPossible() ?? '').toString()),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           onChanged: (value) {
                             price.price = double.tryParse(value);

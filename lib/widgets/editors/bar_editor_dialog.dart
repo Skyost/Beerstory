@@ -45,7 +45,7 @@ class _BarEditorDialogState extends FormDialogState<BarEditorDialog> {
           initialValue: widget.bar.name,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return context.getString('error.notFilled');
+              return context.getString('error.empty');
             }
             return null;
           },

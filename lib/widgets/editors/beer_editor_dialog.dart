@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/repository.dart';
+import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/barcode_scan_button.dart';
 import 'package:beerstory/widgets/choice_dialog.dart';
@@ -75,7 +76,7 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
               radius: 100,
             ),
             onTap: () {
-              if (!widget.readOnly) {
+              if (!widget.readOnly && currentPlatform.isMobile) {
                 showBeerImageChoiceDialog(context, state);
               }
             },
@@ -94,7 +95,7 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
             initialValue: widget.beer.name,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return context.getString('error.notFilled');
+                return context.getString('error.empty');
               }
               return null;
             },
@@ -113,7 +114,7 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
           previewText: widget.beer.degrees == null ? '?' : '${widget.beer.degrees}°',
           editWidget: TextFormField(
             decoration: InputDecoration(hintText: context.getString('beerDialog.degrees.hint')),
-            initialValue: (widget.beer.degrees ?? '').toString(),
+            initialValue: (widget.beer.degrees?.toIntIfPossible() ?? '').toString(),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onSaved: (value) => widget.beer.degrees = double.tryParse(value ?? '?'),
           ),
@@ -159,9 +160,9 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
               setState(() => showMore = true);
             },
           ),
-        if (!widget.readOnly)
+        if (!widget.readOnly && currentPlatform.isMobile)
           Padding(
-            padding: EdgeInsets.only(top: showMore ? FormDialogState.padding : 0),
+            padding: const EdgeInsets.only(top: FormDialogState.padding),
             child: BeerBarcodeScanButton(
               textKey: 'beerDialog.barcode',
               onProductNotFound: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(

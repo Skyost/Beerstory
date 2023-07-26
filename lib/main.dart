@@ -35,6 +35,7 @@ class _BeerstoryApp extends StatelessWidget {
             highlightColor: Colors.white12,
             scaffoldBackgroundColor: Colors.white,
             dialogBackgroundColor: Colors.white,
+            canvasColor: Colors.grey[100],
             dialogTheme: const DialogTheme(
               surfaceTintColor: Colors.white,
             ),

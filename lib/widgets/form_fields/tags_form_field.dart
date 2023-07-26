@@ -25,7 +25,7 @@ class TagsFormField extends FormField<List<String>> {
                 ),
               if (state.value == null || state.value!.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(top: addAddForm ? 10 : 0),
                   child: emptyWidget ?? const SizedBox.shrink(),
                 )
               else

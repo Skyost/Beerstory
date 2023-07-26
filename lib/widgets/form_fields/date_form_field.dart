@@ -19,9 +19,6 @@ class DateFormField extends FormField<DateTime> {
                 initialDate: state.value!,
                 firstDate: DateTime(1900),
                 lastDate: DateTime(2200),
-                helpText: MaterialLocalizations.of(state.context).dateHelpText.toUpperCase(),
-                cancelText: MaterialLocalizations.of(state.context).cancelButtonLabel.toUpperCase(),
-                confirmText: MaterialLocalizations.of(state.context).okButtonLabel.toUpperCase(),
               );
 
               if (date != null) {

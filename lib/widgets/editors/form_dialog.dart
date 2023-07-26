@@ -46,11 +46,11 @@ abstract class FormDialogState<T extends FormDialog> extends ConsumerState<T> {
       actions: [
         if (createCancelButton)
           TextButton(
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase()),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
             onPressed: () => Navigator.pop(context, false),
           ),
         TextButton(
-          child: Text(MaterialLocalizations.of(context).okButtonLabel.toUpperCase()),
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
           onPressed: () async {
             if (!formKey.currentState!.validate()) {
               return;

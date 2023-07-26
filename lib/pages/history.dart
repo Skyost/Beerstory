@@ -46,7 +46,7 @@ class _ClearHistoryButton extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase()),
+                child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
               ),
               TextButton(
                 onPressed: () {
@@ -55,7 +55,7 @@ class _ClearHistoryButton extends ConsumerWidget {
                     ..save();
                   Navigator.pop(context);
                 },
-                child: Text(MaterialLocalizations.of(context).okButtonLabel.toUpperCase()),
+                child: Text(MaterialLocalizations.of(context).okButtonLabel),
               ),
             ],
           ),

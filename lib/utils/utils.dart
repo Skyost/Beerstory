@@ -27,3 +27,12 @@ extension PrimaryDark on ColorScheme {
   /// Returns the dark primary color.
   Color get darkPrimary => (primary as MaterialColor)[700]!;
 }
+
+/// Allows to check if a number is an integer.
+extension IntegerUtils on num {
+  /// Returns whether this number is an integer.
+  bool get isInteger => this is int || this == truncateToDouble();
+
+  /// Returns an integer if possible.
+  num toIntIfPossible() => isInteger ? toInt() : this;
+}

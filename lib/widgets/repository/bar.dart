@@ -62,5 +62,11 @@ class BarWidget extends RepositoryObjectWidget {
   }
 
   /// Opens Google Maps to show the bar address.
-  void _showBarOnMap(BuildContext context) => launchUrlString('https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(bar.address!)}');
+  void _showBarOnMap(BuildContext context) {
+    String query = bar.name;
+    if (bar.address != null && bar.address!.isNotEmpty) {
+      query += ', ${bar.address}';
+    }
+    launchUrlString('https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(query)}');
+  }
 }

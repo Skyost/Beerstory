@@ -33,7 +33,7 @@ class LargeButton extends StatelessWidget {
         ),
       ),
       child: Text(
-        text.toUpperCase(),
+        text,
       ),
     ),
   );

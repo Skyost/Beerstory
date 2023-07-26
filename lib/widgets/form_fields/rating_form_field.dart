@@ -12,7 +12,7 @@ class RatingFormField extends FormField<double> {
     bool readOnly = false,
   }) : super(
           builder: (FormFieldState<double> state) => SmoothStarRating(
-            rating: initialValue ?? 0,
+            rating: state.value ?? 0,
             size: size,
             onRatingChanged: readOnly ? null : state.didChange,
           ),

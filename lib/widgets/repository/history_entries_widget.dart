@@ -89,24 +89,25 @@ class HistoryEntryWidget extends RepositoryObjectWidget {
             ),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Text.rich(TextSpan(
-            children: [
-              TextSpan(
-                text: context.getString('page.history.total').toUpperCase(),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(text: ' '),
-              TextSpan(
-                text: context.getString('page.history.quantity', {
-                  'prefix': historyEntry.moreThanQuantity ? '+' : '',
-                  'quantity': NumberFormat.decimalPattern().format(historyEntry.quantity ?? 0),
-                }),
-              ),
-            ],
-          )),
-        )
+        if (historyEntry.quantity != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text.rich(TextSpan(
+              children: [
+                TextSpan(
+                  text: context.getString('page.history.total').toUpperCase(),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(text: ' '),
+                TextSpan(
+                  text: context.getString('page.history.quantity', {
+                    'prefix': historyEntry.moreThanQuantity ? '+' : '',
+                    'quantity': NumberFormat.decimalPattern().format(historyEntry.quantity),
+                  }),
+                ),
+              ],
+            )),
+          ),
       ],
     );
   }

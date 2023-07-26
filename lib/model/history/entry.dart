@@ -20,19 +20,17 @@ class HistoryEntry with ChangeNotifier {
     required Beer beer,
     double? quantity,
     int times = 1,
+    bool? moreThanQuantity,
   })  : _beerUuid = beer.uuid,
         _quantity = quantity,
-        _times = times {
-    updateMoreThanQuantity(notify: false);
-  }
+        _times = times, _moreThanQuantity = moreThanQuantity ?? (quantity == null);
 
   /// Creates a new history entry instance from a JSON map.
   HistoryEntry.fromJson(Map<String, dynamic> jsonData)
       : _beerUuid = jsonData['beer'],
         _quantity = jsonData['quantity'],
-        _times = jsonData['times'] {
-    updateMoreThanQuantity(notify: false);
-  }
+        _times = jsonData['times'],
+        _moreThanQuantity = jsonData['moreThanQuantity'];
 
   /// Returns the beer UUID.
   String get beerUuid => _beerUuid;
@@ -52,11 +50,15 @@ class HistoryEntry with ChangeNotifier {
     updateMoreThanQuantity();
   }
 
+  /// Calculates the true quantity drunk.
+  double? calculateTrueQuantity(double? rawQuantity) => rawQuantity == null ? null : (rawQuantity * _times);
+
   /// Adds the specified entry to this entry.
   void absorbEntry(HistoryEntry entry) {
-    if (entry._quantity == null) {
+    if (entry._quantity == null || entry._moreThanQuantity) {
       _moreThanQuantity = true;
-    } else {
+    }
+    if (entry._quantity != null) {
       _quantity = (_quantity ?? 0) + entry._quantity!;
     }
 
@@ -73,8 +75,14 @@ class HistoryEntry with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Returns whether this entry has been drunk more than quantity.
+  /// Returns whether this beer has been drunk more than the displayed quantity.
   bool get moreThanQuantity => _moreThanQuantity;
+
+  /// Sets whether this beer has been drunk more than the displayed quantity.
+  set moreThanQuantity(bool moreThanQuantity) {
+    _moreThanQuantity = moreThanQuantity;
+    notifyListeners();
+  }
 
   /// Updates the moreThanQuantity field.
   void updateMoreThanQuantity({bool notify = true}) {
@@ -89,5 +97,6 @@ class HistoryEntry with ChangeNotifier {
         'beer': _beerUuid,
         'quantity': _quantity,
         'times': _times,
+        'moreThanQuantity': _moreThanQuantity,
       };
 }

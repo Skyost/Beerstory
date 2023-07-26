@@ -2,6 +2,7 @@ import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/repository.dart';
 import 'package:beerstory/model/history/entry.dart';
 import 'package:beerstory/model/history/history.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/dialogs/beer_animation_dialog.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/form_fields/checkbox.dart';
@@ -39,14 +40,14 @@ class HistoryEntryEditorDialog extends FormDialog {
     required BuildContext context,
     required DateTime date,
     required HistoryEntry historyEntry,
-    bool showMoreThanQuantityField = true,
+    bool? showMoreThanQuantityField,
   }) async =>
       (await showDialog(
         context: context,
         builder: (context) => HistoryEntryEditorDialog._internal(
           date: date,
           historyEntry: historyEntry,
-          showMoreThanQuantityField: showMoreThanQuantityField,
+          showMoreThanQuantityField: showMoreThanQuantityField ?? (historyEntry.quantity != null),
         ),
       )) ==
       true;
@@ -124,6 +125,22 @@ class _HistoryEntryEditorState extends FormDialogState<HistoryEntryEditorDialog>
       if (showMore) ...[
         const LabelWidget(
           icon: Icons.local_bar,
+          textKey: 'historyEntryDialog.times.label',
+        ),
+        DropdownButtonFormField<int>(
+          value: widget.historyEntry.times,
+          items: List.generate(
+            10,
+                (index) => DropdownMenuItem<int>(
+              value: index + 1,
+              child: Text('${index + 1}x'),
+            ),
+          ),
+          onChanged: (value) {},
+          onSaved: (value) => widget.historyEntry.times = value!,
+        ),
+        const LabelWidget(
+          icon: Icons.local_bar,
           textKey: 'historyEntryDialog.quantity.label',
         ),
         DropdownButtonFormField<double>(
@@ -146,41 +163,24 @@ class _HistoryEntryEditorState extends FormDialogState<HistoryEntryEditorDialog>
           ],
           onChanged: (value) {
             setState(() => showCustomQuantityField = value == -1);
-            (quantityFieldKey.currentState as FormFieldState).didChange(value);
           },
           onSaved: (value) {
             if (value != -1) {
-              widget.historyEntry.quantity = value;
+              widget.historyEntry.quantity = widget.historyEntry.calculateTrueQuantity(value);
             }
           },
         ),
         if (showCustomQuantityField)
           TextFormField(
             decoration: InputDecoration(hintText: context.getString('historyEntryDialog.quantity.hint')),
-            initialValue: widget.historyEntry.quantity != null && widget.historyEntry.quantity! > 0 ? widget.historyEntry.quantity.toString() : null,
+            initialValue: widget.historyEntry.quantity != null && widget.historyEntry.quantity! > 0 ? widget.historyEntry.quantity!.toIntIfPossible().toString() : null,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onSaved: (value) {
               if (widget.historyEntry.quantity == null || widget.historyEntry.quantity! >= 0) {
-                widget.historyEntry.quantity = double.tryParse(value ?? '?');
+                widget.historyEntry.quantity = widget.historyEntry.calculateTrueQuantity(double.tryParse(value ?? '?'));
               }
             },
           ),
-        const LabelWidget(
-          icon: Icons.local_bar,
-          textKey: 'historyEntryDialog.times.label',
-        ),
-        DropdownButtonFormField<int>(
-          value: widget.historyEntry.times,
-          items: List.generate(
-            10,
-            (index) => DropdownMenuItem<int>(
-              value: index + 1,
-              child: Text('${index + 1}x'),
-            ),
-          ),
-          onChanged: (value) {},
-          onSaved: (value) => widget.historyEntry.times = value!,
-        ),
         DateFormField(
           value: date,
           buttonBuilder: (date, onPressed) => LargeButton(
@@ -197,7 +197,7 @@ class _HistoryEntryEditorState extends FormDialogState<HistoryEntryEditorDialog>
             padding: const EdgeInsets.only(top: FormDialogState.padding),
             child: CheckboxFormField(
               initialValue: widget.historyEntry.moreThanQuantity,
-              onSaved: (value) => widget.historyEntry.moreThanQuantity,
+              onSaved: (value) => widget.historyEntry.moreThanQuantity = value!,
               child: const LabelWidget(
                 icon: Icons.add,
                 textKey: 'historyEntryDialog.moreThanQuantity.label',

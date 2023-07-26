@@ -6,7 +6,7 @@
         },
         "bars": {
             "name": "Bars",
-            "empty": "Pas de bar enregistré pour le moment"
+            "empty": "Pas de bar enregistré pour le moment."
         },
         "history": {
             "name": "Historique",
@@ -54,7 +54,7 @@
         },
         "tags": {
             "label": "Tags de la bière",
-            "hint": "Entrez un tag",
+            "hint": "Entrer un tag",
             "empty": "Pas de tag"
         },
         "prices": {
@@ -89,6 +89,7 @@
         }
     },
     "error": {
+        "empty": "Ce champ ne doit pas être vide.",
         "addBeerFirst": "Vous devez d'abord ajouter une bière dans l'application.",
         "openFoodFactsNotFound": "Impossible de trouver votre bière sur les serveurs d'OpenFoodFacts serveurs avec ce code-barre.",
         "openFoodFactsGenericError": "Une erreur est survenue en cherchant votre bière sur OpenFoodFacts.\nVeuillez réessayer plus tard."

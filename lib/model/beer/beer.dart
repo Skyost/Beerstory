@@ -101,7 +101,7 @@ class Beer extends RepositoryObject {
 
   /// Changes the beer prices.
   set prices(List<BeerPrice> prices) {
-    _prices = prices;
+    _prices = prices.where((price) => !price.isEmpty).toList();
     notifyListeners();
   }
 
@@ -182,6 +182,9 @@ class BeerPrice {
           barUuid: jsonData['barUuid'],
           price: jsonData['price'],
         );
+
+  /// Returns whether this price is empty.
+  bool get isEmpty => barUuid == null && price == null;
 
   /// Converts this price to a JSON map.
   Map<String, dynamic> toJson() => {
