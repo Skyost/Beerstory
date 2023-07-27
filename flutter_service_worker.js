@@ -3,11 +3,11 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"index.html": "215e20e05409f42b9ec48f082eac7b81",
-"/": "215e20e05409f42b9ec48f082eac7b81",
+const RESOURCES = {"index.html": "ade1776114270dc6ccd59edfdf0058f8",
+"/": "ade1776114270dc6ccd59edfdf0058f8",
 "flutter.js": "6fef97aeca90b426343ba6c5c9dc5d4a",
 "favicon.png": "d062b8f6aeb9ba266e1bd2d0bc60b553",
-"main.dart.js": "16d623085baffa3bd0d28ac6d12758e0",
+"main.dart.js": "0564a36617374412675d7d617421d0ea",
 "version.json": "bf0b7371ff11c4d8bb51ebad8ec03eb3",
 "canvaskit/chromium/canvaskit.js": "8c8392ce4a4364cbb240aa09b5652e05",
 "canvaskit/chromium/canvaskit.wasm": "fc18c3010856029414b70cae1afc5cd9",
@@ -21,7 +21,7 @@ const RESOURCES = {"index.html": "215e20e05409f42b9ec48f082eac7b81",
 "assets/fonts/MaterialIcons-Regular.otf": "ecf76833287867167a22d40db5430018",
 "assets/AssetManifest.bin": "7ab043beb4338d1dab09b91e1069c805",
 "assets/AssetManifest.json": "1e65639d58f6bc1401e73781bf393ff1",
-"assets/NOTICES": "328d37401eecbc720500a385375ce23a",
+"assets/NOTICES": "ac0399817d4d3d4e26d0c9ba506120f7",
 "assets/FontManifest.json": "37326ff807d944193c443b93e1bb1cbf",
 "assets/assets/fonts/BirdsOfParadise.ttf": "13ae303abe05b6cd14633154fc9d425e",
 "assets/assets/animations/beer.json": "f95ecb2128246d6848ac530bc9ce6974",
