@@ -78,7 +78,7 @@ abstract class Repository<T extends RepositoryObject> with ChangeNotifier {
   T? findByUuid(String uuid) => _data[uuid];
 
   /// Returns the handled objects.
-  Iterable<T> get objects => _data.values;
+  List<T> get objects => _data.values.toList();
 
   /// Returns whether this repository is empty.
   bool get isEmpty => _data.isEmpty;

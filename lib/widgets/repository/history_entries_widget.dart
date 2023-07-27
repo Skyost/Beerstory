@@ -127,5 +127,9 @@ class HistoryEntryWidget extends RepositoryObjectWidget {
       );
 
   @override
-  void onDelete(BuildContext context, WidgetRef ref) => ref.read(historyProvider).removeEntry(date, historyEntry);
+  void onDelete(BuildContext context, WidgetRef ref) {
+    ref.read(historyProvider)
+      ..removeEntry(date, historyEntry)
+      ..save();
+  }
 }

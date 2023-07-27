@@ -57,8 +57,12 @@ class BarWidget extends RepositoryObjectWidget {
 
   @override
   void onDelete(BuildContext context, WidgetRef ref) {
-    ref.read(beerRepositoryProvider).removeBar(bar);
-    ref.read(barRepositoryProvider).remove(bar);
+    ref.read(beerRepositoryProvider)
+      ..removeBar(bar)
+      ..save();
+    ref.read(barRepositoryProvider)
+      ..remove(bar)
+      ..save();
   }
 
   /// Opens Google Maps to show the bar address.

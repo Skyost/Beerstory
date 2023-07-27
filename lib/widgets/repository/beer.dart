@@ -67,8 +67,12 @@ class BeerWidget extends RepositoryObjectWidget {
 
   @override
   void onDelete(BuildContext context, WidgetRef ref) {
-    ref.read(historyProvider).removeBeer(beer);
-    ref.read(beerRepositoryProvider).remove(beer);
+    ref.read(historyProvider)
+      ..removeBeer(beer)
+      ..save();
+    ref.read(beerRepositoryProvider)
+      ..remove(beer)
+      ..save();
   }
 }
 

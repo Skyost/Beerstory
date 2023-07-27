@@ -51,7 +51,7 @@ class HistoryEntries extends RepositoryObject {
   /// Removes a beer from the entries.
   void removeBeer(Beer beer, {bool notify = true}) {
     bool hasChanged = false;
-    for (HistoryEntry entry in _entries) {
+    for (HistoryEntry entry in entries) {
       if (entry.beerUuid == beer.uuid) {
         _entries.remove(entry);
         hasChanged = true;
@@ -96,4 +96,12 @@ class HistoryEntries extends RepositoryObject {
         'date': _formatter.format(date),
         'entries': _entries,
       };
+
+  @override
+  void dispose() {
+    for (HistoryEntry entry in _entries) {
+      entry.dispose();
+    }
+    super.dispose();
+  }
 }
