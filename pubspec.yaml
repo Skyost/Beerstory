@@ -22,6 +22,7 @@ dependencies:
   flutter_svg: ^2.0.7
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  flutter_native_splash: ^2.3.1
 
 dev_dependencies:
   flutter_lints: ^2.0.2
@@ -38,3 +39,10 @@ flutter:
     - family: BirdsOfParadise
       fonts:
         - asset: assets/fonts/BirdsOfParadise.ttf
+
+flutter_native_splash:
+  color: "#009688"
+  image: assets/images/splash/default.png
+  fullscreen: true
+  android_12:
+    image: assets/images/splash/android12.png
