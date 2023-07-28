@@ -87,27 +87,42 @@ class Migrator {
       );
 
   /// Migrates an old history entries object.
-  static HistoryEntries _migrateOldHistoryEntries(OldHistoryEntries oldHistoryEntries, Map<dynamic, RepositoryObject> oldBeerIds) => HistoryEntries(
-        date: OldHistoryEntries.formatter.parse(oldHistoryEntries.key),
-        entries: oldHistoryEntries.entries?.map((historyEntry) => _migrateOldHistoryEntry(historyEntry, oldBeerIds)).toList(),
-      );
+  static HistoryEntries _migrateOldHistoryEntries(OldHistoryEntries oldHistoryEntries, Map<dynamic, RepositoryObject> oldBeerIds) {
+    List<HistoryEntry> entries = [];
+    for (OldHistoryEntry oldHistoryEntry in oldHistoryEntries.entries ?? []) {
+      HistoryEntry? entry = _migrateOldHistoryEntry(oldHistoryEntry, oldBeerIds);
+      if (entry != null) {
+        entries.add(entry);
+      }
+    }
+    return HistoryEntries(
+      date: OldHistoryEntries.formatter.parse(oldHistoryEntries.key),
+      entries: entries,
+    );
+  }
 
   /// Migrates an old history entry object.
-  static HistoryEntry _migrateOldHistoryEntry(OldHistoryEntry oldHistoryEntry, Map<dynamic, RepositoryObject> oldBeerIds) => HistoryEntry(
-    beer: oldBeerIds[oldHistoryEntry.beerId] as Beer,
-    quantity: oldHistoryEntry.quantity,
-    times: oldHistoryEntry.times,
-    moreThanQuantity: oldHistoryEntry.moreThanQuantity,
-  );
+  static HistoryEntry? _migrateOldHistoryEntry(OldHistoryEntry oldHistoryEntry, Map<dynamic, RepositoryObject> oldBeerIds) => oldBeerIds.containsKey(oldHistoryEntry.beerId)
+      ? HistoryEntry(
+          beer: oldBeerIds[oldHistoryEntry.beerId] as Beer,
+          quantity: oldHistoryEntry.quantity,
+          times: oldHistoryEntry.times,
+          moreThanQuantity: oldHistoryEntry.moreThanQuantity,
+        )
+      : null;
 }
 
 /// A repository object with an old Hive id.
 class RepositoryObjectOldId {
   /// The object.
   final RepositoryObject object;
+
   /// The old Hive id.
   final dynamic oldId;
 
   /// Creates a new repository object old id instance.
-  const RepositoryObjectOldId({required this.object, required this.oldId,});
+  const RepositoryObjectOldId({
+    required this.object,
+    required this.oldId,
+  });
 }
