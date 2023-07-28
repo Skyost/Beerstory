@@ -9,8 +9,8 @@ class WaitDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => const AlertDialog(
-        content: CenteredCircularProgressIndicator(),
+  Widget build(BuildContext context) => const Dialog.fullscreen(
+        child: CenteredCircularProgressIndicator(),
       );
 
   /// Shows the dialog.
@@ -19,7 +19,10 @@ class WaitDialog extends StatelessWidget {
   }) =>
       showDialog(
         context: context,
-        builder: (context) => const WaitDialog(),
+        builder: (context) => WillPopScope(
+          child: const WaitDialog(),
+          onWillPop: () => Future.value(false),
+        ),
         barrierDismissible: false,
       );
 }

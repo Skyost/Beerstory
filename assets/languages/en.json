@@ -18,7 +18,6 @@
         "search": "Search..."
     },
     "formDialog": {
-        "success": "{element} added with success. Thanks OpenFoodFacts !",
         "beer": "Beer",
         "bar": "Bar"
     },
@@ -60,11 +59,12 @@
         "prices": {
             "label": "Beer prices",
             "hint": "Price (50cl)",
-            "empty": "No price",
+            "empty": "No price added",
             "noBar": "No bar",
             "add": "Add price"
         },
-        "added": "Beer added with success."
+        "added": "Beer added with success.",
+        "found": "{element} added with success. Thanks OpenFoodFacts !"
     },
     "historyEntryDialog": {
         "beer": {

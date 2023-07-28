@@ -149,7 +149,7 @@ class _BeerPrice extends StatelessWidget {
         return const SizedBox.shrink();
       }
 
-      text = '${numberFormat.format(min)} — ${numberFormat.format(max)}';
+      text = min == max ? numberFormat.format(min) : '${numberFormat.format(min)} — ${numberFormat.format(max)}';
     }
 
     return Padding(

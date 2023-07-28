@@ -18,7 +18,6 @@
         "search": "Rechercher..."
     },
     "formDialog": {
-        "success": "{element} ajouté avec succès. Merci OpenFoodFacts !",
         "beer": "Bière",
         "bar": "Bar"
     },
@@ -60,11 +59,12 @@
         "prices": {
             "label": "Prix de la bière",
             "hint": "Prix (50cl)",
-            "empty": "Pas de prix",
+            "empty": "Pas de prix entré",
             "noBar": "Pas de bar",
             "add": "Ajouter un prix"
         },
-        "added": "Bière ajouté avec succès."
+        "added": "Bière ajoutée avec succès.",
+        "found": "{element} ajouté avec succès. Merci OpenFoodFacts !"
     },
     "historyEntryDialog": {
         "beer": {

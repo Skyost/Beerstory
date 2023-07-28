@@ -191,4 +191,10 @@ class BeerPrice {
         'barUuid': barUuid,
         'price': price,
       };
+
+  /// Copies this beer price.
+  BeerPrice copy() => BeerPrice(
+        barUuid: barUuid,
+        price: price,
+      );
 }

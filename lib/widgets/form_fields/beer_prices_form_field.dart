@@ -15,11 +15,12 @@ class BeerPricesFormField extends FormField<List<BeerPrice>> {
     super.key,
     super.validator,
     super.onSaved,
-    super.initialValue,
+    List<BeerPrice>? initialValue,
     required String noBarFoundText,
     Widget? emptyWidget,
     bool editablePrices = true,
   }) : super(
+          initialValue: initialValue?.map((price) => price.copy()).toList(),
           builder: (state) => _BeerPricesFormFieldWidget(
             formState: state as _BeerPricesFormFieldState,
             noBarFoundText: noBarFoundText,
@@ -84,7 +85,7 @@ class _BeerPricesFormFieldWidget extends ConsumerWidget {
                         padding: const EdgeInsets.only(
                           right: 5,
                         ),
-                        child: DropdownButton<String>(
+                        child: DropdownButtonFormField<String>(
                           value: price.barUuid,
                           isExpanded: true,
                           itemHeight: 56,
@@ -117,9 +118,9 @@ class _BeerPricesFormFieldWidget extends ConsumerWidget {
                         padding: const EdgeInsets.only(
                           left: 5,
                         ),
-                        child: TextField(
+                        child: TextFormField(
                           decoration: InputDecoration(hintText: context.getString('beerDialog.prices.hint')),
-                          controller: TextEditingController(text: (price.price?.toIntIfPossible() ?? '').toString()),
+                          initialValue: price.price?.toIntIfPossible().toString(),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           onChanged: (value) {
                             price.price = double.tryParse(value);

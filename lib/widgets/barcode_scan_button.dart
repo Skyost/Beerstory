@@ -35,59 +35,65 @@ class BeerBarcodeScanButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LargeButton(
-        onPressed: () => CodeScanner(
-          onScan: (code, details, controller) async {
-            WaitDialog.show(context: context);
-            OpenFoodFactsLanguage? language = OpenFoodFactsLanguage.fromOffTag(EzLocalization.of(context)!.locale.languageCode);
-            if (code == null) {
-              return;
-            }
+        onPressed: () {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (dialogContext) => CodeScanner(
+              onScan: (code, details, controller) async {
+                Navigator.pop(dialogContext);
+                if (code == null) {
+                  return;
+                }
 
+                WaitDialog.show(context: context);
+                OpenFoodFactsLanguage? language = OpenFoodFactsLanguage.fromOffTag(EzLocalization.of(context)!.locale.languageCode);
+                ProductQueryConfiguration config = ProductQueryConfiguration(
+                  code,
+                  version: ProductQueryVersion.v3,
+                );
+                ProductResultV3 result = await OpenFoodAPIClient.getProductV3(config);
+                if (result.product == null) {
+                  if (result.result?.id == ProductResultV3.resultProductNotFound) {
+                    onProductNotFound();
+                  } else {
+                    onError();
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                  return;
+                }
 
-            ProductQueryConfiguration config = ProductQueryConfiguration(
-              code,
-              version: ProductQueryVersion.v3,
-            );
-            ProductResultV3 result = await OpenFoodAPIClient.getProductV3(config);
-            if (result.product == null) {
-              if (result.result?.id == ProductResultV3.resultProductNotFound) {
-                onProductNotFound();
-              } else {
-                onError();
-              }
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-              return;
-            }
+                Product product = result.product!;
+                String? name = product.productNameInLanguages?[language] ?? product.productName;
+                if (product.brands != null && product.brands != name) {
+                  String brand = product.brands!.split(',').first;
+                  name = name == null ? brand : '$brand - $name';
+                }
 
-            Product product = result.product!;
-            String? name = product.productNameInLanguages?[language] ?? product.productName;
-            if (product.brands != null) {
-              String brand = product.brands!.split(',').first;
-              name = name == null ? brand : '$brand - $name';
-            }
+                String? image;
+                if (product.imageFrontUrl != null) {
+                  File file = File('${(await getApplicationDocumentsDirectory()).path}/${product.imageFrontUrl!.split('/').last}');
+                  await file.writeAsBytes((await http.get(Uri.parse(product.imageFrontUrl!))).bodyBytes);
+                  image = file.path;
+                }
 
-            String? image;
-            if (product.imageFrontUrl != null) {
-              File file = File('${(await getApplicationDocumentsDirectory()).path}/${product.imageFrontUrl!.split('/').last}');
-              await file.writeAsBytes((await http.get(Uri.parse(product.imageFrontUrl!))).bodyBytes);
-              image = file.path;
-            }
-
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
-            onBeerFound(
-              Beer(
-                name: name ?? '?',
-                image: image,
-                tags: product.categoriesTagsInLanguages?[language] ?? product.categoriesTags,
-              ),
-            );
-          },
-          once: true,
-        ),
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+                onBeerFound(
+                  Beer(
+                    name: name ?? '?',
+                    image: image,
+                    tags: product.categories?.split(', '),
+                  ),
+                );
+              },
+              once: true,
+            ),
+          );
+        },
         text: context.getString(textKey),
       );
 }

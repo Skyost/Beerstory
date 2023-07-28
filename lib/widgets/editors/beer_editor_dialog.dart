@@ -162,7 +162,7 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
           ),
         if (!widget.readOnly && currentPlatform.isMobile)
           Padding(
-            padding: const EdgeInsets.only(top: FormDialogState.padding),
+            padding: EdgeInsets.only(top: showMore ? FormDialogState.padding : 0),
             child: BeerBarcodeScanButton(
               textKey: 'beerDialog.barcode',
               onProductNotFound: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -180,8 +180,8 @@ class _BeerEditorDialogState extends FormDialogState<BeerEditorDialog> {
                 if (context.mounted) {
                   Navigator.pop(context, false);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(context.getString('formDialog.success', {'element': beer.name})),
-                    backgroundColor: Theme.of(context).colorScheme.darkPrimary,
+                    content: Text(context.getString('beerDialog.found', {'element': beer.name})),
+                    backgroundColor: Colors.green,
                   ));
                 }
               },
