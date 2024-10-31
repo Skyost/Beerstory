@@ -19,9 +19,9 @@ class WaitDialog extends StatelessWidget {
   }) =>
       showDialog(
         context: context,
-        builder: (context) => WillPopScope(
+        builder: (context) => PopScope(
+          canPop: false,
           child: const WaitDialog(),
-          onWillPop: () => Future.value(false),
         ),
         barrierDismissible: false,
       );

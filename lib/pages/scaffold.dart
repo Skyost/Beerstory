@@ -1,13 +1,13 @@
 import 'package:beerstory/model/beer/repository.dart';
+import 'package:beerstory/pages/page.dart';
 import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/history_entry_editor_dialog.dart';
 import 'package:ez_localization/ez_localization.dart';
 import 'package:flutter/material.dart' hide Page;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
-import 'page.dart';
+import 'package:jovial_svg/jovial_svg.dart';
 
 /// A simple scaffold that can display pages.
 class PageScaffold extends StatefulWidget {
@@ -117,7 +117,9 @@ class _FloatingActionButton extends ConsumerWidget {
             beer: repository.objects.first,
           );
         },
-        child: SvgPicture.asset('assets/images/add.svg'),
+        child: ScalableImageWidget.fromSISource(
+          si: ScalableImageSource.fromSvg(rootBundle, 'assets/images/add.svg'),
+        ),
       );
 }
 

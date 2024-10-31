@@ -8,24 +8,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker: ^1.0.1
-  intl: ^0.18.0
-  path_provider: ^2.0.15
-  url_launcher: ^6.1.12
+  image_picker: ^1.1.2
+  intl: any
+  path_provider: ^2.1.5
+  url_launcher: ^6.3.1
   code_scan: ^0.4.10
-  ez_localization: ^1.1.0
-  uuid: ^3.0.7
-  flutter_riverpod: ^2.3.6
-  openfoodfacts: ^2.7.3
-  http: ^0.13.6
-  lottie: ^2.5.0
-  flutter_svg: ^2.0.7
+  ez_localization: ^1.1.1
+  uuid: ^4.5.1
+  flutter_riverpod: ^2.6.1
+  openfoodfacts: ^3.16.0
+  http: ^1.2.2
+  lottie: ^3.1.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  flutter_native_splash: ^2.3.1
+  flutter_native_splash: ^2.4.2
+  jovial_svg: ^1.1.23
 
 dev_dependencies:
-  flutter_lints: ^2.0.2
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true

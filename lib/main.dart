@@ -15,7 +15,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Migrator.init();
-  OpenFoodAPIConfiguration.userAgent = const UserAgent(
+  OpenFoodAPIConfiguration.userAgent = UserAgent(
     name: 'Beerstory',
     url: 'https://github.com/Skyost/Beerstory',
   );
