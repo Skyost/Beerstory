@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "fr.skyost.carpicax"
+    namespace = "fr.skyost.beerstory"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
