@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:beerstory/model/beer/beer.dart';
+import 'package:beerstory/widgets/code_scan.dart';
 import 'package:beerstory/widgets/dialogs/wait_dialog.dart';
 import 'package:beerstory/widgets/large_button.dart';
-import 'package:code_scan/code_scan.dart';
 import 'package:ez_localization/ez_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
