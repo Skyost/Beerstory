@@ -33,46 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.12.0"
-  camera:
-    dependency: "direct main"
-    description:
-      name: camera
-      sha256: "26ff41045772153f222ffffecba711a206f670f5834d40ebf5eed3811692f167"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.11.0+2"
-  camera_android_camerax:
-    dependency: transitive
-    description:
-      name: camera_android_camerax
-      sha256: e3627fdc2132d89212b8a8676679f5b07008c7e3d8ae00cea775c3397f9e742b
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.10"
-  camera_avfoundation:
-    dependency: transitive
-    description:
-      name: camera_avfoundation
-      sha256: "0d04cec8715b59fb6dc60eefb47e69024f51233c570e475b886dc9290568bca7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.9.17+4"
-  camera_platform_interface:
-    dependency: transitive
-    description:
-      name: camera_platform_interface
-      sha256: b3ede1f171532e0d83111fe0980b46d17f1aa9788a07a2fbed07366bbdbb9061
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.8.0"
-  camera_web:
-    dependency: transitive
-    description:
-      name: camera_web
-      sha256: "595f28c89d1fb62d77c73c633193755b781c6d2e0ebcd8dc25b763b514e6ba8f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.5"
   characters:
     dependency: transitive
     description:
@@ -232,22 +192,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  google_mlkit_barcode_scanning:
-    dependency: "direct main"
-    description:
-      name: google_mlkit_barcode_scanning
-      sha256: "5852d1daa007a05b33f99e3e3fa34227c49d9c41bc92a85d820666a57fd5c35f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.13.0"
-  google_mlkit_commons:
-    dependency: transitive
-    description:
-      name: google_mlkit_commons
-      sha256: "7e9a6d6e66b44aa8cfe944bda9bc3346c52486dd890ca49e5bc98845cda40d7f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.9.0"
   hive:
     dependency: "direct main"
     description:
@@ -440,6 +384,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mobile_scanner:
+    dependency: "direct main"
+    description:
+      name: mobile_scanner
+      sha256: "728828a798d1a2ee506beb652ca23d974c542c96ed03dcbd5eaf97bef96cdaad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
   openfoodfacts:
     dependency: "direct main"
     description:
@@ -581,14 +533,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  stream_transform:
-    dependency: transitive
-    description:
-      name: stream_transform
-      sha256: "14a00e794c7c11aa145a170587321aedce29769c08d7f58b1d141da75e3b1c6f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   string_scanner:
     dependency: transitive
     description:
@@ -633,10 +577,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "0dea215895a4d254401730ca0ba8204b29109a34a99fb06ae559a2b60988d2de"
+      sha256: "6fc2f56536ee873eeb867ad176ae15f304ccccc357848b351f6f0d8d4a40d193"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.13"
+    version: "6.3.14"
   url_launcher_ios:
     dependency: transitive
     description:

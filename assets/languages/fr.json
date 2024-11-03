@@ -92,7 +92,11 @@
         "empty": "Ce champ ne doit pas être vide.",
         "addBeerFirst": "Vous devez d'abord ajouter une bière dans l'application.",
         "openFoodFactsNotFound": "Impossible de trouver votre bière sur les serveurs d'OpenFoodFacts serveurs avec ce code-barre.",
-        "openFoodFactsGenericError": "Une erreur est survenue en cherchant votre bière sur OpenFoodFacts.\nVeuillez réessayer plus tard."
+        "openFoodFactsGenericError": "Une erreur est survenue en cherchant votre bière sur OpenFoodFacts.\nVeuillez réessayer plus tard.",
+        "scanControllerUninitialized": "Controlleur non initialisé.",
+        "scanPermissionDenied": "Permission refusée.",
+        "scanUnsupported": "Scan non supporté sur cet appareil.",
+        "scanGenericError": "Erreur générique."
     },
     "action": {
         "edit": "Éditer l'entrée",

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:beerstory/model/beer/beer.dart';
-import 'package:beerstory/widgets/code_scan.dart';
 import 'package:beerstory/widgets/dialogs/wait_dialog.dart';
 import 'package:beerstory/widgets/large_button.dart';
+import 'package:beerstory/widgets/scan/barcode_scanner.dart';
 import 'package:ez_localization/ez_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -39,17 +39,19 @@ class BeerBarcodeScanButton extends StatelessWidget {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (dialogContext) => CodeScanner(
-              onScan: (code, details, controller) async {
+            barrierColor: Colors.black,
+            builder: (dialogContext) => BarcodeScanner(
+              onScan: (barcodes) async {
                 Navigator.pop(dialogContext);
-                if (code == null) {
+                String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
+                if (barcode.isEmpty) {
                   return;
                 }
 
                 WaitDialog.show(context: context);
                 OpenFoodFactsLanguage? language = OpenFoodFactsLanguage.fromOffTag(EzLocalization.of(context)!.locale.languageCode);
                 ProductQueryConfiguration config = ProductQueryConfiguration(
-                  code,
+                  barcode,
                   version: ProductQueryVersion.v3,
                 );
                 ProductResultV3 result = await OpenFoodAPIClient.getProductV3(config);
@@ -90,7 +92,6 @@ class BeerBarcodeScanButton extends StatelessWidget {
                   ),
                 );
               },
-              once: true,
             ),
           );
         },

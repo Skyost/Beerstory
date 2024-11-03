@@ -92,7 +92,11 @@
         "empty": "This field should not be empty.",
         "addBeerFirst": "You must add a beer in the app first.",
         "openFoodFactsNotFound": "Cannot find your beer on OpenFoodFacts servers using this barcode.",
-        "openFoodFactsGenericError": "An error occurred while finding your beer on OpenFoodFacts.\nPlease try again later."
+        "openFoodFactsGenericError": "An error occurred while finding your beer on OpenFoodFacts.\nPlease try again later.",
+        "scanControllerUninitialized": "Controller not ready.",
+        "scanPermissionDenied": "Permission denied.",
+        "scanUnsupported": "Scanning is unsupported on this device.",
+        "scanGenericError": "Generic error."
     },
     "action": {
         "edit": "Edit entry",
