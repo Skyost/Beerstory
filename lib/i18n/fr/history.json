@@ -1,0 +1,31 @@
+{
+  "page": {
+    "name": "Historique",
+    "empty": "Rien dans votre historique pour le moment.",
+    "clearConfirm": "Voulez-vous vraiment vider votre historique ?",
+    "quantity": "$prefix$quantity cl",
+    "total": "Total :"
+  },
+  "dialog": {
+    "beer": {
+      "label": "Bière"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "hint": "Quantité (in cl)",
+      "empty": "Pas de quantité",
+      "quantities": {
+        "bottle": "Bouteille / Canette (33cl)",
+        "halfPint": "Demi-pinte (50cl)",
+        "pint": "Pinte (100cl)",
+        "custom": "Personnalisée"
+      }
+    },
+    "times": {
+      "label": "Nombre de fois bue"
+    },
+    "moreThanQuantity": {
+      "label": "Plus que la quantité affichée ?"
+    }
+  }
+}

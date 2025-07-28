@@ -1,0 +1,31 @@
+{
+  "page": {
+    "name": "History",
+    "empty": "Nothing in your history for the moment.",
+    "clearConfirm": "Are you sure you want to clear your history ?",
+    "quantity": "$prefix$quantity cl",
+    "total": "Total :"
+  },
+  "dialog": {
+    "beer": {
+      "label": "Beer"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "hint": "Quantity (in cl)",
+      "empty": "No quantity",
+      "quantities": {
+        "bottle": "Bottle / Can (33cl)",
+        "halfPint": "Half-pint (50cl)",
+        "pint": "Pint (100cl)",
+        "custom": "Custom"
+      }
+    },
+    "times": {
+      "label": "Times drunk"
+    },
+    "moreThanQuantity": {
+      "label": "More than the displayed quantity ?"
+    }
+  }
+}

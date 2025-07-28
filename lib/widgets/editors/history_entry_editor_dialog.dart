@@ -1,90 +1,71 @@
+import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/repository.dart';
-import 'package:beerstory/model/history/entry.dart';
-import 'package:beerstory/model/history/history.dart';
+import 'package:beerstory/model/history_entry/history_entry.dart';
+import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/utils/utils.dart';
-import 'package:beerstory/widgets/dialogs/beer_animation_dialog.dart';
+import 'package:beerstory/widgets/beer_animation_dialog.dart';
+import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
+import 'package:beerstory/widgets/error.dart';
 import 'package:beerstory/widgets/form_fields/checkbox.dart';
-import 'package:beerstory/widgets/form_fields/date_form_field.dart';
-import 'package:beerstory/widgets/label.dart';
-import 'package:beerstory/widgets/large_button.dart';
 import 'package:beerstory/widgets/repository/beer.dart';
-import 'package:ez_localization/ez_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 
 /// The history entry editor.
-class HistoryEntryEditorDialog extends FormDialog {
-  /// The date.
-  final DateTime date;
-
-  /// The history entry.
-  final HistoryEntry historyEntry;
-
+class HistoryEntryEditorDialog extends FormDialog<HistoryEntry> {
   /// Whether to show the "more than quantity" field.
   final bool showMoreThanQuantityField;
 
   /// The history entry internal constructor.
   const HistoryEntryEditorDialog._internal({
-    required this.date,
-    required this.historyEntry,
+    required super.object,
     required this.showMoreThanQuantityField,
   });
 
   @override
-  FormDialogState<HistoryEntryEditorDialog> createState() => _HistoryEntryEditorState();
+  FormDialogState<HistoryEntry, HistoryEntryEditorDialog> createState() => _HistoryEntryEditorState();
 
   /// Shows a history entry editor.
-  static Future<bool> show({
+  static Future<HistoryEntry?> show({
     required BuildContext context,
-    required DateTime date,
     required HistoryEntry historyEntry,
     bool? showMoreThanQuantityField,
-  }) async =>
-      (await showDialog(
+  }) =>
+      showFDialog<HistoryEntry>(
         context: context,
-        builder: (context) => HistoryEntryEditorDialog._internal(
-          date: date,
-          historyEntry: historyEntry,
+        builder: (context, style, animation) => HistoryEntryEditorDialog._internal(
+          object: historyEntry,
           showMoreThanQuantityField: showMoreThanQuantityField ?? (historyEntry.quantity != null),
         ),
-      )) ==
-      true;
+      );
 
   /// Shows a history entry editor for a new entry.
-  static Future<bool> newEntry({
+  static Future<HistoryEntry?> newEntry({
     required BuildContext context,
-    DateTime? date,
     required Beer beer,
   }) async {
-    bool result = await show(
+    HistoryEntry? historyEntry = await show(
       context: context,
-      date: date ?? DateTime.now(),
-      historyEntry: HistoryEntry(beer: beer),
+      historyEntry: HistoryEntry(beerUuid: beer.uuid),
       showMoreThanQuantityField: false,
     );
-    if (result && context.mounted) {
+    if (historyEntry != null && context.mounted) {
       await BeerAnimationDialog.show(context: context);
     }
-    return result;
+    return historyEntry;
   }
 }
 
 /// The history entry editor.
-class _HistoryEntryEditorState extends FormDialogState<HistoryEntryEditorDialog> {
-  /// The available quantities.
-  static final Map<double, String> quantities = {
-    33.0: 'historyEntryDialog.quantity.quantities.bottle',
-    50.0: 'historyEntryDialog.quantity.quantities.halfPint',
-    100.0: 'historyEntryDialog.quantity.quantities.pint',
-  };
+class _HistoryEntryEditorState extends FormDialogState<HistoryEntry, HistoryEntryEditorDialog> {
+  /// The current history entry instance.
+  late HistoryEntry historyEntry = widget.object.copyWith();
 
   /// The quantity field key.
   final GlobalKey quantityFieldKey = GlobalKey();
-
-  /// The current date.
-  late DateTime date;
 
   /// Whether to show more details.
   bool showMore = false;
@@ -93,133 +74,127 @@ class _HistoryEntryEditorState extends FormDialogState<HistoryEntryEditorDialog>
   bool showCustomQuantityField = false;
 
   @override
-  void initState() {
-    super.initState();
-    date = widget.date;
-  }
-
-  @override
   List<Widget> createChildren(BuildContext context) {
-    BeerRepository beerRepository = ref.watch(beerRepositoryProvider);
+    AsyncValue<List<Beer>> beers = ref.watch(beerRepositoryProvider);
+    if (beers.isLoading) {
+      return [
+        const CenteredCircularProgressIndicator(),
+      ];
+    }
+
+    if (beers.hasError) {
+      return [
+        ErrorWidget(
+          error: beers.error!,
+          stackTrace: beers.stackTrace,
+          onRetryPressed: () => ref.refresh(beerRepositoryProvider),
+        ),
+      ];
+    }
+
+    Map<double, String> quantities = this.quantities;
+    List<Beer> beersList = beers.value!;
     return [
       BeerImage(
-        beer: beerRepository.findByUuid(widget.historyEntry.beerUuid)!,
+        beer: beersList.findByUuid(historyEntry.beerUuid),
         radius: 100,
       ),
-      const LabelWidget(
-        icon: Icons.list,
-        textKey: 'historyEntryDialog.beer.label',
-      ),
-      DropdownButtonFormField<String>(
-        value: widget.historyEntry.beerUuid,
-        items: [
-          for (Beer beer in beerRepository.objects)
-            DropdownMenuItem<String>(
+      FSelectMenuTile<String>(
+        prefix: Icon(FIcons.list),
+        title: Text(translations.history.dialog.beer.label),
+        initialValue: historyEntry.beerUuid,
+        menu: [
+          for (Beer beer in beersList)
+            FSelectTile<String>(
               value: beer.uuid,
-              child: Text(beer.name),
+              title: Text(beer.name),
             ),
         ],
-        onChanged: (value) {},
-        onSaved: (value) => widget.historyEntry.beerUuid = value!,
+        onSaved: (value) => historyEntry = historyEntry.copyWith(beerUuid: value?.firstOrNull),
       ),
       if (showMore) ...[
-        const LabelWidget(
-          icon: Icons.local_bar,
-          textKey: 'historyEntryDialog.times.label',
+        FSelectMenuTile<int>(
+          prefix: Icon(FIcons.beer),
+          initialValue: historyEntry.times,
+          title: Text(translations.history.dialog.times.label),
+          menu: [
+            for (int i = 1; i < 11; i++)
+              FSelectTile<int>(
+                value: i,
+                title: Text(i.toString()),
+              ),
+          ],
+          onSaved: (value) => historyEntry = historyEntry.copyWith(times: value?.firstOrNull),
         ),
-        DropdownButtonFormField<int>(
-          value: widget.historyEntry.times,
-          items: List.generate(
-            10,
-                (index) => DropdownMenuItem<int>(
-              value: index + 1,
-              child: Text('${index + 1}x'),
-            ),
-          ),
-          onChanged: (value) {},
-          onSaved: (value) => widget.historyEntry.times = value!,
-        ),
-        const LabelWidget(
-          icon: Icons.local_bar,
-          textKey: 'historyEntryDialog.quantity.label',
-        ),
-        DropdownButtonFormField<double>(
+        FSelectMenuTile<double?>(
+          prefix: Icon(FIcons.beer),
+          title: Text(translations.history.dialog.quantity.label),
           key: quantityFieldKey,
-          value: widget.historyEntry.quantity == null || quantities.keys.contains(widget.historyEntry.quantity) ? widget.historyEntry.quantity : -1,
-          items: [
-            DropdownMenuItem<double>(
+          initialValue: historyEntry.quantity == null || quantities.keys.contains(historyEntry.quantity) ? historyEntry.quantity : -1,
+          menu: [
+            FSelectTile<double?>(
               value: null,
-              child: Text(context.getString('historyEntryDialog.quantity.empty')),
+              title: Text(translations.history.dialog.quantity.empty),
             ),
             for (MapEntry<double, String> quantity in quantities.entries)
-              DropdownMenuItem<double>(
+              FSelectTile<double>(
                 value: quantity.key,
-                child: Text(context.getString(quantity.value)),
+                title: Text(quantity.value),
               ),
-            DropdownMenuItem<double>(
+            FSelectTile<double>(
               value: -1,
-              child: Text(context.getString('historyEntryDialog.quantity.quantities.custom')),
+              title: Text(translations.history.dialog.quantity.quantities.custom),
             ),
           ],
-          onChanged: (value) {
-            setState(() => showCustomQuantityField = value == -1);
+          onChange: (value) {
+            double? quantity = value.firstOrNull;
+            setState(() => showCustomQuantityField = quantity == -1);
           },
           onSaved: (value) {
-            if (value != -1) {
-              widget.historyEntry.quantity = widget.historyEntry.calculateTrueQuantity(value);
+            double? quantity = value?.firstOrNull;
+            if (quantity != -1) {
+              historyEntry = historyEntry.copyWith(quantity: quantity);
             }
           },
         ),
         if (showCustomQuantityField)
-          TextFormField(
-            decoration: InputDecoration(hintText: context.getString('historyEntryDialog.quantity.hint')),
-            initialValue: widget.historyEntry.quantity != null && widget.historyEntry.quantity! > 0 ? widget.historyEntry.quantity!.toIntIfPossible().toString() : null,
+          FTextFormField(
+            hint: translations.history.dialog.quantity.hint,
+            initialText: historyEntry.quantity != null && historyEntry.quantity! > 0 ? historyEntry.quantity!.toIntIfPossible().toString() : null,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             onSaved: (value) {
-              if (widget.historyEntry.quantity == null || widget.historyEntry.quantity! >= 0) {
-                widget.historyEntry.quantity = widget.historyEntry.calculateTrueQuantity(double.tryParse(value ?? '?'));
+              if (historyEntry.quantity == null || historyEntry.quantity! >= 0) {
+                historyEntry.copyWith(quantity: historyEntry.calculateTrueQuantity(double.tryParse(value ?? '')));
               }
             },
           ),
-        DateFormField(
-          value: date,
-          buttonBuilder: (date, onPressed) => LargeButton(
-            padding: const EdgeInsets.only(top: FormDialogState.padding),
-            text: DateFormat.yMMMd(EzLocalization.of(context)?.locale.languageCode).format(date),
-            onPressed: onPressed,
-          ),
-          onSaved: (value) {
-            setState(() => date = value);
-          },
+        FDateField(
+          initialDate: historyEntry.date,
+          onSaved: (value) => historyEntry = historyEntry.copyWith(date: value),
         ),
         if (widget.showMoreThanQuantityField)
-          Padding(
-            padding: const EdgeInsets.only(top: FormDialogState.padding),
-            child: CheckboxFormField(
-              initialValue: widget.historyEntry.moreThanQuantity,
-              onSaved: (value) => widget.historyEntry.moreThanQuantity = value!,
-              child: const LabelWidget(
-                icon: Icons.add,
-                textKey: 'historyEntryDialog.moreThanQuantity.label',
-              ),
-            ),
+          CheckboxFormField(
+            initialValue: historyEntry.moreThanQuantity,
+            onSaved: (value) => historyEntry = historyEntry.copyWith(moreThanQuantity: value),
+            label: Text(translations.history.dialog.moreThanQuantity.label),
           ),
       ] else
-        LargeButton(
-          padding: const EdgeInsets.only(top: FormDialogState.padding),
-          text: context.getString('action.more'),
-          onPressed: () => setState(() {
-            showMore = true;
-          }),
+        FButton(
+          child: Text(translations.misc.more),
+          onPress: () {
+            setState(() => showMore = true);
+          },
         ),
     ];
   }
 
+  /// The available quantities.
+  Map<double, String> get quantities => {
+        33.0: translations.history.dialog.quantity.quantities.bottle,
+        50.0: translations.history.dialog.quantity.quantities.halfPint,
+        100.0: translations.history.dialog.quantity.quantities.pint,
+      };
+
   @override
-  void onSubmit() {
-    History history = ref.read(historyProvider);
-    history.removeEntry(widget.date, widget.historyEntry);
-    history.insertEntry(date, widget.historyEntry);
-    history.save();
-  }
+  HistoryEntry? onValidated() => historyEntry;
 }

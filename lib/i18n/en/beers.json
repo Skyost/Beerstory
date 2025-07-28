@@ -1,0 +1,63 @@
+{
+  "page": {
+    "name": "Beers",
+    "empty": "No beer added for the moment."
+  },
+  "dialog": {
+    "edit": "Edit beer",
+    "barcode": "Scan barcode",
+    "image": {
+      "gallery": "From photo gallery",
+      "camera": "From camera",
+      "remove": "Remove image"
+    },
+    "name": {
+      "label": "Beer name",
+      "hint": "Name"
+    },
+    "degrees": {
+      "label": "Beer degrees",
+      "hint": "Degrees"
+    },
+    "rating": {
+      "label": "Beer rating"
+    },
+    "tags": {
+      "label": "Beer tags",
+      "hint": "Enter a tag"
+    },
+    "prices": {
+      "label": "Beer prices",
+      "hint": "Price (50cl)",
+      "empty": "No price added",
+      "noBar": "No bar",
+      "add": "Add price"
+    },
+    "replace": "Do you want to replace the current beer ?",
+    "added": "Beer added with success.",
+    "found": "{element} added with success. Thanks OpenFoodFacts !"
+  },
+  "details": {
+    "title": "Details",
+    "name": {
+      "label": "Name"
+    },
+    "degrees": {
+      "label": "Degrees",
+      "empty": "No degree specified"
+    },
+    "prices": {
+      "label": "Prices",
+      "empty": "No price specified"
+    },
+    "rating": {
+      "label": "Rating",
+      "empty": "No rating specified"
+    },
+    "tags": {
+      "label": "Tags",
+      "empty": "No tag specified"
+    }
+  },
+  "deleteConfirm": "Are you sure you want to delete this beer ?"
+}

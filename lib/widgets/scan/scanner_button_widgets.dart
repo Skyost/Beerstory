@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// The button that allows to switch camera.
@@ -26,16 +27,10 @@ class SwitchCameraButton extends StatelessWidget {
             return const SizedBox.shrink();
           }
 
-          return IconButton(
-            color: Colors.white,
-            iconSize: 32.0,
-            icon: switch (state.cameraDirection) {
-              CameraFacing.front => const Icon(Icons.camera_front),
-              CameraFacing.back => const Icon(Icons.camera_rear),
-            },
-            onPressed: () async {
-              await controller.switchCamera();
-            },
+          return FButton.icon(
+            style: FButtonStyle.secondary(),
+            onPress: controller.switchCamera,
+            child: const Icon(FIcons.switchCamera),
           );
         },
       );
@@ -62,38 +57,29 @@ class ToggleFlashlightButton extends StatelessWidget {
 
           switch (state.torchState) {
             case TorchState.auto:
-              return IconButton(
-                color: Colors.white,
-                iconSize: 32.0,
-                icon: const Icon(Icons.flash_auto),
-                onPressed: () async {
-                  await controller.toggleTorch();
-                },
+              return FButton.icon(
+                style: FButtonStyle.secondary(),
+                onPress: controller.toggleTorch,
+                child: const Icon(Icons.flash_auto),
               );
             case TorchState.off:
-              return IconButton(
-                color: Colors.white,
-                iconSize: 32.0,
-                icon: const Icon(Icons.flash_off),
-                onPressed: () async {
-                  await controller.toggleTorch();
-                },
+              return FButton.icon(
+                style: FButtonStyle.secondary(),
+                onPress: controller.toggleTorch,
+                child: const Icon(Icons.flash_off),
               );
             case TorchState.on:
-              return IconButton(
-                color: Colors.white,
-                iconSize: 32.0,
-                icon: const Icon(Icons.flash_on),
-                onPressed: () async {
-                  await controller.toggleTorch();
-                },
+              return FButton.icon(
+                style: FButtonStyle.secondary(),
+                onPress: controller.toggleTorch,
+                child: const Icon(Icons.flash_on),
               );
             case TorchState.unavailable:
               return const SizedBox.square(
-                dimension: 48.0,
+                dimension: 48,
                 child: Icon(
-                  Icons.no_flash,
-                  size: 32.0,
+                  Icons.flash_off,
+                  size: 32,
                   color: Colors.grey,
                 ),
               );

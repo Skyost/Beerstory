@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 
 /// Allows to edit a rating.
 class RatingFormField extends FormField<double> {
@@ -8,13 +9,18 @@ class RatingFormField extends FormField<double> {
     super.validator,
     super.onSaved,
     super.initialValue,
+    Widget? label,
     double size = 40,
     bool readOnly = false,
   }) : super(
-          builder: (FormFieldState<double> state) => SmoothStarRating(
-            rating: state.value ?? 0,
-            size: size,
-            onRatingChanged: readOnly ? null : state.didChange,
+          builder: (FormFieldState<double> state) => FLabel(
+            label: label,
+            axis: Axis.vertical,
+            child: SmoothStarRating(
+              rating: state.value ?? 0,
+              size: size,
+              onRatingChanged: readOnly ? null : state.didChange,
+            ),
           ),
         );
 }
@@ -53,19 +59,19 @@ class SmoothStarRating extends StatelessWidget {
     if (index >= rating) {
       icon = Icon(
         defaultIconData,
-        color: borderColor ?? Theme.of(context).colorScheme.primary,
+        color: borderColor ?? context.theme.colors.primary,
         size: size,
       );
     } else if (index > rating - (allowHalfRating ? 0.5 : 1.0) && index < rating) {
       icon = Icon(
         halfFilledIconData,
-        color: color ?? Theme.of(context).colorScheme.primary,
+        color: color ?? context.theme.colors.primary,
         size: size,
       );
     } else {
       icon = Icon(
         filledIconData,
-        color: color ?? Theme.of(context).colorScheme.primary,
+        color: color ?? context.theme.colors.primary,
         size: size,
       );
     }
@@ -92,12 +98,11 @@ class SmoothStarRating extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.transparent,
-        child: Wrap(
-          alignment: WrapAlignment.start,
-          spacing: spacing,
-          children: List.generate(starCount, (index) => buildStar(context, index)),
-        ),
+  Widget build(BuildContext context) => Wrap(
+        alignment: WrapAlignment.start,
+        spacing: spacing,
+        children: [
+          for (int i = 0; i < starCount; i++) buildStar(context, i),
+        ],
       );
 }

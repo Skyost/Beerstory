@@ -1,0 +1,29 @@
+{
+  "page": {
+    "name": "Bars",
+    "empty": "No bar added for the moment."
+  },
+  "dialog": {
+    "name": {
+      "label": "Bar name",
+      "hint": "Name"
+    },
+    "address": {
+      "label": "Bar address",
+      "hint": "Address"
+    },
+    "added": "Bar added with success."
+  },
+  "deleteConfirm": "Are you sure you want to delete this bar ?",
+  "details": {
+    "title": "Details",
+    "name": {
+      "label": "Name"
+    },
+    "address": {
+      "label": "Address",
+      "empty": "No address specified"
+    },
+    "showOnMap": "Show on map"
+  }
+}

@@ -1,5 +1,6 @@
-import 'package:ez_localization/ez_localization.dart';
+import 'package:beerstory/i18n/translations.g.dart';
 import 'package:flutter/material.dart';
+import 'package:forui/assets.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// The scanner error widget.
@@ -20,16 +21,19 @@ class ScannerErrorWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: Icon(Icons.error, color: Colors.white),
+                child: Icon(
+                  FIcons.circleAlert,
+                  color: Colors.white,
+                ),
               ),
               Text(
                 switch (error.errorCode) {
-                  MobileScannerErrorCode.controllerUninitialized => context.getString('error.scanControllerUninitialized'),
-                  MobileScannerErrorCode.permissionDenied => context.getString('scanPermissionDenied'),
-                  MobileScannerErrorCode.unsupported => context.getString('scanUnsupported'),
-                  _ => context.getString('scanGenericError'),
+                  MobileScannerErrorCode.controllerUninitialized => translations.error.scan.controllerUninitialized,
+                  MobileScannerErrorCode.permissionDenied => translations.error.scan.permissionDenied,
+                  MobileScannerErrorCode.unsupported => translations.error.scan.unsupported,
+                  _ => translations.error.scan.genericError,
                 },
                 style: const TextStyle(color: Colors.white),
               ),

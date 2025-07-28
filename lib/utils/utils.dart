@@ -1,25 +1,13 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Allows to check if a string is numeric.
-extension Numeric on String {
+extension StringUtils on String {
   /// Checks whether the current string is numeric.
   bool get isNumeric => double.tryParse(this) != null;
-}
 
-/// Allows to move a file.
-extension Move on File {
-  /// Moves this file to another path.
-  Future<File> move(String to) async {
-    try {
-      return await rename(to);
-    } on FileSystemException catch (_) {
-      final newFile = await copy(to);
-      await delete();
-      return newFile;
-    }
-  }
+  /// Checks whether the current string is empty, and if so, returns a `null` object.
+  String? get nullIfEmpty => trim().isEmpty ? null : trim();
 }
 
 /// Allows to get the dark variant of the primary color of the current color scheme.
@@ -47,3 +35,21 @@ extension IterableUtils<T> on Iterable<T> {
     return null;
   }
 }
+
+/// Contains some useful date time methods.
+extension DateTimeUtils on DateTime {
+  /// Returns the date without the time.
+  DateTime withoutTime() => DateTime(year, month, day);
+}
+
+/// Prints an error.
+void printError(Object error, StackTrace? stackTrace) {
+  if (kDebugMode) {
+    print(error);
+    if (stackTrace != null) {
+      print(stackTrace);
+    }
+  }
+}
+/// Allows to check if a type is a subtype of another.
+bool isSubtype<S, T>() => <S>[] is List<T>;

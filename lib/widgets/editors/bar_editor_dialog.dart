@@ -1,75 +1,78 @@
+import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/bar/bar.dart';
-import 'package:beerstory/model/bar/repository.dart';
+import 'package:beerstory/spacing.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
-import 'package:beerstory/widgets/label.dart';
-import 'package:ez_localization/ez_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 
 /// The bar editor.
-class BarEditorDialog extends FormDialog {
-  /// The bar.
-  final Bar bar;
-
+class BarEditorDialog extends FormDialog<Bar> {
   /// The bar editor internal constructor.
-  const BarEditorDialog._internal({
-    required this.bar,
+  const BarEditorDialog._({
+    required super.object,
+    super.animation,
+    super.style,
   });
 
   @override
-  FormDialogState<BarEditorDialog> createState() => _BarEditorDialogState();
+  FormDialogState<Bar, BarEditorDialog> createState() => _BarEditorDialogState();
 
   /// Shows a bar editor.
-  static Future<bool> show({
+  static Future<Bar?> show({
     required BuildContext context,
     Bar? bar,
-  }) async =>
-      (await showDialog(
+  }) =>
+      showFDialog<Bar>(
         context: context,
-        builder: (context) => BarEditorDialog._internal(
-          bar: bar ?? Bar(name: ''),
+        builder: (context, style, animation) => BarEditorDialog._(
+          object: bar ?? Bar(),
+          style: style.call,
+          animation: animation,
         ),
-      )) ==
-      true;
+      );
 }
 
 /// The bar editor state.
-class _BarEditorDialogState extends FormDialogState<BarEditorDialog> {
+class _BarEditorDialogState extends FormDialogState<Bar, BarEditorDialog> {
+  /// The current bar instance.
+  late Bar bar = widget.object.copyWith();
+
   @override
   List<Widget> createChildren(BuildContext context) => [
-        const LabelWidget(
-          icon: Icons.edit,
-          textKey: 'barDialog.name.label',
+        Padding(
+          padding: const EdgeInsets.only(bottom: kSpace),
+          child: FTextFormField(
+            label: Text(translations.bars.dialog.name.label),
+            initialText: widget.object.name,
+            hint: translations.bars.dialog.name.hint,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return translations.error.empty;
+              }
+              return null;
+            },
+            onSaved: (value) => bar = bar.copyWith(
+              name: value?.trim(),
+            ),
+          ),
         ),
-        TextFormField(
-          decoration: InputDecoration(hintText: context.getString('barDialog.name.hint')),
-          initialValue: widget.bar.name,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return context.getString('error.empty');
-            }
-            return null;
-          },
-          onSaved: (value) => widget.bar.name = value ?? '?',
+        Padding(
+          padding: const EdgeInsets.only(bottom: kSpace * 2),
+          child: FTextFormField(
+            label: Text(translations.bars.dialog.address.label),
+            initialText: widget.object.address,
+            hint: translations.bars.dialog.address.hint,
+            minLines: 1,
+            maxLines: 2,
+            onSaved: (value) => bar = bar.overwriteAddress(
+              address: value?.nullIfEmpty,
+            ),
+          ),
         ),
-        const LabelWidget(
-          icon: Icons.near_me,
-          textKey: 'barDialog.address.label',
-        ),
-        TextFormField(
-          decoration: InputDecoration(hintText: context.getString('barDialog.address.hint')),
-          initialValue: widget.bar.address,
-          minLines: 1,
-          maxLines: 2,
-          onSaved: (value) => widget.bar.address = value,
-        ),
+        // TODO edit prices button,
       ];
 
   @override
-  void onSubmit() {
-    BarRepository barRepository = ref.read(barRepositoryProvider);
-    if (!barRepository.has(widget.bar)) {
-      barRepository.add(widget.bar);
-    }
-    barRepository.save();
-  }
+  Bar? onValidated() => bar;
 }

@@ -1,64 +1,89 @@
 import 'package:beerstory/model/repository.dart';
-import 'package:beerstory/model/repository_object.dart';
+import 'package:beerstory/pages/history.dart';
 import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
-import 'package:beerstory/widgets/centered_message.dart';
-import 'package:beerstory/widgets/order/ordered_list_view.dart';
-import 'package:flutter/material.dart';
+import 'package:beerstory/widgets/empty.dart';
+import 'package:beerstory/widgets/error.dart';
+import 'package:beerstory/widgets/ordered_list_view.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 
 /// Represents an app page.
-abstract class Page<T extends RepositoryObject> extends ConsumerWidget {
+abstract class PageWidget<T extends RepositoryObject, R extends Repository<T>> extends ConsumerWidget {
   /// The page icon.
   final IconData icon;
 
   /// The page title.
-  final String titleKey;
+  final String title;
 
   /// The empty message.
-  final String emptyMessageKey;
+  final String emptyMessage;
 
-  /// The actions.
-  final List<Widget> actions;
+  /// The prefixes.
+  final List<Widget> prefixes;
 
-  /// Whether to show the search box.
-  final bool searchBox;
+  /// The suffixes.
+  final List<Widget> suffixes;
 
   /// Whether to order the list in reverse order.
   final bool reverseOrder;
 
   /// Creates a new page instance.
-  const Page({
+  const PageWidget({
     super.key,
     required this.icon,
-    required this.titleKey,
-    required this.emptyMessageKey,
-    required this.actions,
-    this.searchBox = true,
+    required this.title,
+    required this.emptyMessage,
+    this.prefixes = const [],
+    this.suffixes = const [],
     this.reverseOrder = false,
   });
 
-  /// Allows to watch the corresponding repository.
-  Repository<T> watchRepository(WidgetRef ref);
+  /// The corresponding repository provider.
+  AsyncNotifierProvider<R, List<T>> get repositoryProvider;
 
   /// Allows to create an object widget.
   Widget createObjectWidget(T object, int position);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Repository<T> repository = watchRepository(ref);
-    if (!repository.isInitialized) {
+    AsyncValue<List<T>> objects = ref.watch(repositoryProvider);
+    if (objects.isLoading) {
       return const CenteredCircularProgressIndicator();
     }
 
-    if (repository.isEmpty) {
-      return CenteredMessage(textKey: emptyMessageKey);
+    if (objects.hasError) {
+      return ErrorWidget(
+        error: objects.error!,
+        stackTrace: objects.stackTrace,
+        onRetryPressed: () => ref.refresh(repositoryProvider),
+      );
+    }
+
+    if (objects.value!.isEmpty) {
+      return Center(
+        child: EmptyWidget(text: emptyMessage),
+      );
     }
 
     return OrderedListView<T>(
-      items: repository.objects.toList(),
+      items: objects.value!,
       itemBuilder: (objects, position) => createObjectWidget(objects[position], position),
-      searchBox: searchBox,
       reverseOrder: reverseOrder,
     );
   }
+}
+
+/// A simple history button.
+class HistoryButton extends StatelessWidget {
+  /// Creates a new history button instance.
+  const HistoryButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => FHeaderAction(
+        icon: const Icon(FIcons.history),
+        onPress: () => Navigator.pushNamed(context, HistoryPage.page),
+      );
 }

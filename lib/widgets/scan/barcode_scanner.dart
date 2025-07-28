@@ -35,7 +35,7 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
             fit: BoxFit.contain,
             controller: controller,
             // scanWindow: scanWindow,
-            errorBuilder: (context, error, child) => ScannerErrorWidget(error: error),
+            errorBuilder: (context, error) => ScannerErrorWidget(error: error),
           ),
         ),
         Align(

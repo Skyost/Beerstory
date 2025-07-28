@@ -1,18 +1,15 @@
 import 'package:beerstory/model/bar/bar.dart';
+import 'package:beerstory/model/bar/database.dart';
 import 'package:beerstory/model/repository.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The bar repository provider.
-final barRepositoryProvider = ChangeNotifierProvider<BarRepository>((ref) => BarRepository()..init());
+final barRepositoryProvider = AsyncNotifierProvider<BarRepository, List<Bar>>(BarRepository.new);
 
 /// The repository that handles bars.
 class BarRepository extends Repository<Bar> {
-  /// Creates a new bar repository instance.
-  BarRepository()
-      : super(
-          file: 'bars',
-        );
-
   @override
-  Bar createObjectFromJson(Map<String, dynamic> jsonData) => Bar.fromJson(jsonData);
+  @protected
+  AutoDisposeProvider<RepositoryDatabase<Bar>> get databaseProvider => barsDatabaseProvider;
 }

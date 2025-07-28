@@ -1,9 +1,11 @@
-import 'package:beerstory/widgets/choice_dialog.dart';
+import 'package:beerstory/model/repository.dart';
+import 'package:beerstory/widgets/scrollable_sheet_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 
 /// A repository object widget.
-abstract class RepositoryObjectWidget extends ConsumerWidget {
+abstract class RepositoryObjectWidget<T extends RepositoryObject> extends ConsumerWidget {
   /// The background color.
   final Color? backgroundColor;
 
@@ -13,58 +15,46 @@ abstract class RepositoryObjectWidget extends ConsumerWidget {
   /// Whether to add click listeners.
   final bool addClickListeners;
 
+  /// The object.
+  final T object;
+
   /// Creates a new app widget instance.
   const RepositoryObjectWidget({
     super.key,
     this.backgroundColor,
     this.padding = const EdgeInsets.all(20),
     this.addClickListeners = true,
+    required this.object,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    Widget container = Container(
-      padding: padding,
-      color: backgroundColor,
-      child: buildContent(context, ref),
-    );
+  Widget build(BuildContext context, WidgetRef ref) => FTile(
+        prefix: buildPrefix(context),
+        suffix: buildSuffix(context),
+        title: buildTitle(context),
+        subtitle: buildSubtitle(context),
+        onPress: () => showFSheet(
+          context: context,
+          builder: (context) => ScrollableSheetContentWidget(
+            builder: buildDetailsWidget,
+          ),
+          side: FLayout.btt,
+          mainAxisMaxRatio: null,
+        ),
+      );
 
-    if (!addClickListeners) {
-      return container;
-    }
+  /// Builds the prefix widget.
+  Widget? buildPrefix(BuildContext context) => null;
 
-    return InkWell(
-      onLongPress: () => onLongPress(context, ref),
-      onTap: () => onTap(context, ref),
-      child: container,
-    );
-  }
+  /// Builds the suffix widget.
+  Widget? buildSuffix(BuildContext context) => null;
 
-  /// Builds the widget content.
-  Widget buildContent(BuildContext context, WidgetRef ref);
+  /// Builds the widget title.
+  Widget buildTitle(BuildContext context) => SizedBox.shrink();
 
-  /// On long press listener.
-  void onLongPress(BuildContext context, WidgetRef ref) => ChoiceDialog(
-    choices: [
-      Choice(
-        text: 'action.edit',
-        icon: Icons.edit,
-        callback: () => onEdit(context, ref),
-      ),
-      Choice(
-        text: 'action.delete',
-        icon: Icons.delete,
-        callback: () => onDelete(context, ref),
-      ),
-    ],
-  ).show(context);
+  /// Builds the widget subtitle.
+  Widget? buildSubtitle(BuildContext context) => null;
 
-  /// On tap listener.
-  void onTap(BuildContext context, WidgetRef ref) {}
-
-  /// On tap listener.
-  void onEdit(BuildContext context, WidgetRef ref);
-
-  /// On tap listener.
-  void onDelete(BuildContext context, WidgetRef ref);
+  /// Allows to show more details about the [object].
+  Widget buildDetailsWidget(BuildContext context, ScrollController scrollController);
 }

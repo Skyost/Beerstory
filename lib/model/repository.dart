@@ -1,100 +1,145 @@
-import 'dart:convert';
+import 'dart:async';
 
-import 'package:beerstory/model/repository_object.dart';
-import 'package:beerstory/model/storage/storage.dart';
-import 'package:flutter/material.dart';
+import 'package:beerstory/utils/utils.dart';
+import 'package:drift/drift.dart';
+import 'package:flutter/material.dart' hide Table;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
-/// A simple repository.
-abstract class Repository<T extends RepositoryObject> with ChangeNotifier {
-  /// The storage object.
-  @protected
-  final Storage storage = Storage();
+/// An object that can be stored in a database.
+abstract class RepositoryObject {
+  /// The object UUID.
+  final String uuid;
 
-  /// The repository file.
-  final String file;
+  /// Creates a new repository object instance.
+  RepositoryObject({
+    String? uuid,
+  }) : uuid = uuid ?? Uuid().v4();
 
-  /// The repository data.
-  final Map<String, T> _data = {};
-
-  /// Whether this repository has been initialized.
-  bool _isInitialized = false;
-
-  /// Creates a new repository instance.
-  Repository({
-    required this.file,
-  });
-
-  /// Initializes this repository.
-  Future<void> init() async {
-    if (await storage.fileExists(file)) {
-      Map objects = jsonDecode(await storage.readFile(file));
-      for (MapEntry object in objects.entries) {
-        T result = createObjectFromJson(object.value);
-        add(result, notify: false);
-      }
-    } else {
-      await save();
+  @override
+  bool operator ==(Object other) {
+    if (other is! RepositoryObject) {
+      return super == other;
     }
-    _isInitialized = true;
-    notifyListeners();
+    return identical(this, other) || uuid == other.uuid;
   }
 
-  /// Saves this repository.
-  Future<void> save() async => await storage.saveFile(file, jsonEncode(_data));
+  @override
+  int get hashCode => uuid.hashCode;
+
+  /// Creates a copy of this object.
+  RepositoryObject copyWith();
+}
+
+/// A database, required to store objects.
+mixin RepositoryDatabase<O extends RepositoryObject> {
+  /// Lists the objects.
+  FutureOr<List<O>> list({int? limit});
+
+  /// Adds the specified object.
+  FutureOr<void> add(O object);
+
+  /// Updates the specified object.
+  FutureOr<void> change(O object);
+
+  /// Removes the specified object.
+  FutureOr<void> remove(O object);
+
+  /// Clears all objects from the database.
+  FutureOr<void> clear();
+}
+
+/// Utility mixin to use the [RepositoryDatabase] interface with [GeneratedDatabase].
+mixin GeneratedRepositoryDatabase<O extends RepositoryObject, I extends DataClass, T extends Table> on RepositoryDatabase<O>, GeneratedDatabase {
+  /// The associated table.
+  @protected
+  TableInfo<T, I> get table;
+
+  @override
+  FutureOr<List<O>> list({int? limit}) async {
+    SimpleSelectStatement<T, I> query = select(table);
+    if (limit != null) {
+      query = query..limit(limit);
+    }
+    return (await query.get()).map(toObject).toList();
+  }
+
+  @override
+  FutureOr<void> add(O object) async {
+    Insertable<I> insertable = toInsertable(object);
+    await into(table).insert(insertable);
+  }
+
+  @override
+  FutureOr<void> change(O object) async {
+    Insertable<I> insertable = toInsertable(object);
+    await update(table).replace(insertable);
+  }
+
+  @override
+  FutureOr<void> remove(O object) async {
+    Insertable<I> insertable = toInsertable(object);
+    await delete(table).delete(insertable);
+  }
+
+  @override
+  FutureOr<void> clear() async {
+    await delete(table).go();
+  }
+
+  /// Converts the specified [object] to an [Insertable].
+  Insertable<I> toInsertable(O object);
+
+  /// Converts the specified [I] to an [O].
+  O toObject(I insertable);
+}
+
+/// A simple repository.
+abstract class Repository<T extends RepositoryObject> extends AsyncNotifier<List<T>> {
+  @override
+  FutureOr<List<T>> build() async {
+    RepositoryDatabase<T> database = ref.watch(databaseProvider);
+    return await database.list()
+      ..sort();
+  }
 
   /// Adds the specified object to this repository.
-  void add(T object, { bool notify = true }) {
-    object.addListener(notifyListeners);
-    _data[object.uuid] = object;
-    if (notify) {
-      notifyListeners();
-    }
+  Future<void> add(T object) async {
+    await ref.read(databaseProvider).add(object);
+    List<T> newState = [...(await future), object]..sort();
+    state = AsyncData(newState);
+  }
+
+  /// Updates the specified object in this repository.
+  Future<void> change(T object) async {
+    await ref.read(databaseProvider).change(object);
+    List<T> newState = [
+      for (T item in await future)
+        if (item.uuid == object.uuid) object else item,
+    ]..sort();
+    state = AsyncData(newState);
   }
 
   /// Removes the specified object from this repository.
-  void remove(T object, { bool notify = true }) {
-    object.removeListener(notifyListeners);
-    _data.remove(object.uuid);
-    if (notify) {
-      notifyListeners();
-    }
+  Future<void> remove(T object) async {
+    await ref.read(databaseProvider).remove(object);
+    List<T> newState = List.of(await future)..remove(object);
+    state = AsyncData(newState);
   }
 
   /// Clears this repository.
-  void clear({ bool notify = true }) {
-    _data.clear();
-    if (notify) {
-      notifyListeners();
-    }
+  Future<void> clear({bool notify = true}) async {
+    await ref.read(databaseProvider).clear();
+    state = AsyncData([]);
   }
 
-  /// Returns whether this object is contained inside this repository.
-  bool has(T object) => hasUuid(object.uuid);
-
-  /// Returns whether this UUID is contained inside this repository.
-  bool hasUuid(String uuid) => _data.containsKey(uuid);
-
-  /// Finds an object by its UUID.
-  T? findByUuid(String uuid) => _data[uuid];
-
-  /// Returns the handled objects.
-  List<T> get objects => _data.values.toList();
-
-  /// Returns whether this repository is empty.
-  bool get isEmpty => _data.isEmpty;
-
-  /// Returns whether this repository has been initialized.
-  bool get isInitialized => _isInitialized;
-
-  /// Reads a [T] from JSON data.
+  /// The database provider.
   @protected
-  T createObjectFromJson(Map<String, dynamic> jsonData);
+  AutoDisposeProvider<RepositoryDatabase<T>> get databaseProvider;
+}
 
-  @override
-  void dispose() {
-    for (T object in _data.values) {
-      object.dispose();
-    }
-    super.dispose();
-  }
+/// Some useful methods to use alongside objects list.
+extension ByUuid<T extends RepositoryObject> on List<T> {
+  /// Returns the first object with the given uuid.
+  T? findByUuid(String uuid) => firstWhereOrNull((object) => object.uuid == uuid);
 }

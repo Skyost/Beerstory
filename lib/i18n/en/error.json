@@ -1,0 +1,24 @@
+{
+  "empty": "This field should not be empty.",
+  "addBeerFirst": "You must add a beer in the app first.",
+  "openFoodFacts": {
+    "notFound": "Cannot find your beer on OpenFoodFacts servers using this barcode.",
+    "genericError": "An error occurred while finding your beer on OpenFoodFacts.\nPlease try again later."
+  },
+  "scan": {
+    "controllerUninitialized": "Controller not ready.",
+    "permissionDenied": "Permission denied.",
+    "unsupported": "Scanning is unsupported on this device.",
+    "genericError": "Generic error."
+  },
+  "widget": {
+    "title": "Error",
+    "subtitle": "An error occurred : $error.",
+    "button": {
+      "showTrace": "Show trace",
+      "hideTrace": "Hide trace",
+      "report": "Report",
+      "retry": "Retry"
+    }
+  }
+}

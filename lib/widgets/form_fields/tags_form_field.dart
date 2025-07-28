@@ -1,5 +1,6 @@
-import 'package:beerstory/widgets/tag.dart';
+import 'package:beerstory/spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 
 /// Allows to edit a list of tags.
 class TagsFormField extends FormField<List<String>> {
@@ -11,6 +12,9 @@ class TagsFormField extends FormField<List<String>> {
     super.initialValue,
     bool addAddForm = true,
     String? addFormHint,
+    TextEditingController? addFormController,
+    FocusNode? addFormFocusNode,
+    Widget? label,
     Widget? emptyWidget,
     IconData? tagDeleteIcon,
   }) : super(
@@ -18,42 +22,58 @@ class TagsFormField extends FormField<List<String>> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (addAddForm)
-                TextFormField(
-                  decoration: InputDecoration(hintText: addFormHint),
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (value) => state.didChange((state.value ?? [])..add(value)),
+                Padding(
+                  padding: EdgeInsets.only(bottom: kSpace / 2),
+                  child: FTextFormField(
+                    focusNode: addFormFocusNode,
+                    label: label,
+                    hint: addFormHint,
+                    textInputAction: TextInputAction.send,
+                    controller: addFormController,
+                    onSubmit: (value) {
+                      state.didChange(List.of(state.value ?? [])..add(value));
+                      addFormController?.clear();
+                      addFormFocusNode?.requestFocus();
+                    },
+                  ),
                 ),
               if (state.value == null || state.value!.isEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: addAddForm ? 10 : 0),
+                  padding: EdgeInsets.only(bottom: kSpace / 2),
                   child: emptyWidget ?? const SizedBox.shrink(),
                 )
               else
-                Container(
-                  width: MediaQuery.of(state.context).size.width,
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: [
-                      for (String tag in state.value ?? [])
-                        TagWidget(
-                          text: tag,
-                          right: tagDeleteIcon == null
-                              ? null
-                              : Padding(
-                                  padding: const EdgeInsets.only(left: 6),
-                                  child: GestureDetector(
-                                    onTap: () => state.didChange(state.value?..remove(tag)),
-                                    child: Icon(
-                                      tagDeleteIcon,
-                                      size: 20,
-                                      color: Colors.white,
+                FLabel(
+                  label: addAddForm ? null : label,
+                  axis: Axis.horizontal,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Wrap(
+                      spacing: kSpace / 2,
+                      runSpacing: kSpace / 2,
+                      children: [
+                        for (String tag in state.value ?? [])
+                          FBadge(
+                            child: Row(
+                              children: [
+                                Text(tag),
+                                if (tagDeleteIcon != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6),
+                                    child: GestureDetector(
+                                      onTap: () => state.didChange(state.value?..remove(tag)),
+                                      child: Icon(
+                                        tagDeleteIcon,
+                                        size: 20,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
-                                ),
-                        ),
-                    ],
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
             ],
