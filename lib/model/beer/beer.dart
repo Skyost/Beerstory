@@ -7,8 +7,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
 /// Represents a beer.
-class Beer extends RepositoryObject with Searchable implements Comparable<Beer> {
-  /// The beer name.
+class Beer extends RepositoryObject with HasName, Searchable implements Comparable<Beer> {
+  @override
   final String name;
 
   /// The beer image.

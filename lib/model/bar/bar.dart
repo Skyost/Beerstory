@@ -3,8 +3,8 @@ import 'package:beerstory/utils/compare_fields.dart';
 import 'package:beerstory/utils/searchable.dart';
 
 /// Represents a bar.
-class Bar extends RepositoryObject with Searchable implements Comparable<Bar> {
-  /// The bar name.
+class Bar extends RepositoryObject with HasName, Searchable implements Comparable<Bar> {
+  @override
   final String name;
 
   /// The bar address.

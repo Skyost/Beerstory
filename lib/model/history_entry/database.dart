@@ -13,7 +13,7 @@ part 'database.g.dart';
 @DataClassName('DriftHistoryEntry')
 class HistoryEntries extends Table {
   /// The history entry entry uuid.
-  TextColumn get uuid => text().clientDefault(() => Uuid().v4())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
 
   /// The history entry entry date.
   DateTimeColumn get date => dateTime().withDefault(currentDate)();

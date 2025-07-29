@@ -1,21 +1,12 @@
 import 'package:beerstory/model/repository.dart';
-import 'package:beerstory/pages/history.dart';
 import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
 import 'package:beerstory/widgets/empty.dart';
 import 'package:beerstory/widgets/error.dart';
-import 'package:beerstory/widgets/ordered_list_view.dart';
 import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:forui/forui.dart';
 
 /// Represents an app page.
-abstract class PageWidget<T extends RepositoryObject, R extends Repository<T>> extends ConsumerWidget {
-  /// The page icon.
-  final IconData icon;
-
-  /// The page title.
-  final String title;
-
+abstract class ScaffoldBodyWidget<T extends RepositoryObject, R extends Repository<T>> extends ConsumerWidget {
   /// The empty message.
   final String emptyMessage;
 
@@ -29,10 +20,8 @@ abstract class PageWidget<T extends RepositoryObject, R extends Repository<T>> e
   final bool reverseOrder;
 
   /// Creates a new page instance.
-  const PageWidget({
+  const ScaffoldBodyWidget({
     super.key,
-    required this.icon,
-    required this.title,
     required this.emptyMessage,
     this.prefixes = const [],
     this.suffixes = const [],
@@ -42,8 +31,8 @@ abstract class PageWidget<T extends RepositoryObject, R extends Repository<T>> e
   /// The corresponding repository provider.
   AsyncNotifierProvider<R, List<T>> get repositoryProvider;
 
-  /// Allows to create an object widget.
-  Widget createObjectWidget(T object, int position);
+  /// Builds the body widget (typically, a list view).
+  Widget buildBodyWidget(WidgetRef ref, List<T> object);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,24 +55,6 @@ abstract class PageWidget<T extends RepositoryObject, R extends Repository<T>> e
       );
     }
 
-    return OrderedListView<T>(
-      items: objects.value!,
-      itemBuilder: (objects, position) => createObjectWidget(objects[position], position),
-      reverseOrder: reverseOrder,
-    );
+    return buildBodyWidget(ref, objects.value!);
   }
-}
-
-/// A simple history button.
-class HistoryButton extends StatelessWidget {
-  /// Creates a new history button instance.
-  const HistoryButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) => FHeaderAction(
-        icon: const Icon(FIcons.history),
-        onPress: () => Navigator.pushNamed(context, HistoryPage.page),
-      );
 }

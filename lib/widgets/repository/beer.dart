@@ -9,10 +9,14 @@ import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/adaptive.dart';
 import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
-import 'package:beerstory/widgets/editors/beer_editor_dialog.dart';
-import 'package:beerstory/widgets/form_fields/rating_form_field.dart';
+import 'package:beerstory/widgets/editors/beer_edit.dart';
+import 'package:beerstory/widgets/form_fields/beer_image.dart';
+import 'package:beerstory/widgets/form_fields/rating.dart';
+import 'package:beerstory/widgets/repository/beer_prices.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
+import 'package:beerstory/widgets/scrollable_sheet_content.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -24,8 +28,6 @@ class BeerWidget extends RepositoryObjectWidget<Beer> {
   const BeerWidget({
     super.key,
     required super.object,
-    super.padding,
-    super.addClickListeners,
   });
 
   @override
@@ -33,80 +35,82 @@ class BeerWidget extends RepositoryObjectWidget<Beer> {
 
   @override
   Widget buildPrefix(BuildContext context) => BeerImage(
-        beer: object,
-        radius: context.theme.style.iconStyle.size,
-      );
+    beer: object,
+    radius: context.theme.style.iconStyle.size,
+  );
 
   @override
-  Widget buildSuffix(BuildContext context) => _BeerDegrees(
-        beer: object,
-        inBadge: true,
-      );
+  Widget? buildSuffix(BuildContext context) => BeerDegrees(
+    beer: object,
+    inBadge: true,
+  );
 
   @override
   Widget? buildSubtitle(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _BeerPrices(
-            beer: object,
-            showEmptyMessage: false,
-          ),
-          _BeerRating(
-            beer: object,
-            showEmptyMessage: false,
-          ),
-          _BeerTags(
-            beer: object,
-            showEmptyMessage: false,
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    spacing: 2,
+    children: [
+      _BeerPrices(
+        beer: object,
+        showEmptyMessage: false,
+      ),
+      _BeerRating(
+        beer: object,
+        showEmptyMessage: false,
+        size: 20,
+      ),
+      _BeerTags(
+        beer: object,
+        showEmptyMessage: false,
+      ),
+    ],
+  );
 
   @override
-  Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => BeerDetailsWidget(
-        beerUuid: object.uuid,
-        scrollController: scrollController,
+  Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => _BeerDetailsWidget(
+    beerUuid: object.uuid,
+    scrollController: scrollController,
+    onBeerPricesPress: () {
+      showFSheet(
+        context: context,
+        builder: (context) => ScrollableSheetContentWidget(
+          builder: (context, scrollController) => PricesDetailsWidget.create<Beer>(
+            scrollController: scrollController,
+            objectUuid: object.uuid,
+          ),
+        ),
+        side: FLayout.btt,
+        mainAxisMaxRatio: null,
       );
+    },
+  );
 }
 
 /// Allows to show a beer details.
-class BeerDetailsWidget extends ConsumerWidget {
+class _BeerDetailsWidget extends ConsumerWidget {
   /// The beer UUID.
   final String beerUuid;
 
   /// The scroll controller.
   final ScrollController? scrollController;
 
+  /// The beer prices press callback.
+  final VoidCallback? onBeerPricesPress;
+
   /// Creates a new beer details widget instance.
-  const BeerDetailsWidget({
-    super.key,
+  const _BeerDetailsWidget({
     required this.beerUuid,
     this.scrollController,
+    this.onBeerPricesPress,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Beer? beer = ref.watch(beerRepositoryProvider.select((bars) => bars.value?.findByUuid(beerUuid)));
     if (beer == null) {
-      return CenteredCircularProgressIndicator();
+      return const CenteredCircularProgressIndicator();
     }
     List<FButton> actions = [
-      FButton(
-        // style: FButtonStyle.secondary(),
-        onPress: () async {
-          Beer? editedBeer = await BeerEditorDialog.show(
-            context: context,
-            beer: beer,
-          );
-          if (editedBeer != null && context.mounted) {
-            await showWaitingOverlay(
-              context,
-              future: ref.read(beerRepositoryProvider.notifier).change(editedBeer),
-            );
-          }
-        },
-        child: Text(translations.misc.edit),
-      ),
       FButton(
         style: FButtonStyle.destructive(),
         child: Text(translations.misc.delete),
@@ -115,14 +119,25 @@ class BeerDetailsWidget extends ConsumerWidget {
             ref.read(beerRepositoryProvider.notifier).remove(beer);
           }
         },
-      )
+      ),
     ];
     return ListView(
       controller: scrollController,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: kSpace),
-          child: BeerImage(beer: beer),
+          child: Center(
+            child: BeerImageFormField(
+              initialValue: beer.image,
+              beerUuid: beer.uuid,
+              beerName: beer.name,
+              onChanged: (newImage) async {
+                if (context.mounted && newImage != beer.image) {
+                  await editBeer(context, ref, beer.overwriteImage(image: newImage));
+                }
+              },
+            ),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: kSpace * 2),
@@ -130,35 +145,85 @@ class BeerDetailsWidget extends ConsumerWidget {
             label: Text(translations.beers.details.title),
             children: [
               FTile(
-                prefix: Icon(FIcons.pencil),
+                prefix: const Icon(FIcons.pencil),
                 title: Text(translations.beers.details.name.label),
                 subtitle: _BeerTitle(beer: beer),
+                suffix: const Icon(FIcons.chevronRight),
+                onPress: () async {
+                  String? newName = await BeerNameEditorDialog.show(
+                    context: context,
+                    beerName: beer.name,
+                  );
+                  if (newName != null && newName != beer.name && context.mounted) {
+                    await editBeer(context, ref, beer.copyWith(name: newName));
+                  }
+                },
               ),
               FTile(
-                prefix: Icon(FIcons.thermometer),
+                prefix: const Icon(FIcons.thermometer),
                 title: Text(translations.beers.details.degrees.label),
-                subtitle: _BeerDegrees(beer: beer),
+                subtitle: BeerDegrees(beer: beer),
+                suffix: const Icon(FIcons.chevronRight),
+                onPress: () async {
+                  double? newDegrees = await BeerDegreesEditorDialog.show(
+                    context: context,
+                    beerDegrees: beer.degrees,
+                  );
+                  if (newDegrees != null && newDegrees != beer.degrees && context.mounted) {
+                    await editBeer(context, ref, beer.overwriteDegrees(degrees: newDegrees));
+                  }
+                },
               ),
               FTile(
-                prefix: Icon(FIcons.star),
+                prefix: const Icon(FIcons.star),
                 title: Text(translations.beers.details.rating.label),
                 subtitle: _BeerRating(beer: beer),
+                suffix: const Icon(FIcons.chevronRight),
+                onPress: () async {
+                  double? newRating = await BeerRatingEditorDialog.show(
+                    context: context,
+                    beerRating: beer.rating,
+                  );
+                  if (newRating != null && newRating != beer.rating && context.mounted) {
+                    await editBeer(context, ref, beer.overwriteRating(rating: newRating));
+                  }
+                },
               ),
               FTile(
-                prefix: Icon(FIcons.tag),
+                prefix: const Icon(FIcons.tag),
                 title: Text(translations.beers.details.tags.label),
                 subtitle: _BeerTags(beer: beer),
+                suffix: const Icon(FIcons.chevronRight),
+                onPress: () async {
+                  List<String>? newTags = await BeerTagsEditorDialog.show(
+                    context: context,
+                    beerTags: beer.tags,
+                  );
+                  if (newTags != null && !listEquals(newTags, beer.tags) && context.mounted) {
+                    await editBeer(context, ref, beer.copyWith(tags: newTags));
+                  }
+                },
               ),
               FTile(
-                prefix: Icon(FIcons.beer),
+                prefix: const Icon(FIcons.beer),
                 title: Text(translations.beers.details.prices.label),
                 subtitle: _BeerPrices(beer: beer),
+                suffix: const Icon(FIcons.chevronRight),
+                onPress: onBeerPricesPress,
               ),
             ],
           ),
         ),
         actions.adaptiveWrapper,
       ],
+    );
+  }
+
+  /// Edits a given beer and shows a waiting overlay.
+  Future<void> editBeer(BuildContext context, WidgetRef ref, Beer editedBeer) async {
+    await showWaitingOverlay(
+      context,
+      future: ref.read(beerRepositoryProvider.notifier).change(editedBeer),
     );
   }
 
@@ -197,9 +262,9 @@ class _BeerTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        beer.name,
-        overflow: TextOverflow.ellipsis,
-      );
+    beer.name,
+    overflow: TextOverflow.ellipsis,
+  );
 }
 
 /// Allows to display the beer prices.
@@ -246,10 +311,14 @@ class _BeerRating extends StatelessWidget {
   /// Whether to show a message if empty.
   final bool showEmptyMessage;
 
+  /// The stars size.
+  final double size;
+
   /// Creates a new beer rating widget instance.
   const _BeerRating({
     required this.beer,
     this.showEmptyMessage = true,
+    this.size = 25,
   });
 
   @override
@@ -259,7 +328,7 @@ class _BeerRating extends StatelessWidget {
     }
     return RatingFormField(
       initialValue: beer.rating,
-      size: 25,
+      size: size,
       readOnly: true,
     );
   }
@@ -299,7 +368,7 @@ class _BeerTags extends StatelessWidget {
 }
 
 /// Allows to display the beer degrees.
-class _BeerDegrees extends StatelessWidget {
+class BeerDegrees extends StatelessWidget {
   /// The beer.
   final Beer beer;
 
@@ -307,7 +376,8 @@ class _BeerDegrees extends StatelessWidget {
   final bool inBadge;
 
   /// Creates a new beer degrees widget instance.
-  const _BeerDegrees({
+  const BeerDegrees({
+    super.key,
     required this.beer,
     this.inBadge = false,
   });
@@ -315,7 +385,7 @@ class _BeerDegrees extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (inBadge) {
-      return beer.degrees == null ? SizedBox.shrink() : FBadge(child: Text('${beer.degrees}°'));
+      return beer.degrees == null ? const SizedBox.shrink() : FBadge(child: Text('${beer.degrees}°'));
     }
     return beer.degrees == null ? Text(translations.beers.details.degrees.empty) : Text('${beer.degrees}°');
   }
@@ -338,11 +408,11 @@ class BeerImage extends StatelessWidget {
     Beer? beer,
     double? radius,
   }) : this.fromNameImage(
-          key: key,
-          name: beer?.name,
-          image: beer?.image,
-          radius: radius,
-        );
+         key: key,
+         name: beer?.name,
+         image: beer?.image,
+         radius: radius,
+       );
 
   /// Creates a beer image from a name and an image.
   const BeerImage.fromNameImage({
@@ -350,15 +420,15 @@ class BeerImage extends StatelessWidget {
     this.name,
     this.image,
     double? radius,
-  })  : radius = radius ?? 50,
-        assert(name != null || image != null);
+  }) : radius = radius ?? 50,
+       assert(name != null || image != null);
 
   @override
   Widget build(BuildContext context) => FAvatar(
-        image: image == null ? NetworkImage('') as ImageProvider : FileImage(File(image!)),
-        fallback: Text(_textToWrite),
-        size: radius * 2,
-      );
+    image: image == null ? const NetworkImage('') as ImageProvider : FileImage(File(image!)),
+    fallback: Text(_textToWrite),
+    size: radius * 2,
+  );
 
   /// Returns the text to write.
   String get _textToWrite {

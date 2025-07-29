@@ -1,8 +1,6 @@
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/migration/migrator.dart';
-import 'package:beerstory/pages/bars.dart';
-import 'package:beerstory/pages/beers.dart';
-import 'package:beerstory/pages/history.dart';
+import 'package:beerstory/pages/routes.dart';
 import 'package:beerstory/pages/scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,34 +44,62 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'Beerstory',
-        builder: (context, child) => FTheme(
-          data: _tealTheme.light.copyWith(
-            textFieldStyle: _tealTheme.light.textFieldStyle.copyWith(
-              contentTextStyle: _tealTheme.light.textFieldStyle.contentTextStyle.map(
-                (style) => style.copyWith(
-                  color: _tealTheme.light.colors.foreground,
-                ),
+  Widget build(BuildContext context) {
+    FThemeData themeData = MediaQuery.of(context).platformBrightness == Brightness.dark ? _tealTheme.dark : _tealTheme.light;
+    return MaterialApp(
+      title: 'Beerstory',
+      builder: (context, child) => FTheme(
+        data: themeData.copyWith(
+          headerStyles: themeData.headerStyles.copyWith(
+            rootStyle: (style) => style.copyWith(
+              titleTextStyle: style.titleTextStyle.copyWith(
+                fontFamily: 'BirdsOfParadise',
+              ),
+            ),
+            nestedStyle: (style) => style.copyWith(
+              titleTextStyle: style.titleTextStyle.copyWith(
+                fontFamily: 'BirdsOfParadise',
               ),
             ),
           ),
-          child: child!,
+          textFieldStyle: themeData.textFieldStyle.copyWith(
+            contentTextStyle: themeData.textFieldStyle.contentTextStyle.map(
+              (style) => style.copyWith(
+                color: themeData.colors.foreground,
+              ),
+            ),
+          ),
+          dateFieldStyle: themeData.dateFieldStyle.copyWith(
+            iconStyle: themeData.dateFieldStyle.iconStyle.copyWith(
+              color: themeData.colors.primary,
+            ),
+            textFieldStyle: themeData.dateFieldStyle.textFieldStyle
+                .copyWith(
+                  contentTextStyle: themeData.dateFieldStyle.textFieldStyle.contentTextStyle.map(
+                    (style) => style.copyWith(
+                      fontSize: themeData.typography.base.fontSize ?? style.fontSize,
+                      color: themeData.colors.foreground,
+                    ),
+                  ),
+                )
+                .call,
+          ),
         ),
-        initialRoute: '/',
-        locale: TranslationProvider.of(context).flutterLocale,
-        supportedLocales: AppLocaleUtils.supportedLocales,
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        routes: {
-          '/': (context) => PageScaffold(
-                pages: [BeersPage(), BarsPage()],
-              ),
-          HistoryPage.page: (context) => PageScaffold(
-                showBackButton: true,
-                pages: [HistoryPage()],
-              ),
-        },
-      );
+        child: child!,
+      ),
+      initialRoute: kHomeRoute,
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      localizationsDelegates: [
+        FLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
+      ],
+      routes: {
+        kHomeRoute: (context) => const HomeRouteScaffold(),
+        kHistoryRoute: (context) => const HistoryRouteScaffold(),
+      },
+    );
+  }
 
   /// The light and dark variants of a Teal theme.
   static final ({FThemeData light, FThemeData dark}) _tealTheme = (
@@ -108,7 +134,7 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> {
         foreground: Color(0xFFF2F2F2),
         primary: Color(0xFF0D9488),
         primaryForeground: Color(0xFF042F2E),
-        secondary: Color(0xFF134E4A),
+        secondary: Color(0xFF27272A),
         secondaryForeground: Color(0xFFF0FDFA),
         muted: Color(0xFF262626),
         mutedForeground: Color(0xFFA1A1AA),

@@ -14,7 +14,7 @@ abstract class RepositoryObject {
   /// Creates a new repository object instance.
   RepositoryObject({
     String? uuid,
-  }) : uuid = uuid ?? Uuid().v4();
+  }) : uuid = uuid ?? const Uuid().v4();
 
   @override
   bool operator ==(Object other) {
@@ -29,6 +29,12 @@ abstract class RepositoryObject {
 
   /// Creates a copy of this object.
   RepositoryObject copyWith();
+}
+
+/// An object that has a name.
+mixin HasName on RepositoryObject {
+  /// Returns the name of this object.
+  String get name;
 }
 
 /// A database, required to store objects.
@@ -130,7 +136,7 @@ abstract class Repository<T extends RepositoryObject> extends AsyncNotifier<List
   /// Clears this repository.
   Future<void> clear({bool notify = true}) async {
     await ref.read(databaseProvider).clear();
-    state = AsyncData([]);
+    state = const AsyncData([]);
   }
 
   /// The database provider.

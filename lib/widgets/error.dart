@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:flutter/material.dart';

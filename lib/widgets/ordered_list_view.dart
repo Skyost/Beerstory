@@ -1,30 +1,41 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/spacing.dart';
+import 'package:beerstory/utils/compare_fields.dart';
 import 'package:beerstory/utils/searchable.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
 /// An ordered and searchable listview.
 class OrderedListView<T> extends StatefulWidget {
-  /// The listview items.
-  final List<T> items;
+  /// The objects list.
+  final List<T> objects;
 
   /// The item builder.
-  final Widget Function(List<T>, int) itemBuilder;
+  final FTileMixin Function(T) builder;
 
   /// Whether to order the list in reverse order.
   final bool reverseOrder;
 
+  /// The group items function.
+  final List<GroupData<T>> Function(List<T>)? groupObjects;
+
+  /// Returns the comparator that allows to compare two [T].
+  final Comparator<T>? comparator;
+
   /// Creates a new ordered listview instance.
   const OrderedListView({
     super.key,
-    required this.items,
-    required this.itemBuilder,
+    required this.objects,
+    required this.builder,
     this.reverseOrder = false,
+    this.groupObjects,
+    this.comparator,
   });
 
   @override
@@ -34,44 +45,44 @@ class OrderedListView<T> extends StatefulWidget {
 /// The ordered listview state.
 class _OrderedListViewState<T> extends State<OrderedListView<T>> {
   /// The current scroll controller.
-  ScrollController? scrollController;
+  ScrollController scrollController = ScrollController();
 
   /// The search controller.
-  TextEditingController? searchController;
+  late TextEditingController searchController = TextEditingController()
+    ..addListener(() {
+      if (searchController.value.text.isEmpty) {
+        filterList();
+        return;
+      }
+
+      typingTimer?.cancel();
+      typingTimer = Timer(const Duration(milliseconds: 500), filterList);
+    });
 
   /// The current typing timer.
   Timer? typingTimer;
 
-  /// The ordered items list.
-  List<T>? orderedItems;
+  /// The ordered objects list.
+  List<GroupData<T>>? orderedObjects;
 
   /// Whether to show the search box.
   bool get showSearchBox => isSubtype<T, Searchable>();
 
   @override
   void initState() {
+    initialize();
+    super.initState();
+  }
+
+  Future<void> initialize() async {
     filterList();
     if (showSearchBox) {
-      scrollController = ScrollController();
-      searchController = TextEditingController();
-
-      searchController!.addListener(() {
-        if (searchController!.value.text.isEmpty) {
-          filterList();
-          return;
-        }
-
-        typingTimer?.cancel();
-        typingTimer = Timer(const Duration(milliseconds: 500), filterList);
-      });
-
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController!.position.maxScrollExtent >= 110) {
-          scrollController!.jumpTo(110);
+        if (scrollController.position.maxScrollExtent >= 110) {
+          scrollController.jumpTo(110);
         }
       });
     }
-    super.initState();
   }
 
   @override
@@ -82,28 +93,37 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    if (orderedItems == null) {
+    if (orderedObjects == null) {
       return const CenteredCircularProgressIndicator();
     }
 
-    if (showSearchBox) {
-      return ListView.builder(
-        controller: scrollController,
-        itemCount: orderedItems!.length + 1,
-        itemBuilder: (context, position) => (position == 0 ? _createSearchBox(context) : widget.itemBuilder(orderedItems!, position - 1)),
-      );
+    List<Widget> children = [];
+    if (orderedObjects!.length == 1 && orderedObjects!.firstOrNull?.label == null) {
+      children.addAll(orderedObjects!.first.objects.map(widget.builder));
+    } else {
+      for (GroupData<T> data in orderedObjects!) {
+        children.add(
+          FTileGroup(
+            label: data.label == null ? null : Text(data.label!),
+            children: data.objects.map(widget.builder).toList(),
+          ),
+        );
+      }
     }
 
-    return ListView.builder(
-      itemCount: orderedItems!.length,
-      itemBuilder: (context, position) => widget.itemBuilder(orderedItems!, position),
+    return ListView(
+      controller: scrollController,
+      children: [
+        if (showSearchBox) _createSearchBox(context),
+        ...children,
+      ],
     );
   }
 
   @override
   void dispose() {
-    scrollController?.dispose();
-    searchController?.dispose();
+    scrollController.dispose();
+    searchController.dispose();
     typingTimer?.cancel();
     super.dispose();
   }
@@ -127,25 +147,29 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
 
   /// Orders and filters the current list.
   Future<void> filterList() async {
-    setState(() => orderedItems = null);
+    setState(() => orderedObjects = null);
 
-    List<T> items = List<T>.from(widget.items);
+    List<T> objects = List<T>.from(widget.objects);
 
-    if (searchController != null && searchController!.text.isNotEmpty) {
-      String request = searchController!.text.toLowerCase();
-      items = (items as List<Searchable>).find(request) as List<T>;
+    if (searchController.text.isNotEmpty) {
+      String request = searchController.text.toLowerCase();
+      objects = (objects as List<Searchable>).find(request).cast<T>();
     }
 
     Comparator<T>? comparator = this.comparator;
     if (comparator != null) {
-      items.sort(comparator);
+      objects.sort(comparator);
     }
 
-    setState(() => orderedItems = items);
+    List<GroupData<T>> result = widget.groupObjects == null ? [GroupData(objects: objects)] : widget.groupObjects!(objects)..sort();
+    setState(() => orderedObjects = result);
   }
 
   /// Returns the comparator that allows to compare two [T].
   Comparator<T>? get comparator {
+    if (widget.comparator != null) {
+      return widget.comparator;
+    }
     if (isSubtype<T, Comparable<T>>()) {
       Comparator<T> result = (a, b) => Comparable.compare(a as Comparable<T>, b as Comparable<T>);
       if (widget.reverseOrder) {
@@ -155,6 +179,40 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
     }
     return null;
   }
+}
+
+/// A group data.
+class GroupData<T> implements Comparable<GroupData> {
+  /// The group objects.
+  final List<T> objects;
+
+  /// Creates a new group data instance.
+  const GroupData({
+    this.objects = const [],
+  });
+
+  /// Returns the group label.
+  String? get label => null;
+
+  @override
+  int compareTo(GroupData other) => compareAccordingToFields(
+        this,
+        other,
+        (data) => [
+          data.label,
+        ],
+      );
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! GroupData) {
+      return super == other;
+    }
+    return identical(this, other) || (label == other.label && listEquals(objects, other.objects));
+  }
+
+  @override
+  int get hashCode => Object.hash(label, objects);
 }
 
 /// Allows to create a reverse comparator.

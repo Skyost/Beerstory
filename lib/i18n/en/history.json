@@ -8,24 +8,50 @@
   },
   "dialog": {
     "beer": {
-      "label": "Beer"
+      "label": "Beer",
+      "title": "Beer you just drank"
     },
     "quantity": {
       "label": "Quantity",
-      "hint": "Quantity (in cl)",
+      "title": "Quantity of beer drank",
+      "hint": "Quantity (in cL)",
       "empty": "No quantity",
       "quantities": {
-        "bottle": "Bottle / Can (33cl)",
-        "halfPint": "Half-pint (50cl)",
-        "pint": "Pint (100cl)",
+        "bottle": "Bottle / Can (33cL)",
+        "halfPint": "Half-pint (50cL)",
+        "pint": "Pint (100cL)",
         "custom": "Custom"
       }
     },
     "times": {
-      "label": "Times drunk"
+      "label": "Times",
+      "title": "Number of times you drank this beer"
     },
     "moreThanQuantity": {
       "label": "More than the displayed quantity ?"
+    },
+    "date": {
+      "label": "Date"
+    }
+  },
+  "deleteConfirm": "Are you sure you want to delete this item ?",
+  "details": {
+    "title": "Details",
+    "beer": {
+      "label": "Beer"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "empty": "No quantity"
+    },
+    "times": {
+      "label": "Times"
+    },
+    "moreThanQuantity": {
+      "label": "More than the displayed quantity ?"
+    },
+    "date": {
+      "label": "Date"
     }
   }
 }

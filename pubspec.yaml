@@ -3,7 +3,7 @@ description: Save your favorite beers and find them back instantly !
 version: 1.0.3+7
 
 environment:
-  sdk: '>=3.0.3 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 dependencies:
   flutter:

@@ -16,7 +16,7 @@ class BeerPrice extends RepositoryObject implements Comparable<BeerPrice> {
   BeerPrice({
     super.uuid,
     required this.beerUuid,
-    required this.barUuid,
+    this.barUuid,
     this.amount = 0,
   });
 

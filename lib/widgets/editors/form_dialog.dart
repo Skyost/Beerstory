@@ -1,13 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:beerstory/i18n/translations.g.dart';
-import 'package:beerstory/model/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 
 /// Represents a dialog that holds a form.
-abstract class FormDialog<T extends RepositoryObject> extends ConsumerStatefulWidget {
+abstract class FormDialog<T> extends ConsumerStatefulWidget {
   /// The object instance.
   final T object;
 
@@ -23,15 +22,15 @@ abstract class FormDialog<T extends RepositoryObject> extends ConsumerStatefulWi
     required this.object,
     FDialogStyle Function(FDialogStyle)? style,
     Animation<double>? animation,
-  })  : _style = style,
-        _animation = animation;
+  }) : _style = style,
+       _animation = animation;
 
   @override
   FormDialogState<T, FormDialog<T>> createState();
 }
 
 /// The form dialog state class.
-abstract class FormDialogState<T extends RepositoryObject, W extends FormDialog<T>> extends ConsumerState<W> {
+abstract class FormDialogState<T, W extends FormDialog<T>> extends ConsumerState<W> {
   /// The form key.
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -60,14 +59,8 @@ abstract class FormDialogState<T extends RepositoryObject, W extends FormDialog<
         FButton(
           child: Text(translations.misc.ok),
           onPress: () async {
-            if (!formKey.currentState!.validate()) {
-              return;
-            }
-
-            formKey.currentState!.save();
-            T? result = onValidated();
-            if (result != null && context.mounted) {
-              Navigator.pop(context, result);
+            if (formKey.currentState!.validate()) {
+              saveAndPop(context);
             }
           },
         ),
@@ -75,9 +68,18 @@ abstract class FormDialogState<T extends RepositoryObject, W extends FormDialog<
     );
   }
 
+  /// Saves the form and pops the dialog.
+  void saveAndPop(BuildContext context) {
+    formKey.currentState!.save();
+    T? result = onSaved();
+    if (result != null && context.mounted) {
+      Navigator.pop(context, result);
+    }
+  }
+
   /// Creates the form children.
   List<Widget> createChildren(BuildContext context);
 
-  /// Triggered when the form has been validated.
-  T? onValidated();
+  /// Triggered when the form has been validated and saved.
+  T? onSaved();
 }

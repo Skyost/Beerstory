@@ -1,17 +1,27 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/bar/bar.dart';
 import 'package:beerstory/model/bar/repository.dart';
+import 'package:beerstory/model/beer/beer.dart';
+import 'package:beerstory/model/beer/price/price.dart';
+import 'package:beerstory/model/beer/price/repository.dart';
+import 'package:beerstory/model/beer/repository.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/adaptive.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
-import 'package:beerstory/widgets/editors/bar_editor_dialog.dart';
+import 'package:beerstory/widgets/editors/bar_edit.dart';
+import 'package:beerstory/widgets/repository/beer_prices.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
+import 'package:beerstory/widgets/scrollable_sheet_content.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Allows to show a bar.
@@ -33,9 +43,22 @@ class BarWidget extends RepositoryObjectWidget<Bar> {
 
   @override
   Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => _BarDetailsWidget(
-        barUuid: object.uuid,
-        scrollController: scrollController,
+    barUuid: object.uuid,
+    scrollController: scrollController,
+    onBeerPricesPress: () {
+      showFSheet(
+        context: context,
+        builder: (context) => ScrollableSheetContentWidget(
+          builder: (context, scrollController) => PricesDetailsWidget.create<Bar>(
+            scrollController: scrollController,
+            objectUuid: object.uuid,
+          ),
+        ),
+        side: FLayout.btt,
+        mainAxisMaxRatio: null,
       );
+    },
+  );
 }
 
 /// Allows to show a bar details.
@@ -46,10 +69,14 @@ class _BarDetailsWidget extends ConsumerWidget {
   /// The scroll controller.
   final ScrollController? scrollController;
 
+  /// The beer prices press callback.
+  final VoidCallback? onBeerPricesPress;
+
   /// Creates a new bar details widget instance.
   const _BarDetailsWidget({
     required this.barUuid,
     this.scrollController,
+    this.onBeerPricesPress,
   });
 
   @override
@@ -64,22 +91,6 @@ class _BarDetailsWidget extends ConsumerWidget {
         child: Text(translations.bars.details.showOnMap),
       ),
       FButton(
-        // style: FButtonStyle.secondary(),
-        onPress: () async {
-          Bar? editedBar = await BarEditorDialog.show(
-            context: context,
-            bar: bar,
-          );
-          if (editedBar != null && context.mounted) {
-            await showWaitingOverlay(
-              context,
-              future: ref.read(barRepositoryProvider.notifier).change(editedBar),
-            );
-          }
-        },
-        child: Text(translations.misc.edit),
-      ),
-      FButton(
         style: FButtonStyle.destructive(),
         child: Text(translations.misc.delete),
         onPress: () async {
@@ -87,7 +98,7 @@ class _BarDetailsWidget extends ConsumerWidget {
             ref.read(barRepositoryProvider.notifier).remove(bar);
           }
         },
-      )
+      ),
     ];
     return ListView(
       controller: scrollController,
@@ -101,17 +112,52 @@ class _BarDetailsWidget extends ConsumerWidget {
                 prefix: Icon(FIcons.pencil),
                 title: Text(translations.bars.details.name.label),
                 subtitle: _BarName(bar: bar),
+                suffix: Icon(FIcons.chevronRight),
+                onPress: () async {
+                  String? newName = await BarNameEditorDialog.show(
+                    context: context,
+                    barName: bar.name,
+                  );
+                  if (newName != null && newName != bar.name && context.mounted) {
+                    await editBar(context, ref, bar.copyWith(name: newName));
+                  }
+                },
               ),
               FTile(
                 prefix: Icon(FIcons.mapPin),
                 title: Text(translations.bars.details.address.label),
                 subtitle: _BarAddress(bar: bar),
+                suffix: Icon(FIcons.chevronRight),
+                onPress: () async {
+                  String? newAddress = await BarAddressEditorDialog.show(
+                    context: context,
+                    barAddress: bar.address,
+                  );
+                  if (newAddress != null && newAddress != bar.address && context.mounted) {
+                    await editBar(context, ref, bar.overwriteAddress(address: newAddress));
+                  }
+                },
+              ),
+              FTile(
+                prefix: Icon(FIcons.beer),
+                title: Text(translations.beers.details.prices.label),
+                subtitle: _BarBeerPrices(bar: bar),
+                suffix: Icon(FIcons.chevronRight),
+                onPress: onBeerPricesPress,
               ),
             ],
           ),
         ),
         actions.adaptiveWrapper,
       ],
+    );
+  }
+
+  /// Edits a given bar and shows a waiting overlay.
+  Future<void> editBar(BuildContext context, WidgetRef ref, Bar editedBar) async {
+    await showWaitingOverlay(
+      context,
+      future: ref.read(barRepositoryProvider.notifier).change(editedBar),
     );
   }
 
@@ -189,4 +235,41 @@ class _BarAddress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => (bar.address?.isEmpty ?? true) ? Text(translations.bars.details.address.empty) : Text(bar.address!);
+}
+
+/// Allows to display the bar beer prices.
+class _BarBeerPrices extends ConsumerWidget {
+  /// The bar.
+  final Bar bar;
+
+  /// Creates a new bar beer prices widget instance.
+  const _BarBeerPrices({
+    required this.bar,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    NumberFormat numberFormat = NumberFormat.simpleCurrency(locale: translations.$meta.locale.languageCode);
+    AsyncValue<List<BeerPrice>> prices = ref.watch(beerPricesFromBarProvider(bar));
+    if (!prices.hasValue || prices.value!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    AsyncValue<List<Beer>> beers = ref.watch(beerRepositoryProvider);
+    if (!beers.hasValue || beers.value!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    String result = '';
+    for (BeerPrice price in prices.value!) {
+      Beer? beer = beers.value!.firstWhereOrNull((beer) => beer.uuid == price.beerUuid);
+      if (beer == null) {
+        continue;
+      }
+      result += '${beer.name} (${numberFormat.format(price.amount)}), ';
+    }
+    result = result.trim();
+    if (result.endsWith(',')) {
+      result = result.substring(0, result.length - 1);
+    }
+    return Text(result);
+  }
 }

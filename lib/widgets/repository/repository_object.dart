@@ -5,25 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 
 /// A repository object widget.
-abstract class RepositoryObjectWidget<T extends RepositoryObject> extends ConsumerWidget {
-  /// The background color.
-  final Color? backgroundColor;
-
-  /// The widget padding.
-  final EdgeInsets? padding;
-
-  /// Whether to add click listeners.
-  final bool addClickListeners;
-
+abstract class RepositoryObjectWidget<T extends RepositoryObject> extends ConsumerWidget with FTileMixin {
   /// The object.
   final T object;
 
   /// Creates a new app widget instance.
   const RepositoryObjectWidget({
     super.key,
-    this.backgroundColor,
-    this.padding = const EdgeInsets.all(20),
-    this.addClickListeners = true,
     required this.object,
   });
 
@@ -50,7 +38,7 @@ abstract class RepositoryObjectWidget<T extends RepositoryObject> extends Consum
   Widget? buildSuffix(BuildContext context) => null;
 
   /// Builds the widget title.
-  Widget buildTitle(BuildContext context) => SizedBox.shrink();
+  Widget buildTitle(BuildContext context) => const SizedBox.shrink();
 
   /// Builds the widget subtitle.
   Widget? buildSubtitle(BuildContext context) => null;

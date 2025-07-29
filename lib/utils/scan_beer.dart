@@ -13,9 +13,9 @@ import 'package:path/path.dart' as path;
 
 /// Tries to scan a beer thanks to [BarcodeScanner].
 Future<ScanResult> scanBeer(BuildContext context) async =>
-    (await showDialog<ScanResult>(
+    (await showFDialog<ScanResult>(
       context: context,
-      builder: (context) => BarcodeScanner(
+      builder: (context, style, animation) => BarcodeScanner(
         onScan: (barcodes) async {
           String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
           if (barcode.isEmpty) {

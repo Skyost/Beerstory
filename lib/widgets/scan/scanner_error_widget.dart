@@ -21,7 +21,7 @@ class ScannerErrorWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(bottom: 16),
                 child: Icon(
                   FIcons.circleAlert,

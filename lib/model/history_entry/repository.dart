@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:beerstory/model/history_entry/database.dart';
 import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/repository.dart';
@@ -10,6 +12,15 @@ final historyProvider = AsyncNotifierProvider<History, List<HistoryEntry>>(Histo
 /// The repository that handles history entries.
 class History extends Repository<HistoryEntry> {
   @override
+  Future<void> add(HistoryEntry object) async {
+    await super.add(object);
+    ref.read(lastInsertedBeerProvider.notifier).state = object.beerUuid;
+  }
+
+  @override
   @protected
   AutoDisposeProvider<RepositoryDatabase<HistoryEntry>> get databaseProvider => historyEntriesDatabaseProvider;
 }
+
+/// The last inserted beer provider.
+final lastInsertedBeerProvider = StateProvider<String?>((ref) => null);

@@ -32,6 +32,7 @@ linter:
     prefer_single_quotes: true
     unnecessary_lambdas: true
     avoid_renaming_method_parameters: false
+    prefer_const_constructors: true
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

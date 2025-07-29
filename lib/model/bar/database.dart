@@ -12,7 +12,7 @@ part 'database.g.dart';
 @DataClassName('DriftBar')
 class Bars extends Table {
   /// The bar uuid.
-  TextColumn get uuid => text().clientDefault(() => Uuid().v4())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
 
   /// The bar name.
   TextColumn get name => text()();

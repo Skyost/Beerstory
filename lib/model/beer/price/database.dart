@@ -14,7 +14,7 @@ part 'database.g.dart';
 @DataClassName('DriftBeerPrice')
 class BeerPrices extends Table {
   /// The beer price id.
-  TextColumn get uuid => text().clientDefault(() => Uuid().v4())();
+  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
 
   /// The beer price beer id.
   TextColumn get beerUuid => text().references(Beers, #uuid)();

@@ -1,3 +1,4 @@
+import 'package:beerstory/i18n/translations.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,14 @@ extension StringUtils on String {
 
   /// Checks whether the current string is empty, and if so, returns a `null` object.
   String? get nullIfEmpty => trim().isEmpty ? null : trim();
+}
+
+/// Checks whether a string is empty, and if so, returns an error message.
+String? emptyStringValidator(String? value) {
+  if (value?.nullIfEmpty == null) {
+    return translations.error.empty;
+  }
+  return null;
 }
 
 /// Allows to get the dark variant of the primary color of the current color scheme.

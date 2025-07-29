@@ -8,24 +8,50 @@
   },
   "dialog": {
     "beer": {
-      "label": "Bière"
+      "label": "Bière",
+      "title": "Bière que vous venez de boire"
     },
     "quantity": {
       "label": "Quantité",
-      "hint": "Quantité (in cl)",
+      "title": "Quantité de bière bue",
+      "hint": "Quantité (en cL)",
       "empty": "Pas de quantité",
       "quantities": {
-        "bottle": "Bouteille / Canette (33cl)",
-        "halfPint": "Demi-pinte (50cl)",
-        "pint": "Pinte (100cl)",
+        "bottle": "Bouteille / Canette (33cL)",
+        "halfPint": "Demi-pinte (50cL)",
+        "pint": "Pinte (100cL)",
         "custom": "Personnalisée"
       }
     },
     "times": {
-      "label": "Nombre de fois bue"
+      "label": "Nombre de fois",
+      "title": "Nombre de fois où vous l'avez bue"
     },
     "moreThanQuantity": {
       "label": "Plus que la quantité affichée ?"
+    },
+    "date": {
+      "label": "Date"
+    }
+  },
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+  "details": {
+    "title": "Détails",
+    "beer": {
+      "label": "Bière"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "empty": "Pas de quantité"
+    },
+    "times": {
+      "label": "Nombre de fois"
+    },
+    "moreThanQuantity": {
+      "label": "Plus que la quantité affichée ?"
+    },
+    "date": {
+      "label": "Date"
     }
   }
 }
