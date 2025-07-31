@@ -12,6 +12,7 @@ import 'package:beerstory/pages/bars.dart';
 import 'package:beerstory/pages/beers.dart';
 import 'package:beerstory/pages/history.dart';
 import 'package:beerstory/pages/routes.dart';
+import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/scan_beer.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/beer_animation_dialog.dart';
@@ -358,23 +359,25 @@ class _ScanBeerButton extends ConsumerWidget {
   const _ScanBeerButton();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => FHeaderAction(
-    icon: const Icon(FIcons.barcode),
-    onPress: () async {
-      ScanResult result = await scanBeer(context);
-      if (context.mounted) {
-        context.handleScanResult(
-          result,
-          onSuccess: (beer) async {
-            await showWaitingOverlay(
-              context,
-              future: ref.read(beerRepositoryProvider.notifier).add(beer),
-            );
+  Widget build(BuildContext context, WidgetRef ref) => currentPlatform.isMobile
+      ? FHeaderAction(
+          icon: const Icon(FIcons.barcode),
+          onPress: () async {
+            ScanResult result = await scanBeer(context);
+            if (context.mounted) {
+              context.handleScanResult(
+                result,
+                onSuccess: (beer) async {
+                  await showWaitingOverlay(
+                    context,
+                    future: ref.read(beerRepositoryProvider.notifier).add(beer),
+                  );
+                },
+              );
+            }
           },
-        );
-      }
-    },
-  );
+        )
+      : const SizedBox.shrink();
 }
 
 /// The clear history button.

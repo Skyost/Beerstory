@@ -55,8 +55,8 @@
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>This app requires write access to your photo library in order to add beer pictures in your library.</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-</dict>
+		<true/>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+	</dict>
 </plist>
