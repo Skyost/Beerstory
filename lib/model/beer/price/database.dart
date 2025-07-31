@@ -6,7 +6,6 @@ import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -14,16 +13,19 @@ part 'database.g.dart';
 @DataClassName('DriftBeerPrice')
 class BeerPrices extends Table {
   /// The beer price id.
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
+  TextColumn get uuid => text()();
 
   /// The beer price beer id.
-  TextColumn get beerUuid => text().references(Beers, #uuid)();
+  TextColumn get beerUuid => text().references(Beers, #uuid, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
 
   /// The beer price bar id.
-  TextColumn get barUuid => text().references(Bars, #uuid).nullable()();
+  TextColumn get barUuid => text().references(Bars, #uuid, onUpdate: KeyAction.cascade, onDelete: KeyAction.setNull).nullable()();
 
   /// The beer price amount.
   RealColumn get amount => real()();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {uuid};
 }
 
 /// The beer prices database provider.
@@ -42,9 +44,9 @@ class BeerPricesDatabase extends _$BeerPricesDatabase with RepositoryDatabase<Be
 
   /// Creates a new beer prices database instance.
   BeerPricesDatabase()
-      : super(
-          SqliteUtils.openConnection(_kDbFileName),
-        );
+    : super(
+        SqliteUtils.openConnection(_kDbFileName),
+      );
 
   @override
   int get schemaVersion => 1;
@@ -54,17 +56,22 @@ class BeerPricesDatabase extends _$BeerPricesDatabase with RepositoryDatabase<Be
 
   @override
   Insertable<DriftBeerPrice> toInsertable(BeerPrice object) => DriftBeerPrice(
-        uuid: object.uuid,
-        beerUuid: object.beerUuid,
-        barUuid: object.barUuid,
-        amount: object.amount,
-      );
+    uuid: object.uuid,
+    beerUuid: object.beerUuid,
+    barUuid: object.barUuid,
+    amount: object.amount,
+  );
 
   @override
   BeerPrice toObject(DriftBeerPrice insertable) => BeerPrice(
-        uuid: insertable.uuid,
-        beerUuid: insertable.beerUuid,
-        barUuid: insertable.barUuid,
-        amount: insertable.amount,
-      );
+    uuid: insertable.uuid,
+    beerUuid: insertable.beerUuid,
+    barUuid: insertable.barUuid,
+    amount: insertable.amount,
+  );
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
+  );
 }

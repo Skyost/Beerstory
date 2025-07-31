@@ -28,6 +28,9 @@ class OrderedListView<T> extends StatefulWidget {
   /// Returns the comparator that allows to compare two [T].
   final Comparator<T>? comparator;
 
+  /// The empty widget builder.
+  final Widget Function(BuildContext, String?)? emptyWidgetBuilder;
+
   /// Creates a new ordered listview instance.
   const OrderedListView({
     super.key,
@@ -36,6 +39,7 @@ class OrderedListView<T> extends StatefulWidget {
     this.reverseOrder = false,
     this.groupObjects,
     this.comparator,
+    this.emptyWidgetBuilder,
   });
 
   @override
@@ -66,7 +70,7 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
   List<GroupData<T>>? orderedObjects;
 
   /// Whether to show the search box.
-  bool get showSearchBox => isSubtype<T, Searchable>();
+  bool get showSearchBox => isSubtype<T, Searchable>() && widget.objects.isNotEmpty;
 
   @override
   void initState() {
@@ -98,13 +102,14 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
     }
 
     List<Widget> children = [];
-    if (orderedObjects!.length == 1 && orderedObjects!.firstOrNull?.label == null) {
+    if (orderedObjects!.length == 1 && orderedObjects!.firstOrNull?.label == null && orderedObjects!.firstOrNull?.description == null) {
       children.addAll(orderedObjects!.first.objects.map(widget.builder));
     } else {
       for (GroupData<T> data in orderedObjects!) {
         children.add(
           FTileGroup(
-            label: data.label == null ? null : Text(data.label!),
+            label: data.label == null ? null : Text.rich(data.label!),
+            description: data.description == null ? null : Text.rich(data.description!),
             children: data.objects.map(widget.builder).toList(),
           ),
         );
@@ -115,7 +120,16 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
       controller: scrollController,
       children: [
         if (showSearchBox) _createSearchBox(context),
-        ...children,
+        if (children.isEmpty)
+          widget.emptyWidgetBuilder?.call(context, searchController.text) ?? const SizedBox.shrink()
+        else
+          for (int i = 0; i < children.length; i++)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: i < children.length - 1 ? kSpace : 0,
+              ),
+              child: children[i],
+            ),
       ],
     );
   }
@@ -130,20 +144,23 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
 
   /// Creates the search box.
   Widget _createSearchBox(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: kSpace),
-        child: FTextField(
-          hint: translations.misc.search,
-          controller: searchController,
-          textInputAction: TextInputAction.search,
-          suffixBuilder: (context, value, child) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kSpace / 2, vertical: kSpace),
-            child: Icon(
-              FIcons.search,
-              color: value.$2.contains(WidgetState.focused) ? context.theme.colors.primary : null,
-            ),
-          ),
+    padding: const EdgeInsets.only(bottom: kSpace),
+    child: FTextField(
+      hint: translations.misc.search,
+      controller: searchController,
+      textInputAction: TextInputAction.search,
+      suffixBuilder: (context, value, child) => Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kSpace / 2,
+          vertical: kSpace,
         ),
-      );
+        child: Icon(
+          FIcons.search,
+          color: value.$2.contains(WidgetState.focused) ? context.theme.colors.primary : null,
+        ),
+      ),
+    ),
+  );
 
   /// Orders and filters the current list.
   Future<void> filterList() async {
@@ -161,7 +178,8 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
       objects.sort(comparator);
     }
 
-    List<GroupData<T>> result = widget.groupObjects == null ? [GroupData(objects: objects)] : widget.groupObjects!(objects)..sort();
+    List<GroupData<T>> result = widget.groupObjects == null ? [GroupData(objects: objects)] : widget.groupObjects!(objects)
+      ..sort();
     setState(() => orderedObjects = result);
   }
 
@@ -192,16 +210,19 @@ class GroupData<T> implements Comparable<GroupData> {
   });
 
   /// Returns the group label.
-  String? get label => null;
+  TextSpan? get label => null;
+
+  /// Returns the group description.
+  TextSpan? get description => null;
 
   @override
   int compareTo(GroupData other) => compareAccordingToFields(
-        this,
-        other,
-        (data) => [
-          data.label,
-        ],
-      );
+    this,
+    other,
+    (data) => [
+      data.label?.text,
+    ],
+  );
 
   @override
   bool operator ==(Object other) {
@@ -218,5 +239,6 @@ class GroupData<T> implements Comparable<GroupData> {
 /// Allows to create a reverse comparator.
 extension _ReverseOrder<T> on Comparator<T> {
   /// Returns the reverse comparator.
-  Comparator<T> get reverseComparator => (a, b) => -this(a, b);
+  Comparator<T> get reverseComparator =>
+      (a, b) => -this(a, b);
 }

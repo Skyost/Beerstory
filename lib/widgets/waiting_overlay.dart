@@ -7,18 +7,13 @@ Future<T> showWaitingOverlay<T>(
   BuildContext context, {
   Future<T>? future,
   String? message,
-  bool Function()? onCancel,
 }) async {
   OverlayEntry entry = OverlayEntry(
     builder: (context) => Stack(
       children: [
-        const ModalBarrier(
-          dismissible: false,
-          color: Colors.black54,
-        ),
+        _ModalBarrier(),
         _WaitingDialog(
           message: message,
-          onCancel: onCancel,
         ),
       ],
     ),
@@ -37,18 +32,42 @@ Future<T> showWaitingOverlay<T>(
   return null as T;
 }
 
+/// An animated modal barrier.
+class _ModalBarrier extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _ModalBarrierState();
+}
+
+/// The modal barrier state.
+class _ModalBarrierState extends State<_ModalBarrier> with SingleTickerProviderStateMixin {
+  /// The animation controller.
+  late AnimationController controller = AnimationController(
+    duration: context.theme.dialogStyle.entranceExitDuration,
+    vsync: this,
+  )..forward();
+
+  @override
+  Widget build(BuildContext context) => FAnimatedModalBarrier(
+    onDismiss: null,
+    filter: context.theme.dialogStyle.barrierFilter,
+    animation: controller.view,
+  );
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+}
+
 /// A waiting dialog, with or without a timeout.
 class _WaitingDialog extends StatefulWidget {
   /// The message to display.
   final String? message;
 
-  /// The cancel callback.
-  final bool Function()? onCancel;
-
   /// Creates a new waiting dialog instance.
   const _WaitingDialog({
     this.message,
-    this.onCancel,
   });
 
   @override
@@ -62,32 +81,20 @@ class _WaitingDialogState extends State<_WaitingDialog> {
 
   @override
   Widget build(BuildContext context) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          scrollable: false,
-          actions: widget.onCancel == null
-              ? null
-              : [
-                  TextButton(
-                    child: Text(translations.misc.cancel),
-                    onPressed: () {
-                      if (widget.onCancel!()) {
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ],
-          content: Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(right: 24),
-                child: FProgress.circularIcon(),
-              ),
-              Expanded(
-                child: Text(widget.message ?? translations.misc.loading),
-              ),
-            ],
+    canPop: false,
+    child: FDialog(
+      body: Row(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(right: 24),
+            child: FProgress.circularIcon(),
           ),
-        ),
-      );
+          Expanded(
+            child: Text(widget.message ?? translations.misc.loading),
+          ),
+        ],
+      ),
+      actions: [],
+    ),
+  );
 }

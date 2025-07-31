@@ -7,5 +7,7 @@
   "no": "Non",
   "ok": "Ok",
   "cancel": "Annuler",
-  "loading": "Chargement... Veuillez patienter."
+  "loading": "Chargement... Veuillez patienter.",
+  "notFound": "Objet introuvable.",
+  "migration": "Mise à jour des données anciennes... Veuillez patienter.\nCette information ne sera plus affichée."
 }

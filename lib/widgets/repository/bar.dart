@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/bar/bar.dart';
 import 'package:beerstory/model/bar/repository.dart';
@@ -8,20 +6,16 @@ import 'package:beerstory/model/beer/price/price.dart';
 import 'package:beerstory/model/beer/price/repository.dart';
 import 'package:beerstory/model/beer/repository.dart';
 import 'package:beerstory/model/repository.dart';
-import 'package:beerstory/spacing.dart';
-import 'package:beerstory/utils/adaptive.dart';
+import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/utils/utils.dart';
-import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
 import 'package:beerstory/widgets/editors/bar_edit.dart';
 import 'package:beerstory/widgets/repository/beer_prices.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:beerstory/widgets/scrollable_sheet_content.dart';
-import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Allows to show a bar.
@@ -33,7 +27,7 @@ class BarWidget extends RepositoryObjectWidget<Bar> {
   });
 
   @override
-  Widget? buildPrefix(BuildContext context) => Icon(FIcons.mapPin);
+  Widget? buildPrefix(BuildContext context) => const Icon(FIcons.mapPin);
 
   @override
   Widget buildTitle(BuildContext context) => Text(object.name);
@@ -43,7 +37,7 @@ class BarWidget extends RepositoryObjectWidget<Bar> {
 
   @override
   Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => _BarDetailsWidget(
-    barUuid: object.uuid,
+    objectUuid: object.uuid,
     scrollController: scrollController,
     onBeerPricesPress: () {
       showFSheet(
@@ -62,151 +56,107 @@ class BarWidget extends RepositoryObjectWidget<Bar> {
 }
 
 /// Allows to show a bar details.
-class _BarDetailsWidget extends ConsumerWidget {
-  /// The bar UUID.
-  final String barUuid;
-
-  /// The scroll controller.
-  final ScrollController? scrollController;
-
+class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
   /// The beer prices press callback.
   final VoidCallback? onBeerPricesPress;
 
   /// Creates a new bar details widget instance.
   const _BarDetailsWidget({
-    required this.barUuid,
-    this.scrollController,
+    required super.objectUuid,
+    super.scrollController,
     this.onBeerPricesPress,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    Bar? bar = ref.watch(barRepositoryProvider.select((bars) => bars.value?.findByUuid(barUuid)));
-    if (bar == null) {
-      return CenteredCircularProgressIndicator();
-    }
-    List<FButton> actions = [
-      FButton(
-        onPress: () => showBarOnMap(bar),
-        child: Text(translations.bars.details.showOnMap),
-      ),
-      FButton(
-        style: FButtonStyle.destructive(),
-        child: Text(translations.misc.delete),
-        onPress: () async {
-          if (await showDeleteConfirmationDialog(context)) {
-            ref.read(barRepositoryProvider.notifier).remove(bar);
-          }
-        },
-      ),
-    ];
-    return ListView(
-      controller: scrollController,
+  String get deleteConfirmationMessage => translations.bars.deleteConfirm;
+
+  @override
+  AsyncNotifierProvider<Repository<Bar>, List<Bar>> get repositoryProvider => barRepositoryProvider;
+
+  @override
+  List<Widget> buildChildren(
+    BuildContext context,
+    WidgetRef ref,
+    Bar object,
+  ) => [
+    FTileGroup(
+      label: Text(translations.bars.details.title),
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.bars.details.title),
-            children: [
-              FTile(
-                prefix: Icon(FIcons.pencil),
-                title: Text(translations.bars.details.name.label),
-                subtitle: _BarName(bar: bar),
-                suffix: Icon(FIcons.chevronRight),
-                onPress: () async {
-                  String? newName = await BarNameEditorDialog.show(
-                    context: context,
-                    barName: bar.name,
-                  );
-                  if (newName != null && newName != bar.name && context.mounted) {
-                    await editBar(context, ref, bar.copyWith(name: newName));
-                  }
-                },
-              ),
-              FTile(
-                prefix: Icon(FIcons.mapPin),
-                title: Text(translations.bars.details.address.label),
-                subtitle: _BarAddress(bar: bar),
-                suffix: Icon(FIcons.chevronRight),
-                onPress: () async {
-                  String? newAddress = await BarAddressEditorDialog.show(
-                    context: context,
-                    barAddress: bar.address,
-                  );
-                  if (newAddress != null && newAddress != bar.address && context.mounted) {
-                    await editBar(context, ref, bar.overwriteAddress(address: newAddress));
-                  }
-                },
-              ),
-              FTile(
-                prefix: Icon(FIcons.beer),
-                title: Text(translations.beers.details.prices.label),
-                subtitle: _BarBeerPrices(bar: bar),
-                suffix: Icon(FIcons.chevronRight),
-                onPress: onBeerPricesPress,
-              ),
-            ],
-          ),
+        FTile(
+          prefix: const Icon(FIcons.pencil),
+          title: Text(translations.bars.details.name.label),
+          subtitle: _BarName(bar: object),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            String? newName = await BarNameEditorDialog.show(
+              context: context,
+              barName: object.name,
+            );
+            if (newName != null && newName != object.name && context.mounted) {
+              await editObject(context, ref, object.copyWith(name: newName));
+            }
+          },
         ),
-        actions.adaptiveWrapper,
+        FTile(
+          prefix: const Icon(FIcons.mapPin),
+          title: Text(translations.bars.details.address.label),
+          subtitle: _BarAddress(bar: object),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            String? newAddress = await BarAddressEditorDialog.show(
+              context: context,
+              barAddress: object.address,
+            );
+            if (newAddress != null && newAddress != object.address && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.overwriteAddress(address: newAddress),
+              );
+            }
+          },
+        ),
+        FTile(
+          prefix: const Icon(FIcons.beer),
+          title: Text(translations.beers.details.prices.label),
+          subtitle: _BarBeerPrices(bar: object),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: onBeerPricesPress,
+        ),
       ],
-    );
-  }
+    ),
+  ];
 
-  /// Edits a given bar and shows a waiting overlay.
-  Future<void> editBar(BuildContext context, WidgetRef ref, Bar editedBar) async {
-    await showWaitingOverlay(
-      context,
-      future: ref.read(barRepositoryProvider.notifier).change(editedBar),
-    );
-  }
-
-  /// Shows a delete confirmation dialog.
-  Future<bool> showDeleteConfirmationDialog(BuildContext context) async =>
-      (await showFDialog(
-        context: context,
-        builder: (context, style, animation) => FDialog.adaptive(
-          body: Text(translations.bars.deleteConfirm),
-          actions: [
-            FButton(
-              style: FButtonStyle.outline(),
-              child: Text(translations.misc.cancel),
-              onPress: () => Navigator.pop(context, false),
+  @override
+  List<FButton> buildActions(BuildContext context, WidgetRef ref, Bar object) => [
+    FButton(
+      onPress: () {
+        String query = object!.name;
+        if (object.address != null && object.address!.isNotEmpty) {
+          query += ', ${object.address}';
+        }
+        if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+          launchUrl(
+            Uri.https(
+              'maps.apple.com',
+              '',
+              {'q': query},
             ),
-            FButton(
-              style: FButtonStyle.destructive(),
-              child: Text(translations.misc.yes),
-              onPress: () => Navigator.pop(context, true),
+          );
+        } else {
+          launchUrl(
+            Uri.https(
+              'google.com',
+              'maps/search/',
+              {'api': '1', 'query': query},
             ),
-          ],
-        ),
-      )) ==
-      true;
-
-  /// Opens Google Maps to show the bar address.
-  void showBarOnMap(Bar bar) {
-    String query = bar.name;
-    if (bar.address != null && bar.address!.isNotEmpty) {
-      query += ', ${bar.address}';
-    }
-    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
-      launchUrl(
-        Uri.https(
-          'maps.apple.com',
-          '',
-          {'q': query},
-        ),
-      );
-    } else {
-      launchUrl(
-        Uri.https(
-          'google.com',
-          'maps/search/',
-          {'api': '1', 'query': query},
-        ),
-      );
-    }
-  }
+          );
+        }
+      },
+      child: Text(translations.bars.details.showOnMap),
+    ),
+    ...super.buildActions(context, ref, object),
+  ];
 }
 
 /// Allows to display the bar name.
@@ -249,8 +199,9 @@ class _BarBeerPrices extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    NumberFormat numberFormat = NumberFormat.simpleCurrency(locale: translations.$meta.locale.languageCode);
-    AsyncValue<List<BeerPrice>> prices = ref.watch(beerPricesFromBarProvider(bar));
+    AsyncValue<List<BeerPrice>> prices = ref.watch(
+      beerPricesFromBarProvider(bar.uuid),
+    );
     if (!prices.hasValue || prices.value!.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -260,11 +211,13 @@ class _BarBeerPrices extends ConsumerWidget {
     }
     String result = '';
     for (BeerPrice price in prices.value!) {
-      Beer? beer = beers.value!.firstWhereOrNull((beer) => beer.uuid == price.beerUuid);
+      Beer? beer = beers.value!.firstWhereOrNull(
+        (beer) => beer.uuid == price.beerUuid,
+      );
       if (beer == null) {
         continue;
       }
-      result += '${beer.name} (${numberFormat.format(price.amount)}), ';
+      result += '${beer.name} (${NumberFormat.formatPrice(price.amount)}), ';
     }
     result = result.trim();
     if (result.endsWith(',')) {

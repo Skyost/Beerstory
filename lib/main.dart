@@ -2,6 +2,7 @@ import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/migration/migrator.dart';
 import 'package:beerstory/pages/routes.dart';
 import 'package:beerstory/pages/scaffold.dart';
+import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,7 +17,10 @@ Future<void> main() async {
     name: 'Beerstory',
     url: 'https://github.com/Skyost/Beerstory',
   );
-  OpenFoodAPIConfiguration.globalLanguages = [OpenFoodFactsLanguage.ENGLISH, OpenFoodFactsLanguage.FRENCH];
+  OpenFoodAPIConfiguration.globalLanguages = [
+    OpenFoodFactsLanguage.ENGLISH,
+    OpenFoodFactsLanguage.FRENCH,
+  ];
   await LocaleSettings.useDeviceLocale();
   runApp(
     ProviderScope(
@@ -28,21 +32,7 @@ Future<void> main() async {
 }
 
 /// The beerstory app class.
-class _BeerstoryApp extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _BeerstoryAppState();
-}
-
-/// The beerstory app class state.
-class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Migrator.migrate(ref);
-    });
-  }
-
+class _BeerstoryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FThemeData themeData = MediaQuery.of(context).platformBrightness == Brightness.dark ? _tealTheme.dark : _tealTheme.light;
@@ -95,7 +85,9 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> {
         ...GlobalMaterialLocalizations.delegates,
       ],
       routes: {
-        kHomeRoute: (context) => const HomeRouteScaffold(),
+        kHomeRoute: (context) => const _MigratorWidget(
+          child: HomeRouteScaffold(),
+        ),
         kHistoryRoute: (context) => const HistoryRouteScaffold(),
       },
     );
@@ -146,4 +138,38 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> {
       ),
     ),
   );
+}
+
+/// Allows to use the [Migrator] class and to report changes to the user.
+class _MigratorWidget extends ConsumerStatefulWidget {
+  /// The child widget.
+  final Widget child;
+
+  /// Creates a new migrator widget instance.
+  const _MigratorWidget({
+    required this.child,
+  });
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _MigratorWidgetState();
+}
+
+/// The migrator widget state.
+class _MigratorWidgetState extends ConsumerState<_MigratorWidget> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (await Migrator.needsMigration(ref) && mounted) {
+        showWaitingOverlay(
+          context,
+          future: Migrator.migrate(ref),
+          message: translations.misc.migration,
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

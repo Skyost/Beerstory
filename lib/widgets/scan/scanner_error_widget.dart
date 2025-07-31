@@ -16,33 +16,33 @@ class ScannerErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ColoredBox(
-        color: Colors.black,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
-                child: Icon(
-                  FIcons.circleAlert,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                switch (error.errorCode) {
-                  MobileScannerErrorCode.controllerUninitialized => translations.error.scan.controllerUninitialized,
-                  MobileScannerErrorCode.permissionDenied => translations.error.scan.permissionDenied,
-                  MobileScannerErrorCode.unsupported => translations.error.scan.unsupported,
-                  _ => translations.error.scan.genericError,
-                },
-                style: const TextStyle(color: Colors.white),
-              ),
-              Text(
-                error.errorDetails?.message ?? '',
-                style: const TextStyle(color: Colors.white),
-              ),
-            ],
+    color: Colors.black,
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Icon(
+              FIcons.circleAlert,
+              color: Colors.white,
+            ),
           ),
-        ),
-      );
+          Text(
+            switch (error.errorCode) {
+              MobileScannerErrorCode.controllerUninitialized => translations.error.scan.controllerUninitialized,
+              MobileScannerErrorCode.permissionDenied => translations.error.scan.permissionDenied,
+              MobileScannerErrorCode.unsupported => translations.error.scan.unsupported,
+              _ => translations.error.scan.genericError,
+            },
+            style: const TextStyle(color: Colors.white),
+          ),
+          Text(
+            error.errorDetails?.message ?? '',
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    ),
+  );
 }

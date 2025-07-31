@@ -20,7 +20,7 @@ jobs:
         channel: 'stable'
         cache: true
     - name: Build ⚙️
-      run: flutter build web --base-href "/Beerstory/"
+      run: dart run beerstory:compile_svg && flutter build web --base-href "/Beerstory/"
     - name: Deploy 🚀
       uses: peaceiris/actions-gh-pages@v3
       with:

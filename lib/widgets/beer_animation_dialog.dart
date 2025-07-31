@@ -19,8 +19,8 @@ class BeerAnimationDialog extends StatefulWidget {
     required this.onFinished,
     FDialogStyle Function(FDialogStyle)? style,
     Animation<double>? animation,
-  })  : _style = style,
-        _animation = animation;
+  }) : _style = style,
+       _animation = animation;
 
   @override
   State<StatefulWidget> createState() => _BeerAnimationDialogState();
@@ -28,20 +28,22 @@ class BeerAnimationDialog extends StatefulWidget {
   /// Shows the dialog only for the duration of the animation.
   static Future<void> show({
     required BuildContext context,
-  }) =>
-      showFDialog(
-        context: context,
-        builder: (context, style, animation) => BeerAnimationDialog(
-          style: style.call,
-          animation: animation,
-          onFinished: () {
+    VoidCallback? onFinished,
+  }) => showFDialog(
+    context: context,
+    builder: (context, style, animation) => BeerAnimationDialog(
+      style: style.call,
+      animation: animation,
+      onFinished:
+          onFinished ??
+          () {
             if (context.mounted) {
               Navigator.pop(context);
             }
           },
-        ),
-        barrierDismissible: false,
-      );
+    ),
+    barrierDismissible: false,
+  );
 }
 
 /// The beer animation dialog state.
@@ -57,19 +59,19 @@ class _BeerAnimationDialogState extends State<BeerAnimationDialog> with TickerPr
 
   @override
   Widget build(BuildContext context) => FDialog(
-        style: widget._style,
-        animation: widget._animation,
-        body: Lottie.asset(
-          'assets/animations/beer.json',
-          controller: controller,
-          onLoaded: (composition) {
-            controller.duration = composition.duration;
-            TickerFuture tickerFuture = controller.forward();
-            tickerFuture.whenCompleteOrCancel(widget.onFinished);
-          },
-        ),
-        actions: [],
-      );
+    style: widget._style,
+    animation: widget._animation,
+    body: Lottie.asset(
+      'assets/animations/beer.json',
+      controller: controller,
+      onLoaded: (composition) {
+        controller.duration = composition.duration;
+        TickerFuture tickerFuture = controller.forward();
+        tickerFuture.whenCompleteOrCancel(widget.onFinished);
+      },
+    ),
+    actions: [],
+  );
 
   @override
   void dispose() {

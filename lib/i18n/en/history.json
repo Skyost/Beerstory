@@ -15,8 +15,8 @@
       "label": "Quantity",
       "title": "Quantity of beer drank",
       "hint": "Quantity (in cL)",
-      "empty": "No quantity",
       "quantities": {
+        "unspecified": "Unspecified",
         "bottle": "Bottle / Can (33cL)",
         "halfPint": "Half-pint (50cL)",
         "pint": "Pint (100cL)",
@@ -42,10 +42,12 @@
     },
     "quantity": {
       "label": "Quantity",
-      "empty": "No quantity"
+      "empty": "Unknown",
+      "quantity": "$quantity cL"
     },
     "times": {
-      "label": "Times"
+      "label": "Times",
+      "empty": "Unknown"
     },
     "moreThanQuantity": {
       "label": "More than the displayed quantity ?"

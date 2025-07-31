@@ -38,3 +38,4 @@ linter:
 # https://dart.dev/guides/language/analysis-options
 formatter:
   trailing_commas: preserve
+  page_width: 200

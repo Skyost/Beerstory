@@ -1,7 +1,9 @@
 {
-  "error": "Erreur",
-  "empty": "Ce champ ne doit pas être vide.",
-  "addBeerFirst": "Vous devez d'abord ajouter une bière dans l'application.",
+  "generic": "Une erreur est survenue. Veuillez réessayer plus tard.",
+  "fields": {
+    "empty": "Ce champ ne doit pas être vide.",
+    "number": "Veuillez entrer un nombre valide."
+  },
   "openFoodFacts": {
     "notFound": "Impossible de trouver votre bière sur les serveurs d'OpenFoodFacts serveurs avec ce code-barre.",
     "genericError": "Une erreur est survenue en cherchant votre bière sur OpenFoodFacts.\nVeuillez réessayer plus tard."

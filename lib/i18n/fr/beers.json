@@ -1,7 +1,8 @@
 {
   "page": {
     "name": "Bières",
-    "empty": "Pas de bière enregistrée pour le moment."
+    "empty": "Pas de bière enregistrée pour le moment.",
+    "searchEmpty": "Aucune bière trouvée."
   },
   "dialog": {
     "edit": "Modifier la bière",

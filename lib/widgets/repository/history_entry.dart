@@ -5,16 +5,12 @@ import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/spacing.dart';
-import 'package:beerstory/utils/adaptive.dart';
-import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
 import 'package:beerstory/widgets/editors/history_entry_edit.dart';
-import 'package:beerstory/widgets/form_fields/beer_quantity.dart';
 import 'package:beerstory/widgets/repository/beer.dart';
-import 'package:beerstory/widgets/waiting_overlay.dart';
+import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:intl/intl.dart';
 
 /// A widget that allows to display a history entry.
 class HistoryEntryWidget extends ConsumerWidget with FTileMixin {
@@ -29,7 +25,11 @@ class HistoryEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Beer? beer = ref.watch(beerRepositoryProvider.select((beers) => beers.value?.findByUuid(historyEntry.beerUuid)));
+    Beer? beer = ref.watch(
+      beerRepositoryProvider.select(
+        (beers) => beers.value?.findByUuid(historyEntry.beerUuid),
+      ),
+    );
     return beer == null
         ? const SizedBox.shrink()
         : _HistoryEntryContent(
@@ -51,181 +51,155 @@ class _HistoryEntryContent extends BeerWidget {
   });
 
   @override
-  Widget? buildSuffix(BuildContext context) => Column(
+  Widget buildPrefix(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
+    spacing: kSpace,
     children: [
-      if (historyEntry.quantity != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: Text.rich(
+      Text.rich(
+        TextSpan(
+          children: [
             TextSpan(
-              children: [
-                TextSpan(
-                  text: translations.history.page.total,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const TextSpan(text: ' '),
-                TextSpan(
-                  text: translations.history.page.quantity(
-                    prefix: historyEntry.moreThanQuantity ? '+' : '',
-                    quantity: NumberFormat.decimalPattern().format(historyEntry.quantity),
-                  ),
-                ),
-              ],
+              text: historyEntry.times.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
+            const TextSpan(text: '×'),
+          ],
         ),
-      BeerDegrees(
-        beer: object,
-        inBadge: true,
+        style: context.theme.typography.xs.copyWith(
+          color: context.theme.colors.mutedForeground,
+        ),
       ),
+      super.buildPrefix(context),
     ],
   );
 
   @override
-  Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => _HistoryEntryDetailsWidget(
-    historyEntryUuid: historyEntry.uuid,
-    scrollController: scrollController,
-  );
+  Widget buildDetailsWidget(BuildContext context, ScrollController scrollController) => _HistoryEntryDetailsWidget(objectUuid: historyEntry.uuid, scrollController: scrollController);
 }
 
 /// Allows to show a history entry details.
-class _HistoryEntryDetailsWidget extends ConsumerWidget {
-  /// The history entry UUID.
-  final String historyEntryUuid;
-
-  /// The scroll controller.
-  final ScrollController? scrollController;
-
+class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEntry> {
   /// Creates a new history entry widget instance.
   const _HistoryEntryDetailsWidget({
-    required this.historyEntryUuid,
-    this.scrollController,
+    required super.objectUuid,
+    super.scrollController,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    HistoryEntry? historyEntry = ref.watch(historyProvider.select((history) => history.value?.findByUuid(historyEntryUuid)));
-    if (historyEntry == null) {
-      return const CenteredCircularProgressIndicator();
-    }
-    List<FButton> actions = [
-      FButton(
-        style: FButtonStyle.destructive(),
-        child: Text(translations.misc.delete),
-        onPress: () async {
-          if (await showDeleteConfirmationDialog(context)) {
-            ref.read(historyProvider.notifier).remove(historyEntry);
-          }
-        },
-      ),
-    ];
-    Beer? beer = ref.watch(beerRepositoryProvider.select((beers) => beers.value?.findByUuid(historyEntry.beerUuid)));
-    if (beer == null) {
-      return const CenteredCircularProgressIndicator();
-    }
-    return ListView(
-      controller: scrollController,
+  String get deleteConfirmationMessage => translations.history.deleteConfirm;
+
+  @override
+  AsyncNotifierProvider<Repository<HistoryEntry>, List<HistoryEntry>> get repositoryProvider => historyProvider;
+
+  @override
+  List<Widget> buildChildren(BuildContext context, WidgetRef ref, HistoryEntry object) => [
+    FDateField(
+      initialDate: object.date,
+      onChange: (date) async {
+        await editObject(context, ref, object.copyWith(date: date));
+      },
+    ),
+    FTileGroup(
+      label: Text(translations.bars.details.title),
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FDateField(
-            initialDate: historyEntry.date,
-            onChange: (date) async {
-              await editHistoryEntry(context, ref, historyEntry.copyWith(date: date));
-            },
-          ),
+        _BeerTile(
+          beerUuid: object.beerUuid,
+          onPressed: (beer) async {
+            String? newBeerUuid = await HistoryEntryBeerEditorDialog.show(
+              context: context,
+              beerUuid: beer.uuid,
+            );
+            if (newBeerUuid != null && newBeerUuid != beer.uuid && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.copyWith(beerUuid: newBeerUuid),
+              );
+            }
+          },
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.bars.details.title),
-            children: [
-              FTile(
-                title: Text(translations.history.dialog.beer.label),
-                subtitle: Text(beer.name),
-                suffix: const Icon(FIcons.chevronRight),
-                onPress: () async {
-                  String? newBeerUuid = await HistoryEntryBeerEditorDialog.show(
-                    context: context,
-                    beerUuid: historyEntry.beerUuid,
-                  );
-                  if (newBeerUuid != null && newBeerUuid != historyEntry.beerUuid && context.mounted) {
-                    await editHistoryEntry(context, ref, historyEntry.copyWith(beerUuid: newBeerUuid));
-                  }
-                },
-              ),
-              FTile(
-                title: Text(translations.history.dialog.quantity.label),
-                subtitle: Text('${historyEntry.quantity} cL'),
-                suffix: const Icon(FIcons.chevronRight),
-                onPress: () async {
-                  BeerQuantity? newQuantity = await HistoryEntryQuantityEditorDialog.show(
-                    context: context,
-                    quantity: historyEntry.quantity,
-                  );
-                  if (newQuantity?.value != historyEntry.quantity && context.mounted) {
-                    await editHistoryEntry(context, ref, historyEntry.overwriteQuantity(quantity: newQuantity?.value));
-                  }
-                },
-              ),
-              FTile(
-                title: Text(translations.history.dialog.times.label),
-                subtitle: Text(historyEntry.times.toString()),
-                suffix: const Icon(FIcons.chevronRight),
-                onPress: () async {
-                  int? newTimes = await HistoryEntryTimesEditorDialog.show(
-                    context: context,
-                    times: historyEntry.times,
-                  );
-                  if (newTimes != null && newTimes != historyEntry.times && context.mounted) {
-                    await editHistoryEntry(context, ref, historyEntry.copyWith(times: newTimes));
-                  }
-                },
-              ),
-              FTile(
-                suffix: FCheckbox(value: historyEntry.moreThanQuantity),
-                title: Text(translations.history.dialog.moreThanQuantity.label),
-                subtitle: Text(historyEntry.moreThanQuantity.toString()),
-                onPress: () async {
-                  await editHistoryEntry(context, ref, historyEntry.copyWith(moreThanQuantity: !historyEntry.moreThanQuantity));
-                },
-              ),
-            ],
+        FTile(
+          title: Text(translations.history.dialog.quantity.label),
+          subtitle: Text(
+            object.quantity == null
+                ? translations.history.details.quantity.empty
+                : translations.history.details.quantity.quantity(
+                    quantity: object.quantity!,
+                  ),
           ),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            BeerQuantity? newQuantity = await HistoryEntryQuantityEditorDialog.show(
+              context: context,
+              quantity: object.quantity,
+            );
+            if (newQuantity?.value != object.quantity && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.overwriteQuantity(quantity: newQuantity?.value),
+              );
+            }
+          },
         ),
-        actions.adaptiveWrapper,
+        FTile(
+          title: Text(translations.history.dialog.times.label),
+          subtitle: Text(object.times.toString()),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            int? newTimes = await HistoryEntryTimesEditorDialog.show(
+              context: context,
+              times: object.times,
+            );
+            if (newTimes != null && newTimes != object.times && context.mounted) {
+              await editObject(context, ref, object.copyWith(times: newTimes));
+            }
+          },
+        ),
+        FTile(
+          suffix: FCheckbox(value: object.moreThanQuantity),
+          title: Text(translations.history.dialog.moreThanQuantity.label),
+          subtitle: Text(
+            object.moreThanQuantity ? translations.misc.yes : translations.misc.no,
+          ),
+          onPress: () async {
+            await editObject(
+              context,
+              ref,
+              object.copyWith(moreThanQuantity: !object.moreThanQuantity),
+            );
+          },
+        ),
       ],
-    );
-  }
+    ),
+  ];
+}
 
-  /// Edits a given history entry and shows a waiting overlay.
-  Future<void> editHistoryEntry(BuildContext context, WidgetRef ref, HistoryEntry editedHistoryEntry) async {
-    await showWaitingOverlay(
-      context,
-      future: ref.read(historyProvider.notifier).change(editedHistoryEntry),
-    );
-  }
+/// Allows to display the beer of a history entry.
+class _BeerTile extends ConsumerWidget with FTileMixin {
+  /// The beer UUID.
+  final String beerUuid;
 
-  /// Shows a delete confirmation dialog.
-  Future<bool> showDeleteConfirmationDialog(BuildContext context) async =>
-      (await showFDialog(
-        context: context,
-        builder: (context, style, animation) => FDialog.adaptive(
-          body: Text(translations.history.deleteConfirm),
-          actions: [
-            FButton(
-              style: FButtonStyle.outline(),
-              child: Text(translations.misc.cancel),
-              onPress: () => Navigator.pop(context, false),
-            ),
-            FButton(
-              style: FButtonStyle.destructive(),
-              child: Text(translations.misc.yes),
-              onPress: () => Navigator.pop(context, true),
-            ),
-          ],
-        ),
-      )) ==
-      true;
+  /// Called when the tile is pressed.
+  final Function(Beer)? onPressed;
+
+  /// Creates a new beer widget instance.
+  const _BeerTile({required this.beerUuid, this.onPressed});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    Beer? beer = ref.watch(
+      beerRepositoryProvider.select(
+        (beers) => beers.value?.findByUuid(beerUuid),
+      ),
+    );
+    return beer == null
+        ? const SizedBox.shrink()
+        : FTile(
+            title: Text(translations.history.dialog.beer.label),
+            subtitle: Text(beer.name),
+            suffix: const Icon(FIcons.chevronRight),
+            onPress: onPressed == null ? null : () => onPressed!(beer),
+          );
+  }
 }

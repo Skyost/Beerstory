@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:beerstory/i18n/translations.g.dart';
+import 'package:beerstory/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -41,12 +42,22 @@ abstract class FormDialogState<T, W extends FormDialog<T>> extends ConsumerState
       style: widget._style,
       animation: widget._animation,
       body: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: math.max(0, MediaQuery.sizeOf(context).height - 186)),
+        constraints: BoxConstraints(
+          maxHeight: math.max(0, MediaQuery.sizeOf(context).height - 186),
+        ),
         child: Form(
           key: formKey,
           child: ListView(
             shrinkWrap: true,
-            children: children,
+            children: [
+              for (int i = 0; i < children.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: i < children.length - 1 ? kSpace : kSpace * 2,
+                  ),
+                  child: children[i],
+                ),
+            ],
           ),
         ),
       ),

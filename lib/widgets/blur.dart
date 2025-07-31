@@ -38,16 +38,16 @@ class BlurWidget extends ConsumerStatefulWidget {
 class _BlurWidgetState extends ConsumerState<BlurWidget> {
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: widget.borderRadius ?? BorderRadius.zero,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur),
-          child: Container(
-            decoration: BoxDecoration(
-              color: (MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white).withValues(alpha: widget.colorOpacity),
-            ),
-            alignment: widget.alignment,
-            child: widget.child,
-          ),
+    borderRadius: widget.borderRadius ?? BorderRadius.zero,
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur),
+      child: Container(
+        decoration: BoxDecoration(
+          color: (MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white).withValues(alpha: widget.colorOpacity),
         ),
-      );
+        alignment: widget.alignment,
+        child: widget.child,
+      ),
+    ),
+  );
 }

@@ -22,7 +22,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
   jovial_svg: ^1.1.27
   mobile_scanner: ^7.0.1
-  drift: ^2.28.0
+  drift: ^2.28.1
   drift_flutter: ^0.2.5
   forui: ^0.14.1
   forui_assets: ^0.14.0
@@ -32,11 +32,10 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^6.0.0
-  drift_dev: ^2.28.0
+  drift_dev: ^2.28.1
   build_runner: ^2.5.4
   custom_lint: ^0.7.3
   riverpod_lint: ^2.6.5
-  slang_build_runner: ^4.7.0
 
 flutter:
   uses-material-design: true
@@ -51,7 +50,7 @@ flutter:
         - asset: assets/fonts/BirdsOfParadise.ttf
 flutter_native_splash:
   color: "#009688"
-  image: assets/images/splash/default.png
+  image: assets/splash/default.png
   fullscreen: true
   android_12:
-    image: assets/images/splash/android12.png
+    image: assets/splash/android12.png

@@ -15,8 +15,8 @@
       "label": "Quantité",
       "title": "Quantité de bière bue",
       "hint": "Quantité (en cL)",
-      "empty": "Pas de quantité",
       "quantities": {
+        "unspecified": "Non spécifiée",
         "bottle": "Bouteille / Canette (33cL)",
         "halfPint": "Demi-pinte (50cL)",
         "pint": "Pinte (100cL)",
@@ -42,10 +42,12 @@
     },
     "quantity": {
       "label": "Quantité",
-      "empty": "Pas de quantité"
+      "empty": "Inconnue",
+      "quantity": "$quantity cL"
     },
     "times": {
-      "label": "Nombre de fois"
+      "label": "Nombre de fois",
+      "empty": "Inconnu"
     },
     "moreThanQuantity": {
       "label": "Plus que la quantité affichée ?"

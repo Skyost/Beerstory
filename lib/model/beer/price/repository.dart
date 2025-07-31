@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:beerstory/model/bar/bar.dart';
-import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/price/database.dart';
 import 'package:beerstory/model/beer/price/price.dart';
 import 'package:beerstory/model/repository.dart';
@@ -19,31 +17,37 @@ class BeerPriceRepository extends Repository<BeerPrice> {
 }
 
 /// The beer prices from beer provider.
-final beerPricesFromBeerProvider = AsyncNotifierProvider.family.autoDispose<BeerPriceFromBeerNotifier, List<BeerPrice>, Beer>(BeerPriceFromBeerNotifier.new);
+final beerPricesFromBeerProvider = AsyncNotifierProvider.autoDispose.family<BeerPriceFromBeerNotifier, List<BeerPrice>, String>(BeerPriceFromBeerNotifier.new);
 
 /// Allows to display the prices of a given beer.
-class BeerPriceFromBeerNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, Beer> {
+class BeerPriceFromBeerNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, String> {
   @override
-  FutureOr<List<BeerPrice>> build(Beer arg) async {
-    List<BeerPrice> prices = await ref.watch(beerPriceRepositoryProvider.future);
+  FutureOr<List<BeerPrice>> build(String beerUuid) async {
+    List<BeerPrice> prices = await ref.watch(
+      beerPriceRepositoryProvider.future,
+    );
     return [
       for (BeerPrice price in prices)
-        if (price.beerUuid == arg.uuid) price,
+        if (price.beerUuid == beerUuid) price,
     ];
   }
 }
 
 /// The beer prices from bar provider.
-final beerPricesFromBarProvider = AsyncNotifierProvider.family.autoDispose<BeerPriceFromBarNotifier, List<BeerPrice>, Bar>(BeerPriceFromBarNotifier.new);
+final beerPricesFromBarProvider = AsyncNotifierProvider.autoDispose.family<BeerPriceFromBarNotifier, List<BeerPrice>, String>(
+  BeerPriceFromBarNotifier.new,
+);
 
 /// Allows to display the prices of a given bar.
-class BeerPriceFromBarNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, Bar> {
+class BeerPriceFromBarNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, String> {
   @override
-  FutureOr<List<BeerPrice>> build(Bar arg) async {
-    List<BeerPrice> prices = await ref.watch(beerPriceRepositoryProvider.future);
+  FutureOr<List<BeerPrice>> build(String barUuid) async {
+    List<BeerPrice> prices = await ref.watch(
+      beerPriceRepositoryProvider.future,
+    );
     return [
       for (BeerPrice price in prices)
-        if (price.barUuid == arg.uuid) price,
+        if (price.barUuid == barUuid) price,
     ];
   }
 }

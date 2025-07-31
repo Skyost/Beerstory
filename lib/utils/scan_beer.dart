@@ -1,15 +1,10 @@
-import 'dart:io';
-
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
-import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/scan/barcode_scanner.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/openfoodfacts.dart';
-import 'package:path/path.dart' as path;
 
 /// Tries to scan a beer thanks to [BarcodeScanner].
 Future<ScanResult> scanBeer(BuildContext context) async =>
@@ -35,21 +30,7 @@ Future<ScanResult> scanBeer(BuildContext context) async =>
             return;
           }
           if (result.product == null) {
-            if (result.result?.id == ProductResultV3.resultProductNotFound) {
-              showFToast(
-                context: context,
-                title: Text(translations.error.openFoodFacts.notFound),
-              );
-            } else {
-              showFToast(
-                context: context,
-                title: Text(translations.error.openFoodFacts.genericError),
-              );
-            }
-            Navigator.pop(
-              context,
-              ScanResultError(errorId: result.result?.id),
-            );
+            Navigator.pop(context, ScanResultError(errorId: result.result?.id));
             return;
           }
 
@@ -64,20 +45,11 @@ Future<ScanResult> scanBeer(BuildContext context) async =>
           if (product.imageFrontUrl != null) {
             image = await showWaitingOverlay(
               context,
-              future: (() async {
-                try {
-                  Uri uri = Uri.parse(product.imageFrontUrl!);
-                  String extension = path.extension(uri.pathSegments.last);
-                  Directory directory = await Beer.getImagesTargetDirectory();
-                  File file = File(path.join(directory.path, 'openFoodFacts', '$barcode$extension'));
-                  file.parent.createSync(recursive: true);
-                  await file.writeAsBytes((await http.get(uri)).bodyBytes);
-                  return file.path;
-                } catch (ex, stackTrace) {
-                  printError(ex, stackTrace);
-                }
-                return null;
-              })(),
+              future: BeerImage.copyImage(
+                originalFilePath: product.imageFrontUrl!,
+                filenamePrefix: barcode,
+                source: 'openFoodFacts',
+              ),
             );
           }
 
@@ -107,12 +79,22 @@ extension HandleScanResult on BuildContext {
         showFToast(
           context: this,
           title: Text(translations.error.openFoodFacts.notFound),
+          style: (style) => style.copyWith(
+            titleTextStyle: style.titleTextStyle.copyWith(
+              color: theme.colors.errorForeground,
+            ),
+          ),
         );
         break;
       case ScanResultError():
         showFToast(
           context: this,
           title: Text(translations.error.openFoodFacts.genericError),
+          style: (style) => style.copyWith(
+            titleTextStyle: style.titleTextStyle.copyWith(
+              color: theme.colors.errorForeground,
+            ),
+          ),
         );
         break;
       case ScanResultSuccess():
@@ -142,18 +124,18 @@ class ScanResultError extends ScanResult {
 
   /// Creates a new scan result error instance.
   factory ScanResultError({String? errorId}) => switch (errorId) {
-        ProductResultV3.resultProductNotFound => const ScanResultNotFound(),
-        _ => ScanResultError._(errorId: errorId),
-      };
+    ProductResultV3.resultProductNotFound => const ScanResultNotFound(),
+    _ => ScanResultError._(errorId: errorId),
+  };
 }
 
 /// Returned when the result is not found.
 class ScanResultNotFound extends ScanResultError {
   /// Creates a new scan result not found instance.
   const ScanResultNotFound()
-      : super._(
-          errorId: ProductResultV3.resultProductNotFound,
-        );
+    : super._(
+        errorId: ProductResultV3.resultProductNotFound,
+      );
 }
 
 /// Returned when the scan is cancelled.

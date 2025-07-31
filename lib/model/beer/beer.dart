@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/utils/compare_fields.dart';
 import 'package:beerstory/utils/searchable.dart';
+import 'package:beerstory/utils/utils.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -55,64 +57,104 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     List<String>? tags,
     double? degrees,
     double? rating,
-  }) =>
-      Beer(
-        uuid: uuid ?? this.uuid,
-        name: name ?? this.name,
-        image: image ?? this.image,
-        tags: tags ?? _tags,
-        degrees: degrees ?? this.degrees,
-        rating: rating ?? this.rating,
-      );
+  }) => Beer(
+    uuid: uuid ?? this.uuid,
+    name: name ?? this.name,
+    image: image ?? this.image,
+    tags: tags ?? _tags,
+    degrees: degrees ?? this.degrees,
+    rating: rating ?? this.rating,
+  );
 
   /// Overwrites the [Beer.image] field.
   Beer overwriteImage({String? image}) => Beer(
-        uuid: uuid,
-        name: name,
-        image: image,
-        tags: _tags,
-        degrees: degrees,
-        rating: rating,
-      );
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
   /// Overwrites the [Beer.degrees] field.
   Beer overwriteDegrees({double? degrees}) => Beer(
-        uuid: uuid,
-        name: name,
-        image: image,
-        tags: _tags,
-        degrees: degrees,
-        rating: rating,
-      );
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
   /// Overwrites the [Beer.rating] field.
   Beer overwriteRating({double? rating}) => Beer(
-        uuid: uuid,
-        name: name,
-        image: image,
-        tags: _tags,
-        degrees: degrees,
-        rating: rating,
-      );
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
   @override
   int compareTo(Beer other) => compareAccordingToFields<Beer>(
-        this,
-        other,
-        (beer) => [
-          beer.name,
-          beer.rating,
-          beer.degrees,
-          beer.uuid,
-        ],
-      );
+    this,
+    other,
+    (beer) => [
+      beer.name,
+      beer.rating,
+      beer.degrees,
+      beer.uuid,
+    ],
+  );
 
   @override
   List<String> get searchTerms => [
-        name,
-        ..._tags,
-      ];
+    name,
+    ..._tags,
+  ];
+}
 
+/// Contains some methods to work with beers images.
+class BeerImage {
   /// Returns the beer image path.
-  static Future<Directory> getImagesTargetDirectory({bool create = true}) async => Directory(path.join((await getApplicationSupportDirectory()).path, 'images'));
+  static Future<Directory> getImagesTargetDirectory({
+    bool create = true,
+  }) async => Directory(
+    path.join((await getApplicationSupportDirectory()).path, 'images'),
+  );
+
+  /// Copies the image to the target directory and returns the path.
+  static Future<String?> copyImage({
+    required String originalFilePath,
+    required String filenamePrefix,
+    String source = 'manual',
+  }) async {
+    try {
+      Uri uri = Uri.parse(originalFilePath);
+      String extension = path.extension(uri.pathSegments.last);
+      Directory directory = await getImagesTargetDirectory();
+      String filename = filenamePrefix;
+      if (source == 'manual') {
+        filename += '-${DateTime.now().millisecondsSinceEpoch}';
+      }
+      File file = File(
+        path.join(directory.path, source, '$filename$extension'),
+      );
+      file.parent.createSync(recursive: true);
+      if (uri.scheme == 'http' || uri.scheme == 'https') {
+        file.writeAsBytesSync((await http.get(uri)).bodyBytes);
+      } else {
+        File originalFile = File(uri.path);
+        if (!originalFile.existsSync()) {
+          return null;
+        }
+        originalFile.copySync(file.path);
+      }
+      return file.path;
+    } catch (ex, stackTrace) {
+      printError(ex, stackTrace);
+    }
+    return null;
+  }
 }

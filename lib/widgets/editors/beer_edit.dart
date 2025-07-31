@@ -1,15 +1,18 @@
-// ignore_for_file: prefer_const_constructors
+import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/spacing.dart';
+import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
-import 'package:beerstory/widgets/form_fields/beer_image.dart';
-import 'package:beerstory/widgets/form_fields/rating.dart';
-import 'package:beerstory/widgets/form_fields/tags.dart';
+import 'package:beerstory/widgets/repository/beer.dart';
+import 'package:beerstory/widgets/smooth_star_rating.dart';
+import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// The add beer dialog.
 class AddBeerDialog extends FormDialog<Beer> {
@@ -42,10 +45,16 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
   /// The current beer instance.
   late Beer beer = widget.object.copyWith();
 
+  /// The add form focus node.
+  final FocusNode addFormFocusNode = FocusNode();
+
+  /// The add form controller.
+  final TextEditingController addFormController = TextEditingController();
+
   @override
   List<Widget> createChildren(BuildContext context) => [
     Padding(
-      padding: const EdgeInsets.only(bottom: kSpace * 2),
+      padding: const EdgeInsets.only(bottom: kSpace),
       child: Center(
         child: BeerImageFormField(
           initialValue: beer.image,
@@ -57,31 +66,43 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
         ),
       ),
     ),
-    Padding(
-      padding: const EdgeInsets.only(bottom: kSpace),
-      child: FTextFormField(
-        label: Text(translations.beers.dialog.name.label),
-        hint: translations.beers.dialog.name.hint,
-        initialText: beer.name,
-        validator: emptyStringValidator,
-        onSaved: (value) => beer = beer.copyWith(
-          name: value?.trim(),
-        ),
+    _BeerNameFormField(
+      initialText: beer.name,
+      onSaved: (value) => beer = beer.copyWith(
+        name: value?.trim(),
       ),
     ),
-    Padding(
-      padding: EdgeInsets.only(bottom: kSpace * 2),
-      child: RatingFormField(
-        label: Text(translations.beers.dialog.rating.label),
-        initialValue: beer.rating,
-        size: 50,
-        onSaved: (value) => beer = beer.overwriteRating(rating: (value ?? 0) <= 0 ? null : value),
+    _BeerRatingFormField(
+      initialValue: beer.rating,
+      onSaved: (value) => beer = beer.overwriteRating(
+        rating: value,
+      ),
+    ),
+    _BeerDegreesFormField(
+      initialValue: beer.degrees,
+      onSaved: (value) => beer = beer.overwriteDegrees(
+        degrees: value,
+      ),
+    ),
+    _BeerTagsFormField(
+      initialValue: beer.tags,
+      addFormFocusNode: addFormFocusNode,
+      addFormController: addFormController,
+      onSaved: (value) => beer = beer.copyWith(
+        tags: value,
       ),
     ),
   ];
 
   @override
   Beer? onSaved() => beer;
+
+  @override
+  void dispose() {
+    addFormFocusNode.dispose();
+    addFormController.dispose();
+    super.dispose();
+  }
 }
 
 /// Allows to edit a beer name.
@@ -117,15 +138,9 @@ class _BeerNameEditorDialogState extends FormDialogState<String, BeerNameEditorD
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    Padding(
-      padding: const EdgeInsets.only(bottom: kSpace),
-      child: FTextFormField(
-        label: Text(translations.beers.dialog.name.label),
-        hint: translations.beers.dialog.name.hint,
-        initialText: beerName,
-        validator: emptyStringValidator,
-        onSaved: (value) => beerName = value?.nullIfEmpty,
-      ),
+    _BeerNameFormField(
+      initialText: beerName,
+      onSaved: (value) => beerName = value?.trimOrNullIfEmpty,
     ),
   ];
 
@@ -166,15 +181,9 @@ class _BeerDegreesEditorDialogState extends FormDialogState<double?, BeerDegrees
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    Padding(
-      padding: const EdgeInsets.only(bottom: kSpace),
-      child: FTextFormField(
-        label: Text(translations.beers.dialog.degrees.label),
-        hint: translations.beers.dialog.degrees.hint,
-        initialText: (beerDegrees?.toIntIfPossible() ?? '').toString(),
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        onSaved: (value) => beerDegrees = double.tryParse(value ?? ''),
-      ),
+    _BeerDegreesFormField(
+      initialValue: beerDegrees,
+      onSaved: (value) => beerDegrees = value,
     ),
   ];
 
@@ -215,11 +224,9 @@ class _BeerRatingEditorDialogState extends FormDialogState<double?, BeerRatingEd
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    RatingFormField(
-      label: Text(translations.beers.dialog.rating.label),
+    _BeerRatingFormField(
       initialValue: beerRating,
-      size: 50,
-      onSaved: (value) => beerRating = (value ?? 0) <= 0 ? null : value,
+      onSaved: (value) => beerRating = value,
     ),
   ];
 
@@ -266,13 +273,10 @@ class _BeerTagsEditorDialogState extends FormDialogState<List<String>?, BeerTags
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    TagsFormField(
+    _BeerTagsFormField(
       initialValue: beerTags,
-      label: Text(translations.beers.dialog.tags.label),
-      addFormHint: translations.beers.dialog.tags.hint,
       addFormFocusNode: addFormFocusNode,
       addFormController: addFormController,
-      tagDeleteIcon: FIcons.delete,
       onSaved: (value) => beerTags = value,
     ),
   ];
@@ -286,4 +290,244 @@ class _BeerTagsEditorDialogState extends FormDialogState<List<String>?, BeerTags
     addFormController.dispose();
     super.dispose();
   }
+}
+
+/// The beer image form field.
+class BeerImageFormField extends FormField<String?> {
+  /// Creates a new beer image form field instance.
+  BeerImageFormField({
+    super.key,
+    super.initialValue,
+    super.onSaved,
+    required String beerUuid,
+    String? beerName,
+    final ValueChanged<String?>? onChanged,
+  }) : super(
+         builder: (state) => FPopover(
+           controller: (state as _BeerImageFormState).imagePopoverController,
+           popoverBuilder: (context, controller) => SizedBox(
+             width: math.min(300, MediaQuery.of(context).size.width),
+             child: Column(
+               mainAxisSize: MainAxisSize.min,
+               children: [
+                 FItemGroup(
+                   children: [
+                     FItem(
+                       prefix: const Icon(FIcons.galleryThumbnails),
+                       title: Text(translations.beers.dialog.image.gallery),
+                       onPress: () async {
+                         String? image = await showWaitingOverlay(
+                           context,
+                           future: _changeImageFromSource(
+                             beerUuid,
+                             ImageSource.gallery,
+                           ),
+                         );
+                         if (image != null) {
+                           state.didChange(image);
+                           onChanged?.call(image);
+                         }
+                         controller.hide();
+                       },
+                     ),
+                     FItem(
+                       prefix: const Icon(FIcons.camera),
+                       title: Text(translations.beers.dialog.image.camera),
+                       onPress: () async {
+                         String? image = await showWaitingOverlay(
+                           context,
+                           future: _changeImageFromSource(
+                             beerUuid,
+                             ImageSource.camera,
+                           ),
+                         );
+                         if (image != null) {
+                           state.didChange(image);
+                           onChanged?.call(image);
+                         }
+                         controller.hide();
+                       },
+                     ),
+                     if (state.value != null)
+                       FItem(
+                         prefix: const Icon(FIcons.cross),
+                         title: Text(translations.beers.dialog.image.remove),
+                         onPress: () {
+                           state.didChange(null);
+                           onChanged?.call(null);
+                           controller.hide();
+                         },
+                       ),
+                   ],
+                 ),
+               ],
+             ),
+           ),
+           child: GestureDetector(
+             onTap: state.imagePopoverController.show,
+             child: BeerImageWidget.fromNameImage(
+               name: beerName,
+               image: state.value,
+               radius: 100,
+             ),
+           ),
+         ),
+       );
+
+  /// Changes the image of the beer.
+  static Future<String?> _changeImageFromSource(
+    String beerUuid,
+    ImageSource source,
+  ) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: source);
+    return pickedFile == null
+        ? null
+        : BeerImage.copyImage(
+            originalFilePath: pickedFile.path,
+            filenamePrefix: beerUuid,
+          );
+  }
+
+  @override
+  FormFieldState<String?> createState() => _BeerImageFormState();
+}
+
+/// The beer image form field state.
+class _BeerImageFormState extends FormFieldState<String?> with SingleTickerProviderStateMixin {
+  /// The current image.
+  late String? oldBeerImage = widget.initialValue;
+
+  /// The image popover controller.
+  late final FPopoverController imagePopoverController = FPopoverController(vsync: this);
+
+  @override
+  void save() {
+    super.save();
+    if (oldBeerImage != value && oldBeerImage != null) {
+      File oldImage = File(oldBeerImage!);
+      if (oldImage.existsSync()) {
+        oldImage.delete();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    imagePopoverController.dispose();
+    super.dispose();
+  }
+}
+
+/// The beer name form field.
+class _BeerNameFormField extends FTextFormField {
+  /// Creates a new beer name form field instance.
+  _BeerNameFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.beers.dialog.name.label),
+         hint: translations.beers.dialog.name.hint,
+         validator: emptyStringValidator,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+       );
+}
+
+/// The beer rating form field.
+class _BeerRatingFormField extends FormField<double> {
+  /// Creates a new beer rating form field instance.
+  _BeerRatingFormField({
+    super.onSaved,
+    super.initialValue,
+    double size = 50,
+  }) : super(
+         builder: (state) => FLabel(
+           label: Text(translations.beers.dialog.rating.label),
+           axis: Axis.vertical,
+           child: SmoothStarRating(
+             rating: state.value ?? 0,
+             size: size,
+             onRatingChanged: state.didChange,
+           ),
+         ),
+       );
+
+  @override
+  FormFieldSetter<double>? get onSaved =>
+      (value) => super.onSaved?.call((value ?? 0) <= 0 ? null : value);
+}
+
+/// The beer degrees form field.
+class _BeerDegreesFormField extends FTextFormField {
+  /// Creates a new beer degrees form field instance.
+  _BeerDegreesFormField({
+    double? initialValue,
+    FormFieldSetter<double>? onSaved,
+  }) : super(
+         label: Text(translations.beers.dialog.degrees.label),
+         hint: translations.beers.dialog.degrees.hint,
+         initialText: initialValue == null ? null : NumberFormat.formatDouble(initialValue),
+         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+         validator: numbersValidator,
+         onSaved: (value) => onSaved?.call(NumberFormat.tryParseDouble(value)),
+       );
+}
+
+/// The beer tags form field.
+class _BeerTagsFormField extends FormField<List<String>> {
+  /// Creates a new beer tags form field instance.
+  _BeerTagsFormField({
+    super.onSaved,
+    super.initialValue,
+    TextEditingController? addFormController,
+    FocusNode? addFormFocusNode,
+  }) : super(
+         builder: (FormFieldState<List<String>> state) => Column(
+           mainAxisSize: MainAxisSize.min,
+           children: [
+             Padding(
+               padding: const EdgeInsets.only(bottom: kSpace / 2),
+               child: FTextFormField(
+                 focusNode: addFormFocusNode,
+                 label: Text(translations.beers.dialog.tags.label),
+                 hint: translations.beers.dialog.tags.hint,
+                 textInputAction: TextInputAction.send,
+                 controller: addFormController,
+                 onSubmit: (value) {
+                   state.didChange(List.of(state.value ?? [])..add(value));
+                   addFormController?.clear();
+                   addFormFocusNode?.requestFocus();
+                 },
+               ),
+             ),
+             Align(
+               alignment: Alignment.centerLeft,
+               child: Wrap(
+                 spacing: kSpace / 2,
+                 runSpacing: kSpace / 2,
+                 children: [
+                   for (String tag in state.value ?? [])
+                     FBadge(
+                       child: Row(
+                         children: [
+                           Text(tag),
+                           Padding(
+                             padding: const EdgeInsets.only(left: 6),
+                             child: GestureDetector(
+                               onTap: () => state.didChange(state.value?..remove(tag)),
+                               child: const Icon(
+                                 FIcons.delete,
+                                 size: 20,
+                                 color: Colors.white,
+                               ),
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+                 ],
+               ),
+             ),
+           ],
+         ),
+       );
 }

@@ -1,20 +1,32 @@
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// Allows to check if a string is numeric.
 extension StringUtils on String {
-  /// Checks whether the current string is numeric.
-  bool get isNumeric => double.tryParse(this) != null;
-
   /// Checks whether the current string is empty, and if so, returns a `null` object.
-  String? get nullIfEmpty => trim().isEmpty ? null : trim();
+  String? get trimOrNullIfEmpty => trim().isEmpty ? null : trim();
 }
 
 /// Checks whether a string is empty, and if so, returns an error message.
 String? emptyStringValidator(String? value) {
-  if (value?.nullIfEmpty == null) {
-    return translations.error.empty;
+  if (value?.trimOrNullIfEmpty == null) {
+    return translations.error.fields.empty;
+  }
+  return null;
+}
+
+/// Checks whether a string is not a valid number, and if so, returns an error message.
+String? numbersValidator(String? value, {bool allowEmpty = true}) {
+  if (value?.trimOrNullIfEmpty == null) {
+    return allowEmpty ? null : translations.error.fields.empty;
+  }
+  NumberFormat numberFormat = NumberFormat.decimalPattern(
+    translations.$meta.locale.languageCode,
+  );
+  if (numberFormat.tryParse(value!) == null) {
+    return translations.error.fields.number;
   }
   return null;
 }
@@ -29,9 +41,6 @@ extension PrimaryDark on ColorScheme {
 extension IntegerUtils on num {
   /// Returns whether this number is an integer.
   bool get isInteger => this is int || this == truncateToDouble();
-
-  /// Returns an integer if possible.
-  num toIntIfPossible() => isInteger ? toInt() : this;
 }
 
 /// Contains some useful iterable methods.
@@ -60,5 +69,6 @@ void printError(Object error, StackTrace? stackTrace) {
     }
   }
 }
+
 /// Allows to check if a type is a subtype of another.
 bool isSubtype<S, T>() => <S>[] is List<T>;

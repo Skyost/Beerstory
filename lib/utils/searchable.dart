@@ -9,7 +9,6 @@ extension SearchableExtension<T extends Searchable> on List<T> {
   /// Finds the items that match the request.
   List<T> find(String request) => [
     for (T item in this)
-      if (item.searchTerms.any((term) => term.toLowerCase().contains(request)))
-        item
+      if (item.searchTerms.any((term) => term.toLowerCase().contains(request))) item,
   ];
 }

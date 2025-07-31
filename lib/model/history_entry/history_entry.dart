@@ -49,58 +49,88 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     double? quantity,
     int? times,
     bool? moreThanQuantity,
-  }) =>
-      HistoryEntry(
-        uuid: uuid ?? this.uuid,
-        date: date ?? this.date,
-        beerUuid: beerUuid ?? this.beerUuid,
-        quantity: quantity ?? this.quantity,
-        times: times ?? this.times,
-        moreThanQuantity: moreThanQuantity ?? this.moreThanQuantity,
-      );
+  }) => HistoryEntry(
+    uuid: uuid ?? this.uuid,
+    date: date ?? this.date,
+    beerUuid: beerUuid ?? this.beerUuid,
+    quantity: quantity ?? this.quantity,
+    times: times ?? this.times,
+    moreThanQuantity: moreThanQuantity ?? this.moreThanQuantity,
+  );
 
   /// Overwrites the [HistoryEntry.quantity] field.
   HistoryEntry overwriteQuantity({double? quantity}) => HistoryEntry(
-        uuid: uuid,
-        date: date,
-        beerUuid: beerUuid,
-        quantity: quantity,
-        times: times,
-        moreThanQuantity: moreThanQuantity,
-      );
+    uuid: uuid,
+    date: date,
+    beerUuid: beerUuid,
+    quantity: quantity,
+    times: times,
+    moreThanQuantity: moreThanQuantity,
+  );
 
   @override
   int compareTo(HistoryEntry other) => compareAccordingToFields<HistoryEntry>(
-        this,
-        other,
-        (entry) => [
-          entry.date,
-          entry.times,
-          entry.quantity,
-          entry.uuid,
-        ],
-      );
+    this,
+    other,
+    (entry) => [
+      entry.date,
+      entry.times,
+      entry.quantity,
+      entry.uuid,
+    ],
+  );
 
   /// Calculates the true quantity drunk.
   double? calculateTrueQuantity(double? rawQuantity) => rawQuantity == null ? null : (rawQuantity * times);
 
   /// Adds the specified entry to this entry.
-  HistoryEntry absorbEntry(HistoryEntry entry) {
-    bool? moreThanQuantity;
-    if (entry.quantity == null || entry.moreThanQuantity) {
+  HistoryEntry absorbEntry(HistoryEntry historyEntry) {
+    AbsorbResult result = AbsorbResult.fromHistoryEntry(historyEntry: this)..absorb(historyEntry);
+    return copyWith(
+      moreThanQuantity: result.moreThanQuantity,
+      quantity: result.quantity,
+      times: result.times,
+    );
+  }
+}
+
+/// Represents the result of an absorb.
+class AbsorbResult {
+  /// The quantity.
+  double? quantity;
+
+  /// The number of times this beer has been drank.
+  int times;
+
+  /// Whether this is more than the current [quantity].
+  bool moreThanQuantity;
+
+  /// Creates a new absorb result instance.
+  AbsorbResult({
+    this.quantity,
+    this.times = 1,
+    this.moreThanQuantity = false,
+  });
+
+  /// Creates a new absorb result instance from a [historyEntry].
+  AbsorbResult.fromHistoryEntry({
+    required HistoryEntry historyEntry,
+  }) : this(
+         quantity: historyEntry.quantity,
+         times: historyEntry.times,
+         moreThanQuantity: historyEntry.moreThanQuantity,
+       );
+
+  /// Absorbs the specified [historyEntry].
+  void absorb(HistoryEntry historyEntry) {
+    if (historyEntry.quantity == null || historyEntry.moreThanQuantity) {
       moreThanQuantity = true;
     }
 
-    double? quantity;
-    if (entry.quantity != null) {
-      quantity = (quantity ?? 0) + entry.quantity!;
+    if (historyEntry.quantity != null) {
+      quantity = (quantity ?? 0) + historyEntry.quantity!;
     }
 
-    int times = this.times + entry.times;
-    return copyWith(
-      moreThanQuantity: moreThanQuantity,
-      quantity: quantity,
-      times: times,
-    );
+    times += historyEntry.times;
   }
 }

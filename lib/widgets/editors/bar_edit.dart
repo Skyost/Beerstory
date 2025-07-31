@@ -1,6 +1,5 @@
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/bar/bar.dart';
-import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:flutter/material.dart';
@@ -39,29 +38,16 @@ class _AddBarDialogState extends FormDialogState<Bar, AddBarDialog> {
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    Padding(
-      padding: const EdgeInsets.only(bottom: kSpace),
-      child: FTextFormField(
-        label: Text(translations.bars.dialog.name.label),
-        initialText: widget.object.name,
-        hint: translations.bars.dialog.name.hint,
-        validator: emptyStringValidator,
-        onSaved: (value) => bar = bar.copyWith(
-          name: value?.nullIfEmpty,
-        ),
+    _BarNameFormField(
+      initialText: widget.object.name,
+      onSaved: (value) => bar = bar.copyWith(
+        name: value?.trimOrNullIfEmpty,
       ),
     ),
-    Padding(
-      padding: const EdgeInsets.only(bottom: kSpace * 2),
-      child: FTextFormField(
-        label: Text(translations.bars.dialog.address.label),
-        initialText: widget.object.address,
-        hint: translations.bars.dialog.address.hint,
-        minLines: 1,
-        maxLines: 3,
-        onSaved: (value) => bar = bar.overwriteAddress(
-          address: value?.nullIfEmpty,
-        ),
+    _BarAddressFormField(
+      initialText: widget.object.address,
+      onSaved: (value) => bar = bar.overwriteAddress(
+        address: value?.trimOrNullIfEmpty,
       ),
     ),
   ];
@@ -103,11 +89,8 @@ class _BarNameEditorDialogState extends FormDialogState<String, BarNameEditorDia
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    FTextFormField(
-      label: Text(translations.bars.dialog.name.label),
+    _BarNameFormField(
       initialText: barName,
-      hint: translations.bars.dialog.name.hint,
-      validator: emptyStringValidator,
       onSaved: (value) => barName = value?.trim(),
     ),
   ];
@@ -154,16 +137,41 @@ class _BarAddressEditorDialogState extends FormDialogState<String, BarAddressEdi
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    FTextFormField(
-      label: Text(translations.bars.dialog.address.label),
+    _BarAddressFormField(
       initialText: barAddress,
-      hint: translations.bars.dialog.address.hint,
-      minLines: 1,
-      maxLines: 3,
       onSaved: (value) => barAddress = value?.trim(),
     ),
   ];
 
   @override
   String? onSaved() => barAddress;
+}
+
+/// The bar name form field.
+class _BarNameFormField extends FTextFormField {
+  /// Creates a new bar name form field instance.
+  _BarNameFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.bars.dialog.name.label),
+         hint: translations.bars.dialog.name.hint,
+         validator: emptyStringValidator,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+       );
+}
+
+/// The bar address form field.
+class _BarAddressFormField extends FTextFormField {
+  /// Creates a new bar address form field instance.
+  _BarAddressFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.bars.dialog.address.label),
+         hint: translations.bars.dialog.address.hint,
+         minLines: 1,
+         maxLines: 3,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+       );
 }

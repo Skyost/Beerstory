@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
@@ -11,7 +9,7 @@ class CenteredCircularProgressIndicator extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: FProgress.circularIcon(),
-      );
+  Widget build(BuildContext context) => const Center(
+    child: FProgress.circularIcon(),
+  );
 }

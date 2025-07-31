@@ -1,7 +1,8 @@
 {
   "page": {
     "name": "Bars",
-    "empty": "Pas de bar enregistré pour le moment."
+    "empty": "Pas de bar enregistré pour le moment.",
+    "searchEmpty": "Aucun bar trouvé."
   },
   "dialog": {
     "name": {

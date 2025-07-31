@@ -1,7 +1,8 @@
 {
   "page": {
     "name": "Beers",
-    "empty": "No beer added for the moment."
+    "empty": "No beer added for the moment.",
+    "searchEmpty": "No beer found."
   },
   "dialog": {
     "edit": "Edit beer",

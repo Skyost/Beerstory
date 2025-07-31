@@ -1,30 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
-/// Allows to edit a rating.
-class RatingFormField extends FormField<double> {
-  /// Creates a new rating form field instance.
-  RatingFormField({
-    super.key,
-    super.validator,
-    super.onSaved,
-    super.initialValue,
-    Widget? label,
-    double size = 40,
-    bool readOnly = false,
-  }) : super(
-          builder: (FormFieldState<double> state) => FLabel(
-            label: label,
-            axis: Axis.vertical,
-            child: SmoothStarRating(
-              rating: state.value ?? 0,
-              size: size,
-              onRatingChanged: readOnly ? null : state.didChange,
-            ),
-          ),
-        );
-}
-
 /// Thanks [`smooth_star_rating`](https://raw.githubusercontent.com/thangmam/smoothratingbar/master/lib/smooth_star_rating.dart) !
 class SmoothStarRating extends StatelessWidget {
   final int starCount;
@@ -99,10 +75,10 @@ class SmoothStarRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        alignment: WrapAlignment.start,
-        spacing: spacing,
-        children: [
-          for (int i = 0; i < starCount; i++) buildStar(context, i),
-        ],
-      );
+    alignment: WrapAlignment.start,
+    spacing: spacing,
+    children: [
+      for (int i = 0; i < starCount; i++) buildStar(context, i),
+    ],
+  );
 }

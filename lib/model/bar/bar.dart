@@ -33,34 +33,33 @@ class Bar extends RepositoryObject with HasName, Searchable implements Comparabl
     String? uuid,
     String? name,
     String? address,
-  }) =>
-      Bar(
-        uuid: uuid ?? this.uuid,
-        name: name ?? this.name,
-        address: address ?? this.address,
-      );
+  }) => Bar(
+    uuid: uuid ?? this.uuid,
+    name: name ?? this.name,
+    address: address ?? this.address,
+  );
 
   /// Overwrites the [Bar.address] field.
   Bar overwriteAddress({String? address}) => Bar(
-        uuid: uuid,
-        name: name,
-        address: address,
-      );
+    uuid: uuid,
+    name: name,
+    address: address,
+  );
 
   @override
   int compareTo(Bar other) => compareAccordingToFields<Bar>(
-        this,
-        other,
-        (bar) => [
-          bar.name,
-          bar.address,
-          bar.uuid,
-        ],
-      );
+    this,
+    other,
+    (bar) => [
+      bar.name,
+      bar.address,
+      bar.uuid,
+    ],
+  );
 
   @override
   List<String> get searchTerms => [
-        name,
-        if (address != null) address!,
-      ];
+    name,
+    if (address != null) address!,
+  ];
 }

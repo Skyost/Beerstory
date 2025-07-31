@@ -37,33 +37,32 @@ class BeerPrice extends RepositoryObject implements Comparable<BeerPrice> {
     String? beerUuid,
     String? barUuid,
     double? amount,
-  }) =>
-      BeerPrice(
-        uuid: uuid ?? this.uuid,
-        beerUuid: beerUuid ?? this.beerUuid,
-        barUuid: barUuid ?? this.barUuid,
-        amount: amount ?? this.amount,
-      );
+  }) => BeerPrice(
+    uuid: uuid ?? this.uuid,
+    beerUuid: beerUuid ?? this.beerUuid,
+    barUuid: barUuid ?? this.barUuid,
+    amount: amount ?? this.amount,
+  );
 
   /// Overwrites the [BeerPrice.barUuid] field.
   BeerPrice overwriteBar({String? barUuid}) => BeerPrice(
-        uuid: uuid,
-        beerUuid: beerUuid,
-        barUuid: barUuid,
-        amount: amount,
-      );
+    uuid: uuid,
+    beerUuid: beerUuid,
+    barUuid: barUuid,
+    amount: amount,
+  );
 
   @override
   int compareTo(BeerPrice other) => compareAccordingToFields<BeerPrice>(
-        this,
-        other,
-        (price) => [
-          price.amount,
-          price.barUuid,
-          price.beerUuid,
-          price.uuid,
-        ],
-      );
+    this,
+    other,
+    (price) => [
+      price.amount,
+      price.barUuid,
+      price.beerUuid,
+      price.uuid,
+    ],
+  );
 }
 
 /// Some useful methods to use alongside prices list.

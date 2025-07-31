@@ -11,5 +11,5 @@ final beerRepositoryProvider = AsyncNotifierProvider<BeerRepository, List<Beer>>
 class BeerRepository extends Repository<Beer> {
   @override
   @protected
-  AutoDisposeProvider<RepositoryDatabase<Beer>> get databaseProvider => beersDatabaseProvider;
+  AutoDisposeProvider<BeersDatabase> get databaseProvider => beersDatabaseProvider;
 }

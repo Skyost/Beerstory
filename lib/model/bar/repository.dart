@@ -11,5 +11,5 @@ final barRepositoryProvider = AsyncNotifierProvider<BarRepository, List<Bar>>(Ba
 class BarRepository extends Repository<Bar> {
   @override
   @protected
-  AutoDisposeProvider<RepositoryDatabase<Bar>> get databaseProvider => barsDatabaseProvider;
+  AutoDisposeProvider<BarsDatabase> get databaseProvider => barsDatabaseProvider;
 }

@@ -4,7 +4,6 @@ import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -12,7 +11,7 @@ part 'database.g.dart';
 @DataClassName('DriftBeer')
 class Beers extends Table {
   /// The beer id.
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
+  TextColumn get uuid => text()();
 
   /// The beer name.
   TextColumn get name => text()();
@@ -61,9 +60,9 @@ class BeersDatabase extends _$BeersDatabase with RepositoryDatabase<Beer>, Gener
 
   /// Creates a new beers database instance.
   BeersDatabase()
-      : super(
-          SqliteUtils.openConnection(_kDbFileName),
-        );
+    : super(
+        SqliteUtils.openConnection(_kDbFileName),
+      );
 
   @override
   int get schemaVersion => 1;
@@ -73,21 +72,26 @@ class BeersDatabase extends _$BeersDatabase with RepositoryDatabase<Beer>, Gener
 
   @override
   Insertable<DriftBeer> toInsertable(Beer object) => DriftBeer(
-        uuid: object.uuid,
-        name: object.name,
-        image: object.image,
-        tags: object.tags,
-        degrees: object.degrees,
-        rating: object.rating,
-      );
+    uuid: object.uuid,
+    name: object.name,
+    image: object.image,
+    tags: object.tags,
+    degrees: object.degrees,
+    rating: object.rating,
+  );
 
   @override
   Beer toObject(DriftBeer insertable) => Beer(
-        uuid: insertable.uuid,
-        name: insertable.name,
-        image: insertable.image,
-        tags: insertable.tags,
-        degrees: insertable.degrees,
-        rating: insertable.rating,
-      );
+    uuid: insertable.uuid,
+    name: insertable.name,
+    image: insertable.image,
+    tags: insertable.tags,
+    degrees: insertable.degrees,
+    rating: insertable.rating,
+  );
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
+  );
 }

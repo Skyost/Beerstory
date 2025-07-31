@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:beerstory/model/beer/database.dart';
 import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/repository.dart';
@@ -5,7 +7,6 @@ import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -13,22 +14,22 @@ part 'database.g.dart';
 @DataClassName('DriftHistoryEntry')
 class HistoryEntries extends Table {
   /// The history entry entry uuid.
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
+  TextColumn get uuid => text()();
 
   /// The history entry entry date.
-  DateTimeColumn get date => dateTime().withDefault(currentDate)();
+  DateTimeColumn get date => dateTime()();
 
   /// The history entry beer id.
-  TextColumn get beerUuid => text().references(Beers, #uuid)();
+  TextColumn get beerUuid => text().references(Beers, #uuid, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
 
   /// The history entry entry quantity.
   RealColumn get quantity => real().nullable()();
 
   /// The number of times this beer has been drank.
-  IntColumn get times => integer().withDefault(const Constant(1))();
+  IntColumn get times => integer()();
 
   /// Whether this is more than the current quantity.
-  BoolColumn get moreThanQuantity => boolean().withDefault(const Constant(false))();
+  BoolColumn get moreThanQuantity => boolean()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -50,9 +51,23 @@ class HistoryEntriesDatabase extends _$HistoryEntriesDatabase with RepositoryDat
 
   /// Creates a new history entries database instance.
   HistoryEntriesDatabase()
-      : super(
-          SqliteUtils.openConnection(_kDbFileName),
-        );
+    : super(
+        SqliteUtils.openConnection(_kDbFileName),
+      );
+
+  @override
+  Future<List<HistoryEntry>> list({int? limit, DateTime? date}) async {
+    SimpleSelectStatement<HistoryEntries, DriftHistoryEntry> query = select(
+      table,
+    );
+    if (limit != null) {
+      query = query..limit(limit);
+    }
+    if (date != null) {
+      query = query..where((table) => table.date.equals(date));
+    }
+    return (await query.get()).map(toObject).toList();
+  }
 
   @override
   int get schemaVersion => 1;
@@ -62,21 +77,26 @@ class HistoryEntriesDatabase extends _$HistoryEntriesDatabase with RepositoryDat
 
   @override
   Insertable<DriftHistoryEntry> toInsertable(HistoryEntry object) => DriftHistoryEntry(
-        uuid: object.uuid,
-        date: object.date,
-        beerUuid: object.beerUuid,
-        quantity: object.quantity,
-        times: object.times,
-        moreThanQuantity: object.moreThanQuantity,
-      );
+    uuid: object.uuid,
+    date: object.date,
+    beerUuid: object.beerUuid,
+    quantity: object.quantity,
+    times: object.times,
+    moreThanQuantity: object.moreThanQuantity,
+  );
 
   @override
   HistoryEntry toObject(DriftHistoryEntry insertable) => HistoryEntry(
-        uuid: insertable.uuid,
-        date: insertable.date,
-        beerUuid: insertable.beerUuid,
-        quantity: insertable.quantity,
-        times: insertable.times,
-        moreThanQuantity: insertable.moreThanQuantity,
-      );
+    uuid: insertable.uuid,
+    date: insertable.date,
+    beerUuid: insertable.beerUuid,
+    quantity: insertable.quantity,
+    times: insertable.times,
+    moreThanQuantity: insertable.moreThanQuantity,
+  );
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
+  );
 }

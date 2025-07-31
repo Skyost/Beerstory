@@ -16,32 +16,32 @@ class ScrollableSheetContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DraggableScrollableSheet(
-        expand: false,
-        builder: (context, controller) => ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(
-            dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-              PointerDeviceKind.trackpad,
-            },
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: context.theme.colors.background,
-              border: Border.symmetric(
-                horizontal: BorderSide(
-                  color: context.theme.colors.border,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: kSpace,
-                horizontal: kSpace * 2,
-              ),
-              child: builder(context, controller),
+    expand: false,
+    builder: (context, controller) => ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.trackpad,
+        },
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: context.theme.colors.background,
+          border: Border.symmetric(
+            horizontal: BorderSide(
+              color: context.theme.colors.border,
             ),
           ),
         ),
-      );
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: kSpace,
+            horizontal: kSpace * 2,
+          ),
+          child: builder(context, controller),
+        ),
+      ),
+    ),
+  );
 }

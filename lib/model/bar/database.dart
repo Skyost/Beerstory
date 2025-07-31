@@ -4,7 +4,6 @@ import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -12,7 +11,7 @@ part 'database.g.dart';
 @DataClassName('DriftBar')
 class Bars extends Table {
   /// The bar uuid.
-  TextColumn get uuid => text().clientDefault(() => const Uuid().v4())();
+  TextColumn get uuid => text()();
 
   /// The bar name.
   TextColumn get name => text()();
@@ -40,9 +39,9 @@ class BarsDatabase extends _$BarsDatabase with RepositoryDatabase<Bar>, Generate
 
   /// Creates a new bars database instance.
   BarsDatabase()
-      : super(
-          SqliteUtils.openConnection(_kDbFileName),
-        );
+    : super(
+        SqliteUtils.openConnection(_kDbFileName),
+      );
 
   @override
   int get schemaVersion => 1;
@@ -52,15 +51,20 @@ class BarsDatabase extends _$BarsDatabase with RepositoryDatabase<Bar>, Generate
 
   @override
   Insertable<DriftBar> toInsertable(Bar object) => DriftBar(
-        uuid: object.uuid,
-        name: object.name,
-        address: object.address,
-      );
+    uuid: object.uuid,
+    name: object.name,
+    address: object.address,
+  );
 
   @override
   Bar toObject(DriftBar insertable) => Bar(
-        uuid: insertable.uuid,
-        name: insertable.name,
-        address: insertable.address,
-      );
+    uuid: insertable.uuid,
+    name: insertable.name,
+    address: insertable.address,
+  );
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
+  );
 }

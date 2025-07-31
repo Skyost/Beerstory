@@ -166,3 +166,4 @@ app.*.symbols
 
 # Generated
 *.g.dart
+assets/images/

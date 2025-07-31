@@ -27,32 +27,32 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
 
   @override
   Widget build(BuildContext context) => Stack(
-      fit: StackFit.expand,
-      children: [
-        Center(
-          child: MobileScanner(
-            onDetect: widget.onScan,
-            fit: BoxFit.contain,
-            controller: controller,
-            // scanWindow: scanWindow,
-            errorBuilder: (context, error) => ScannerErrorWidget(error: error),
+    fit: StackFit.expand,
+    children: [
+      Center(
+        child: MobileScanner(
+          onDetect: widget.onScan,
+          fit: BoxFit.contain,
+          controller: controller,
+          // scanWindow: scanWindow,
+          errorBuilder: (context, error) => ScannerErrorWidget(error: error),
+        ),
+      ),
+      Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ToggleFlashlightButton(controller: controller),
+              SwitchCameraButton(controller: controller),
+            ],
           ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ToggleFlashlightButton(controller: controller),
-                SwitchCameraButton(controller: controller),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+      ),
+    ],
+  );
 
   @override
   Future<void> dispose() async {
