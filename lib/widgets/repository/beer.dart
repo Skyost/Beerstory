@@ -96,17 +96,13 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
   });
 
   @override
-  String get deleteConfirmationMessage => translations.bars.deleteConfirm;
+  String get deleteConfirmationMessage => translations.beers.deleteConfirm;
 
   @override
   AsyncNotifierProvider<Repository<Beer>, List<Beer>> get repositoryProvider => beerRepositoryProvider;
 
   @override
-  List<Widget> buildChildren(
-    BuildContext context,
-    WidgetRef ref,
-    Beer object,
-  ) => [
+  List<Widget> buildChildren(BuildContext context, WidgetRef ref, Beer object) => [
     Center(
       child: BeerImageFormField(
         initialValue: object.image,
@@ -201,6 +197,12 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           suffix: const Icon(FIcons.chevronRight),
           onPress: onBeerPricesPress,
         ),
+        if (kDebugMode)
+          FTile(
+            prefix: const Icon(FIcons.hash),
+            title: const Text('UUID'),
+            subtitle: Text(object.uuid),
+          ),
       ],
     ),
   ];

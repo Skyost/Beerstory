@@ -8,6 +8,7 @@ import 'package:beerstory/spacing.dart';
 import 'package:beerstory/widgets/editors/history_entry_edit.dart';
 import 'package:beerstory/widgets/repository/beer.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -170,6 +171,12 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
             );
           },
         ),
+        if (kDebugMode)
+          FTile(
+            prefix: const Icon(FIcons.hash),
+            title: const Text('UUID'),
+            subtitle: Text(object.uuid),
+          ),
       ],
     ),
   ];

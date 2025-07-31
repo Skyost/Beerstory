@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
@@ -5,7 +7,7 @@ import 'package:forui/forui.dart';
 /// Shows a waiting dialog.
 Future<T> showWaitingOverlay<T>(
   BuildContext context, {
-  Future<T>? future,
+  FutureOr<T>? future,
   String? message,
 }) async {
   OverlayEntry entry = OverlayEntry(

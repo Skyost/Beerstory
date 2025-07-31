@@ -442,8 +442,8 @@ class _BeerTimesFormField extends FSelectMenuTile<int> {
          title: Text(translations.history.dialog.times.title),
          detailsBuilder: (_, values, _) => Text(values.firstOrNull?.toString() ?? ''),
          menuBuilder: (context, index) => FSelectTile<int>(
-           value: index,
-           title: Text(index.toString()),
+           value: index + 1,
+           title: Text('${index + 1}'),
          ),
          onSaved: (value) => onSaved?.call(value?.firstOrNull ?? 1),
        );

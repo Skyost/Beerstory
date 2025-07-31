@@ -118,11 +118,17 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
         ),
         FTile(
           prefix: const Icon(FIcons.beer),
-          title: Text(translations.beers.details.prices.label),
+          title: Text(translations.bars.details.prices.label),
           subtitle: _BarBeerPrices(bar: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: onBeerPricesPress,
         ),
+        if (kDebugMode)
+          FTile(
+            prefix: const Icon(FIcons.hash),
+            title: const Text('UUID'),
+            subtitle: Text(object.uuid),
+          ),
       ],
     ),
   ];
@@ -131,7 +137,7 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
   List<FButton> buildActions(BuildContext context, WidgetRef ref, Bar object) => [
     FButton(
       onPress: () {
-        String query = object!.name;
+        String query = object.name;
         if (object.address != null && object.address!.isNotEmpty) {
           query += ', ${object.address}';
         }
@@ -199,25 +205,15 @@ class _BarBeerPrices extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<BeerPrice>> prices = ref.watch(
-      beerPricesFromBarProvider(bar.uuid),
-    );
+    AsyncValue<List<BeerPrice>> prices = ref.watch(beerPricesFromBarProvider(bar.uuid));
     if (!prices.hasValue || prices.value!.isEmpty) {
-      return const SizedBox.shrink();
+      return Text(translations.bars.details.prices.empty);
     }
     AsyncValue<List<Beer>> beers = ref.watch(beerRepositoryProvider);
-    if (!beers.hasValue || beers.value!.isEmpty) {
-      return const SizedBox.shrink();
-    }
     String result = '';
     for (BeerPrice price in prices.value!) {
-      Beer? beer = beers.value!.firstWhereOrNull(
-        (beer) => beer.uuid == price.beerUuid,
-      );
-      if (beer == null) {
-        continue;
-      }
-      result += '${beer.name} (${NumberFormat.formatPrice(price.amount)}), ';
+      Beer? beer = beers.value?.firstWhereOrNull((beer) => beer.uuid == price.beerUuid);
+      result += '${beer?.name ?? price.beerUuid} (${NumberFormat.formatPrice(price.amount)}), ';
     }
     result = result.trim();
     if (result.endsWith(',')) {

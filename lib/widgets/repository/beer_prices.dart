@@ -13,6 +13,7 @@ import 'package:beerstory/widgets/async_value_widget.dart';
 import 'package:beerstory/widgets/editors/beer_prices.dart';
 import 'package:beerstory/widgets/empty.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -147,6 +148,10 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
         for (BeerPrice beerPrice in beerPrices) {
           String title = buildTitle(beerPrice, availableObjects);
           String? subtitle = buildSubtitle(beerPrice, availableObjects);
+          if (kDebugMode) {
+            subtitle = subtitle == null ? '' : '$subtitle\n\n';
+            subtitle += beerPrice.uuid;
+          }
           children.add(
             FTile(
               title: Text(title),

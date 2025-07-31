@@ -25,6 +25,10 @@
       "label": "Adresse",
       "empty": "Pas d'adresse spécifiée"
     },
+    "prices": {
+      "label": "Prix",
+      "empty": "Pas de prix spécifié"
+    },
     "showOnMap": "Afficher sur la carte"
   }
 }

@@ -27,13 +27,6 @@
       "label": "Tags de la bière",
       "hint": "Entrer un tag"
     },
-    "prices": {
-      "label": "Prix de la bière",
-      "hint": "Prix (50cl)",
-      "empty": "Pas de prix entré",
-      "noBar": "Pas de bar",
-      "add": "Ajouter un prix"
-    },
     "replace": "Voulez-vous remplacer la bière actuelle ?",
     "added": "Bière ajoutée avec succès.",
     "found": "{element} ajouté avec succès. Merci OpenFoodFacts !"

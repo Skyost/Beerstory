@@ -25,6 +25,10 @@
       "label": "Address",
       "empty": "No address specified"
     },
+    "prices": {
+      "label": "Prices",
+      "empty": "No price specified"
+    },
     "showOnMap": "Show on map"
   }
 }

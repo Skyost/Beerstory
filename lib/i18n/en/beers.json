@@ -27,13 +27,6 @@
       "label": "Beer tags",
       "hint": "Enter a tag"
     },
-    "prices": {
-      "label": "Beer prices",
-      "hint": "Price (50cl)",
-      "empty": "No price added",
-      "noBar": "No bar",
-      "add": "Add price"
-    },
     "replace": "Do you want to replace the current beer ?",
     "added": "Beer added with success.",
     "found": "{element} added with success. Thanks OpenFoodFacts !"

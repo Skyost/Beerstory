@@ -46,7 +46,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
   late TabController tabController =
       TabController(
         vsync: this,
-        length: 2,
+        length: 3,
         initialIndex: currentPageIndex,
       )..addListener(() {
         if (mounted) {
@@ -123,9 +123,6 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
           if (pageIndex == 1) {
             return;
           }
-          if (pageIndex == 2) {
-            pageIndex = 1;
-          }
           if (pageIndex != currentPageIndex) {
             currentPageIndex = pageIndex;
             tabController.animateTo(currentPageIndex);
@@ -167,6 +164,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
         controller: tabController,
         children: [
           const BeersScaffoldBody(),
+          const SizedBox.shrink(),
           const BarsScaffoldBody(),
         ],
       ),
@@ -228,13 +226,12 @@ class _NewHistoryEntryButton extends ConsumerWidget {
                     historyEntry: HistoryEntry(beerUuid: beer.uuid),
                   );
                   if (historyEntry != null && context.mounted) {
-                    Completer addCompleter = Completer();
-                    ref.read(historyProvider.notifier).add(historyEntry).then(addCompleter.complete).catchError(addCompleter.completeError);
+                    Future addFuture = ref.read(historyProvider.notifier).add(historyEntry);
                     await BeerAnimationDialog.show(
                       context: context,
                       onFinished: () async {
                         try {
-                          await addCompleter.future;
+                          await addFuture;
                         } catch (ex, stackTrace) {
                           printError(ex, stackTrace);
                           if (context.mounted) {

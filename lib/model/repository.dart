@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:beerstory/model/database.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' hide Table;
@@ -38,59 +39,60 @@ mixin HasName on RepositoryObject {
 }
 
 /// A database, required to store objects.
-mixin RepositoryDatabase<O extends RepositoryObject> {
-  /// Lists the objects.
-  FutureOr<List<O>> list({int? limit});
-
-  /// Adds the specified object.
-  FutureOr<void> add(O object);
-
-  /// Updates the specified object.
-  FutureOr<void> change(O object);
-
-  /// Removes the specified object.
-  FutureOr<void> remove(O object);
-
-  /// Clears all objects from the database.
-  FutureOr<void> clear();
-}
-
-/// Utility mixin to use the [RepositoryDatabase] interface with [GeneratedDatabase].
-mixin GeneratedRepositoryDatabase<O extends RepositoryObject, I extends DataClass, T extends Table> on RepositoryDatabase<O>, GeneratedDatabase {
+mixin DatabaseRepository<O extends RepositoryObject, I extends DataClass, T extends Table> on Repository<O> {
   /// The associated table.
   @protected
-  TableInfo<T, I> get table;
+  TableInfo<T, I> getTable(Database database);
 
   @override
-  FutureOr<List<O>> list({int? limit}) async {
-    SimpleSelectStatement<T, I> query = select(table);
-    if (limit != null) {
-      query = query..limit(limit);
-    }
-    return (await query.get()).map(toObject).toList();
+  FutureOr<List<O>> build() async {
+    Database database = ref.watch(databaseProvider);
+    Stream<List<O>> stream = database.select(getTable(database)).map(toObject).watch();
+    StreamSubscription<List<O>> subscription = stream.listen((data) => state = AsyncData(List.of(data)..sort()));
+    ref.onDispose(subscription.cancel);
+    return List.of(await stream.first)..sort();
   }
+
+  // /// Lists the objects.
+  // @protected
+  // FutureOr<List<O>> list({int? limit}) async {
+  //   Database database = ref.read(databaseProvider);
+  //   SimpleSelectStatement<T, I> query = database.select(getTable(database));
+  //   if (limit != null) {
+  //     query = query..limit(limit);
+  //   }
+  //   return await query.map(toObject).get();
+  // }
 
   @override
   FutureOr<void> add(O object) async {
+    Database database = ref.read(databaseProvider);
     Insertable<I> insertable = toInsertable(object);
-    await into(table).insert(insertable);
+    await database.into(getTable(database)).insert(insertable);
+    await super.add(object);
   }
 
   @override
   FutureOr<void> change(O object) async {
+    Database database = ref.read(databaseProvider);
     Insertable<I> insertable = toInsertable(object);
-    await update(table).replace(insertable);
+    await database.update(getTable(database)).replace(insertable);
+    await super.change(object);
   }
 
   @override
   FutureOr<void> remove(O object) async {
+    Database database = ref.read(databaseProvider);
     Insertable<I> insertable = toInsertable(object);
-    await delete(table).delete(insertable);
+    await database.delete(getTable(database)).delete(insertable);
+    await super.remove(object);
   }
 
   @override
   FutureOr<void> clear() async {
-    await delete(table).go();
+    Database database = ref.read(databaseProvider);
+    await database.delete(getTable(database)).go();
+    await super.clear();
   }
 
   /// Converts the specified [object] to an [Insertable].
@@ -102,23 +104,14 @@ mixin GeneratedRepositoryDatabase<O extends RepositoryObject, I extends DataClas
 
 /// A simple repository.
 abstract class Repository<T extends RepositoryObject> extends AsyncNotifier<List<T>> {
-  @override
-  FutureOr<List<T>> build() async {
-    RepositoryDatabase<T> database = ref.watch(databaseProvider);
-    return await database.list()
-      ..sort();
-  }
-
   /// Adds the specified object to this repository.
-  Future<void> add(T object) async {
-    await ref.read(databaseProvider).add(object);
+  FutureOr<void> add(T object) async {
     List<T> newState = [...(await future), object]..sort();
     state = AsyncData(newState);
   }
 
   /// Updates the specified object in this repository.
-  Future<void> change(T object) async {
-    await ref.read(databaseProvider).change(object);
+  FutureOr<void> change(T object) async {
     List<T> newState = [
       for (T item in await future)
         if (item.uuid == object.uuid) object else item,
@@ -127,21 +120,15 @@ abstract class Repository<T extends RepositoryObject> extends AsyncNotifier<List
   }
 
   /// Removes the specified object from this repository.
-  Future<void> remove(T object) async {
-    await ref.read(databaseProvider).remove(object);
+  FutureOr<void> remove(T object) async {
     List<T> newState = List.of(await future)..remove(object);
     state = AsyncData(newState);
   }
 
   /// Clears this repository.
-  Future<void> clear({bool notify = true}) async {
-    await ref.read(databaseProvider).clear();
+  FutureOr<void> clear() async {
     state = const AsyncData([]);
   }
-
-  /// The database provider.
-  @protected
-  AutoDisposeProvider<RepositoryDatabase<T>> get databaseProvider;
 }
 
 /// Some useful methods to use alongside objects list.

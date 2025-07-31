@@ -1,19 +1,34 @@
 import 'dart:async';
 
-import 'package:beerstory/model/beer/price/database.dart';
 import 'package:beerstory/model/beer/price/price.dart';
+import 'package:beerstory/model/database.dart';
 import 'package:beerstory/model/repository.dart';
-import 'package:flutter/material.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The beer price repository provider.
 final beerPriceRepositoryProvider = AsyncNotifierProvider<BeerPriceRepository, List<BeerPrice>>(BeerPriceRepository.new);
 
 /// The repository that handles beer prices.
-class BeerPriceRepository extends Repository<BeerPrice> {
+class BeerPriceRepository extends Repository<BeerPrice> with DatabaseRepository<BeerPrice, DriftBeerPrice, BeerPrices> {
   @override
-  @protected
-  AutoDisposeProvider<RepositoryDatabase<BeerPrice>> get databaseProvider => beerPricesDatabaseProvider;
+  TableInfo<BeerPrices, DriftBeerPrice> getTable(Database database) => database.beerPrices;
+
+  @override
+  Insertable<DriftBeerPrice> toInsertable(BeerPrice object) => DriftBeerPrice(
+    uuid: object.uuid,
+    beerUuid: object.beerUuid,
+    barUuid: object.barUuid,
+    amount: object.amount,
+  );
+
+  @override
+  BeerPrice toObject(DriftBeerPrice insertable) => BeerPrice(
+    uuid: insertable.uuid,
+    beerUuid: insertable.beerUuid,
+    barUuid: insertable.barUuid,
+    amount: insertable.amount,
+  );
 }
 
 /// The beer prices from beer provider.
