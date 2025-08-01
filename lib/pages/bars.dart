@@ -27,7 +27,7 @@ class BarsScaffoldBody extends ScaffoldBodyWidget<Bar> {
       emptyWidgetBuilder: (context, search) => Container(
         padding: const EdgeInsets.all(kSpace),
         constraints: BoxConstraints(
-          minHeight: constraints.maxHeight,
+          minHeight: constraints.maxHeight  - 76,
         ),
         child: Center(
           child: EmptyWidget(

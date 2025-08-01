@@ -21,6 +21,7 @@ import 'package:beerstory/widgets/editors/bar_edit.dart';
 import 'package:beerstory/widgets/editors/beer_edit.dart';
 import 'package:beerstory/widgets/editors/history_entry_edit.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,17 +44,30 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
   /// The current index.
   int currentPageIndex = 0;
 
+  /// The current menu index.
+  int currentMenuIndex = 0;
+
   /// The tab controller.
   late TabController tabController =
       TabController(
-        vsync: this,
-        length: 3,
-        initialIndex: currentPageIndex,
-      )..addListener(() {
-        if (mounted) {
-          setState(() => currentPageIndex = tabController.index);
-        }
-      });
+          vsync: this,
+          length: 2,
+          initialIndex: currentPageIndex,
+        )
+        ..addListener(() {
+          if (mounted) {
+            setState(() {
+              currentPageIndex = tabController.index;
+              if (!tabController.indexIsChanging) {
+                if (tabController.previousIndex == 0 && tabController.index == 1) {
+                  currentMenuIndex = 2;
+                } else if (tabController.previousIndex == 1 && tabController.index == 0) {
+                  currentMenuIndex = 0;
+                }
+              }
+            });
+          }
+        });
 
   /// The gradient animation controller.
   late AnimationController gradientAnimationController =
@@ -119,10 +133,14 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
                 ),
               )
             : null,
-        index: currentPageIndex,
+        index: currentMenuIndex,
         onChange: (pageIndex) {
           if (pageIndex == 1) {
             return;
+          }
+          setState(() => currentMenuIndex = pageIndex);
+          if (pageIndex == 2) {
+            pageIndex = 1;
           }
           if (pageIndex != currentPageIndex) {
             currentPageIndex = pageIndex;
@@ -138,7 +156,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
             _NewHistoryEntryButton(
               blur: lerpDouble(0, 4, gradientAnimationController.value)!,
               colorOpacity: lerpDouble(0, 0.3, gradientAnimationController.value)!,
-              onHoverChange: (hovered) {
+              onGradientShouldChange: (hovered) {
                 if (hovered) {
                   gradientAnimationController.animateTo(
                     1,
@@ -165,7 +183,6 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
         controller: tabController,
         children: [
           const BeersScaffoldBody(),
-          const SizedBox.shrink(),
           const BarsScaffoldBody(),
         ],
       ),
@@ -191,15 +208,15 @@ class _NewHistoryEntryButton extends ConsumerWidget {
   /// The opacity of the button background.
   final double colorOpacity;
 
-  /// Handler called when the hover changes.
-  final ValueChanged<bool>? onHoverChange;
+  /// Handler called when the gradient should change.
+  final ValueChanged<bool>? onGradientShouldChange;
 
   /// Creates a new new history entry button instance.
   const _NewHistoryEntryButton({
     this.size = 56,
     this.blur = 0,
     this.colorOpacity = 0,
-    this.onHoverChange,
+    this.onGradientShouldChange,
   });
 
   @override
@@ -214,8 +231,11 @@ class _NewHistoryEntryButton extends ConsumerWidget {
               blur: blur,
               colorOpacity: colorOpacity,
               child: FTappable(
-                onHoverChange: onHoverChange,
+                onHoverChange: onGradientShouldChange,
                 onPress: () async {
+                  if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+                    onGradientShouldChange?.call(true);
+                  }
                   Beer? beer;
                   String? lastBeerUuid = ref.read(lastInsertedBeerProvider);
                   if (lastBeerUuid != null) {
@@ -252,6 +272,9 @@ class _NewHistoryEntryButton extends ConsumerWidget {
                         }
                       },
                     );
+                  }
+                  if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
+                    onGradientShouldChange?.call(false);
                   }
                 },
                 child: ScalableImageWidget.fromSISource(

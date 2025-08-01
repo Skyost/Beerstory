@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/spacing.dart';
@@ -38,12 +39,17 @@ abstract class FormDialogState<T, W extends FormDialog<T>> extends ConsumerState
   @override
   Widget build(BuildContext context) {
     List<Widget> children = createChildren(context);
+    FlutterView window = PlatformDispatcher.instance.views.first;
+    EdgeInsets viewInsets = EdgeInsets.fromViewPadding(
+      window.viewInsets,
+      window.devicePixelRatio,
+    );
     return FDialog.adaptive(
       style: widget._style,
       animation: widget._animation,
       body: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: math.max(0, MediaQuery.sizeOf(context).height - 186),
+          maxHeight: math.max(0, MediaQuery.sizeOf(context).height - 192 - viewInsets.bottom),
         ),
         child: Form(
           key: formKey,

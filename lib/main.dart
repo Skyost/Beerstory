@@ -44,11 +44,14 @@ class _BeerstoryApp extends StatelessWidget {
             rootStyle: (style) => style.copyWith(
               titleTextStyle: style.titleTextStyle.copyWith(
                 fontFamily: 'BirdsOfParadise',
+                height: 1.15,
               ),
             ),
             nestedStyle: (style) => style.copyWith(
               titleTextStyle: style.titleTextStyle.copyWith(
                 fontFamily: 'BirdsOfParadise',
+                fontSize: 24,
+                height: 1.15,
               ),
             ),
           ),

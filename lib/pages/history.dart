@@ -69,7 +69,7 @@ class HistoryScaffoldBody extends ScaffoldBodyWidget<HistoryEntry> {
           emptyWidgetBuilder: (context, search) => Container(
             padding: const EdgeInsets.all(kSpace),
             constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
+              minHeight: constraints.maxHeight - 76,
             ),
             child: Center(
               child: EmptyWidget(
