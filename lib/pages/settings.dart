@@ -5,6 +5,7 @@ import 'package:beerstory/model/database.dart';
 import 'package:beerstory/model/settings/group_objects.dart';
 import 'package:beerstory/model/settings/theme.dart';
 import 'package:beerstory/spacing.dart';
+import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:file_picker/file_picker.dart';
@@ -35,16 +36,17 @@ class SettingsScaffoldBody extends StatelessWidget {
           ],
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: kSpace),
-        child: FTileGroup(
-          label: Text(translations.settings.data.label),
-          children: [
-            _BackupDataTile(),
-            _RestoreDataTile(),
-          ],
+      if (currentPlatform != Platform.web)
+        Padding(
+          padding: const EdgeInsets.only(bottom: kSpace),
+          child: FTileGroup(
+            label: Text(translations.settings.data.label),
+            children: [
+              _BackupDataTile(),
+              _RestoreDataTile(),
+            ],
+          ),
         ),
-      ),
       FTileGroup(
         label: Text(translations.settings.about.label),
         children: [

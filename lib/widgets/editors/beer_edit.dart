@@ -5,6 +5,7 @@ import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/format.dart';
+import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/repository/beer.dart';
@@ -287,76 +288,82 @@ class BeerImageFormField extends FormField<String?> {
     required String beerUuid,
     String? beerName,
     final ValueChanged<String?>? onChanged,
+    bool? enabled,
   }) : super(
-         builder: (state) => FPopover(
-           controller: (state as _BeerImageFormState).imagePopoverController,
-           popoverBuilder: (context, controller) => SizedBox(
-             width: math.min(300, MediaQuery.of(context).size.width),
-             child: Column(
-               mainAxisSize: MainAxisSize.min,
-               children: [
-                 FItemGroup(
-                   children: [
-                     FItem(
-                       prefix: const Icon(FIcons.galleryThumbnails),
-                       title: Text(translations.beers.dialog.image.gallery),
-                       onPress: () async {
-                         String? image = await showWaitingOverlay(
-                           context,
-                           future: _changeImageFromSource(
-                             beerUuid,
-                             ImageSource.gallery,
-                           ),
-                         );
-                         if (image != null) {
-                           state.didChange(image);
-                           onChanged?.call(image);
-                         }
-                         controller.hide();
-                       },
+         builder: (state) {
+           Widget child = BeerImageWidget.fromNameImage(
+             name: beerName,
+             image: state.value,
+             radius: 100,
+           );
+           return (enabled ?? currentPlatform != Platform.web)
+               ? child
+               : FPopover(
+                   controller: (state as _BeerImageFormState).imagePopoverController,
+                   popoverBuilder: (context, controller) => SizedBox(
+                     width: math.min(300, MediaQuery.of(context).size.width),
+                     child: Column(
+                       mainAxisSize: MainAxisSize.min,
+                       children: [
+                         FItemGroup(
+                           children: [
+                             FItem(
+                               prefix: const Icon(FIcons.galleryThumbnails),
+                               title: Text(translations.beers.dialog.image.gallery),
+                               onPress: () async {
+                                 String? image = await showWaitingOverlay(
+                                   context,
+                                   future: _changeImageFromSource(
+                                     beerUuid,
+                                     ImageSource.gallery,
+                                   ),
+                                 );
+                                 if (image != null) {
+                                   state.didChange(image);
+                                   onChanged?.call(image);
+                                 }
+                                 controller.hide();
+                               },
+                             ),
+                             FItem(
+                               prefix: const Icon(FIcons.camera),
+                               title: Text(translations.beers.dialog.image.camera),
+                               onPress: () async {
+                                 String? image = await showWaitingOverlay(
+                                   context,
+                                   future: _changeImageFromSource(
+                                     beerUuid,
+                                     ImageSource.camera,
+                                   ),
+                                 );
+                                 if (image != null) {
+                                   state.didChange(image);
+                                   onChanged?.call(image);
+                                 }
+                                 controller.hide();
+                               },
+                             ),
+                             if (state.value != null)
+                               FItem(
+                                 prefix: const Icon(FIcons.cross),
+                                 title: Text(translations.beers.dialog.image.remove),
+                                 onPress: () {
+                                   state.didChange(null);
+                                   onChanged?.call(null);
+                                   controller.hide();
+                                 },
+                               ),
+                           ],
+                         ),
+                       ],
                      ),
-                     FItem(
-                       prefix: const Icon(FIcons.camera),
-                       title: Text(translations.beers.dialog.image.camera),
-                       onPress: () async {
-                         String? image = await showWaitingOverlay(
-                           context,
-                           future: _changeImageFromSource(
-                             beerUuid,
-                             ImageSource.camera,
-                           ),
-                         );
-                         if (image != null) {
-                           state.didChange(image);
-                           onChanged?.call(image);
-                         }
-                         controller.hide();
-                       },
-                     ),
-                     if (state.value != null)
-                       FItem(
-                         prefix: const Icon(FIcons.cross),
-                         title: Text(translations.beers.dialog.image.remove),
-                         onPress: () {
-                           state.didChange(null);
-                           onChanged?.call(null);
-                           controller.hide();
-                         },
-                       ),
-                   ],
-                 ),
-               ],
-             ),
-           ),
-           child: GestureDetector(
-             onTap: state.imagePopoverController.show,
-             child: BeerImageWidget.fromNameImage(
-               name: beerName,
-               image: state.value,
-               radius: 100,
-             ),
-           ),
-         ),
+                   ),
+                   child: GestureDetector(
+                     onTap: state.imagePopoverController.show,
+                     child: child,
+                   ),
+                 );
+         },
        );
 
   /// Changes the image of the beer.
