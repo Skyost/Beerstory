@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:beerstory/i18n/translations.g.dart';
+import 'package:beerstory/widgets/circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
@@ -89,7 +90,7 @@ class _WaitingDialogState extends State<_WaitingDialog> {
         children: [
           const Padding(
             padding: EdgeInsets.only(right: 24),
-            child: FProgress.circularIcon(),
+            child: CenteredProgressIndicator(),
           ),
           Expanded(
             child: Text(widget.message ?? translations.misc.loading),

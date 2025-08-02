@@ -12,6 +12,7 @@ import 'package:beerstory/pages/bars.dart';
 import 'package:beerstory/pages/beers.dart';
 import 'package:beerstory/pages/history.dart';
 import 'package:beerstory/pages/routes.dart';
+import 'package:beerstory/pages/settings.dart';
 import 'package:beerstory/utils/platform.dart';
 import 'package:beerstory/utils/scan_beer.dart';
 import 'package:beerstory/utils/utils.dart';
@@ -19,6 +20,7 @@ import 'package:beerstory/widgets/beer_animation_dialog.dart';
 import 'package:beerstory/widgets/blur.dart';
 import 'package:beerstory/widgets/editors/bar_edit.dart';
 import 'package:beerstory/widgets/editors/beer_edit.dart';
+import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/editors/history_entry_edit.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/foundation.dart';
@@ -40,7 +42,7 @@ class HomeRouteScaffold extends ConsumerStatefulWidget {
 }
 
 /// The main route scaffold state.
-class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with TickerProviderStateMixin<HomeRouteScaffold> {
+class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with SingleTickerProviderStateMixin<HomeRouteScaffold> {
   /// The current index.
   int currentPageIndex = 0;
 
@@ -50,32 +52,22 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
   /// The tab controller.
   late TabController tabController =
       TabController(
-          vsync: this,
-          length: 2,
-          initialIndex: currentPageIndex,
-        )
-        ..addListener(() {
-          if (mounted) {
-            setState(() {
-              currentPageIndex = tabController.index;
-              if (!tabController.indexIsChanging) {
-                if (tabController.previousIndex == 0 && tabController.index == 1) {
-                  currentMenuIndex = 2;
-                } else if (tabController.previousIndex == 1 && tabController.index == 0) {
-                  currentMenuIndex = 0;
-                }
-              }
-            });
-          }
-        });
-
-  /// The gradient animation controller.
-  late AnimationController gradientAnimationController =
-      AnimationController(
-        duration: const Duration(milliseconds: 500),
         vsync: this,
+        length: 2,
+        initialIndex: currentPageIndex,
       )..addListener(() {
-        setState(() => {});
+        if (mounted) {
+          setState(() {
+            currentPageIndex = tabController.index;
+            if (!tabController.indexIsChanging) {
+              if (tabController.previousIndex == 0 && tabController.index == 1) {
+                currentMenuIndex = 2;
+              } else if (tabController.previousIndex == 1 && tabController.index == 0) {
+                currentMenuIndex = 0;
+              }
+            }
+          });
+        }
       });
 
   /// Whether the currently displayed page is the beers body widget.
@@ -109,30 +101,14 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
 
     return FScaffold(
       header: FHeader.nested(
-        title: Text(pageTitle),
+        title: GestureDetector(
+          child: Text(pageTitle),
+          onTap: () => Navigator.pushNamed(context, kSettingsRoute),
+        ),
         prefixes: [if (historyLength > 0) _HistoryButton()],
         suffixes: suffixes,
       ),
       footer: FBottomNavigationBar(
-        style: beerCount > 0
-            ? (style) => style.copyWith(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: lerpDouble(0.6, 0.4, gradientAnimationController.value)!,
-                    colors: [
-                      context.theme.colors.primary.withValues(
-                        alpha: lerpDouble(0.3, 1, gradientAnimationController.value),
-                      ),
-                      (style.decoration.color ?? context.theme.colors.background).withValues(
-                        alpha: lerpDouble(0.7, 0.5, gradientAnimationController.value),
-                      ),
-                    ],
-                    stops: [lerpDouble(0, 0.75, gradientAnimationController.value)!, 1.0],
-                  ),
-                ),
-              )
-            : null,
         index: currentMenuIndex,
         onChange: (pageIndex) {
           if (pageIndex == 1) {
@@ -152,26 +128,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
             icon: const Icon(FIcons.beer),
             label: Text(translations.beers.page.name),
           ),
-          if (beerCount > 0)
-            _NewHistoryEntryButton(
-              blur: lerpDouble(0, 4, gradientAnimationController.value)!,
-              colorOpacity: lerpDouble(0, 0.3, gradientAnimationController.value)!,
-              onGradientShouldChange: (hovered) {
-                if (hovered) {
-                  gradientAnimationController.animateTo(
-                    1,
-                    curve: Curves.easeIn,
-                  );
-                } else {
-                  gradientAnimationController.animateTo(
-                    0,
-                    curve: Curves.easeIn,
-                  );
-                }
-              },
-            )
-          else
-            const SizedBox.shrink(),
+          if (beerCount > 0) _NewHistoryEntryButton() else const SizedBox.shrink(),
           FBottomNavigationBarItem(
             icon: const Icon(FIcons.mapPin),
             label: Text(translations.bars.page.name),
@@ -192,49 +149,83 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Tick
   @override
   void dispose() {
     tabController.dispose();
-    gradientAnimationController.dispose();
     super.dispose();
   }
 }
 
 /// Allows to insert a new history entry.
-class _NewHistoryEntryButton extends ConsumerWidget {
+class _NewHistoryEntryButton extends ConsumerStatefulWidget {
   /// The size of the button.
   final double size;
-
-  /// The blur of the button background.
-  final double blur;
-
-  /// The opacity of the button background.
-  final double colorOpacity;
-
-  /// Handler called when the gradient should change.
-  final ValueChanged<bool>? onGradientShouldChange;
 
   /// Creates a new new history entry button instance.
   const _NewHistoryEntryButton({
     this.size = 56,
-    this.blur = 0,
-    this.colorOpacity = 0,
-    this.onGradientShouldChange,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _NewHistoryEntryButtonState();
+}
+
+class _NewHistoryEntryButtonState extends ConsumerState<_NewHistoryEntryButton> with SingleTickerProviderStateMixin<_NewHistoryEntryButton> {
+  /// The gradient animation controller.
+  late AnimationController gradientAnimationController =
+      AnimationController(
+        duration: const Duration(milliseconds: 500),
+        vsync: this,
+      )..addListener(() {
+        setState(() => {});
+      });
+
+  /// Returns the blur value.
+  double get blur => lerpDouble(0, 4, gradientAnimationController.value)!;
+
+  /// Returns the color opacity.
+  double get colorOpacity => lerpDouble(0, 0.3, gradientAnimationController.value)!;
+
+  /// Called when the gradient should change.
+  void onGradientShouldChange(bool hovered) {
+    if (hovered) {
+      gradientAnimationController.animateTo(1, curve: Curves.easeIn);
+    } else {
+      gradientAnimationController.animateTo(0, curve: Curves.easeIn);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     List<Beer>? beers = ref.watch(beerRepositoryProvider).value;
     return beers == null || beers.isEmpty
         ? const SizedBox.shrink()
         : SizedBox(
-            width: size,
-            height: size,
+            height: widget.size,
             child: BlurWidget(
+              below: Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.center,
+                      radius: lerpDouble(0.55, 0.4, gradientAnimationController.value)!,
+                      colors: [
+                        context.theme.colors.primary.withValues(
+                          alpha: lerpDouble(0.3, 1, gradientAnimationController.value),
+                        ),
+                        (context.theme.bottomNavigationBarStyle.decoration.color ?? context.theme.colors.background).withValues(
+                          alpha: lerpDouble(0.7, 0.5, gradientAnimationController.value),
+                        ),
+                      ],
+                      stops: [lerpDouble(0, 0.75, gradientAnimationController.value)!, 1.0],
+                    ),
+                  ),
+                ),
+              ),
               blur: blur,
               colorOpacity: colorOpacity,
               child: FTappable(
                 onHoverChange: onGradientShouldChange,
                 onPress: () async {
                   if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
-                    onGradientShouldChange?.call(true);
+                    onGradientShouldChange.call(true);
                   }
                   Beer? beer;
                   String? lastBeerUuid = ref.read(lastInsertedBeerProvider);
@@ -242,12 +233,12 @@ class _NewHistoryEntryButton extends ConsumerWidget {
                     beer = beers.findByUuid(lastBeerUuid);
                   }
                   beer ??= beers.first;
-                  HistoryEntry? historyEntry = await AddHistoryEntryDialog.show(
+                  FormDialogResult<HistoryEntry> historyEntry = await AddHistoryEntryDialog.show(
                     context: context,
                     historyEntry: HistoryEntry(beerUuid: beer.uuid),
                   );
-                  if (historyEntry != null && context.mounted) {
-                    Future addFuture = ref.read(historyProvider.notifier).add(historyEntry);
+                  if (historyEntry is FormDialogResultSaved<HistoryEntry> && context.mounted) {
+                    Future addFuture = ref.read(historyProvider.notifier).absorb(historyEntry.value);
                     await BeerAnimationDialog.show(
                       context: context,
                       onFinished: () async {
@@ -261,7 +252,7 @@ class _NewHistoryEntryButton extends ConsumerWidget {
                               title: Text(translations.error.generic),
                               style: (style) => style.copyWith(
                                 titleTextStyle: style.titleTextStyle.copyWith(
-                                  color: context.theme.colors.errorForeground,
+                                  color: context.theme.colors.error,
                                 ),
                               ),
                             );
@@ -274,7 +265,7 @@ class _NewHistoryEntryButton extends ConsumerWidget {
                     );
                   }
                   if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
-                    onGradientShouldChange?.call(false);
+                    onGradientShouldChange.call(false);
                   }
                 },
                 child: ScalableImageWidget.fromSISource(
@@ -286,6 +277,12 @@ class _NewHistoryEntryButton extends ConsumerWidget {
               ),
             ),
           );
+  }
+
+  @override
+  void dispose() {
+    gradientAnimationController.dispose();
+    super.dispose();
   }
 }
 
@@ -325,7 +322,7 @@ class _HistoryButton extends StatelessWidget {
 /// The add beer button.
 class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
   /// The show editor function.
-  final Future<T?> Function(BuildContext) showEditor;
+  final Future<FormDialogResult<T>> Function(BuildContext) showEditor;
 
   /// The repository provider.
   final AsyncNotifierProvider<Repository<T>, List<T>> repositoryProvider;
@@ -344,12 +341,12 @@ class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => FHeaderAction(
     icon: const Icon(FIcons.plus),
     onPress: () async {
-      T? object = await showEditor(context);
-      if (object != null && context.mounted) {
+      FormDialogResult<T?> object = await showEditor(context);
+      if (object is FormDialogResultSaved<T> && context.mounted) {
         try {
           await showWaitingOverlay(
             context,
-            future: ref.read(repositoryProvider.notifier).add(object),
+            future: ref.read(repositoryProvider.notifier).add(object.value),
           );
           if (context.mounted) {
             showFToast(
@@ -365,7 +362,7 @@ class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
               title: Text(translations.error.generic),
               style: (style) => style.copyWith(
                 titleTextStyle: style.titleTextStyle.copyWith(
-                  color: context.theme.colors.errorForeground,
+                  color: context.theme.colors.error,
                 ),
               ),
             );
@@ -438,5 +435,26 @@ class _ClearHistoryButton extends ConsumerWidget {
         ],
       ),
     ),
+  );
+}
+
+/// The settings route scaffold.
+class SettingsRouteScaffold extends StatelessWidget {
+  /// Creates a new settings route scaffold instance.
+  const SettingsRouteScaffold({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => FScaffold(
+    header: FHeader.nested(
+      title: Text(translations.settings.page.name),
+      prefixes: [
+        FHeaderAction.x(
+          onPress: () => Navigator.pop(context),
+        ),
+      ],
+    ),
+    child: const SettingsScaffoldBody(),
   );
 }

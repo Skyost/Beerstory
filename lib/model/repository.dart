@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:beerstory/model/database.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart' hide Table;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
@@ -128,6 +128,18 @@ abstract class Repository<T extends RepositoryObject> extends AsyncNotifier<List
   /// Clears this repository.
   FutureOr<void> clear() async {
     state = const AsyncData([]);
+  }
+
+  @override
+  bool updateShouldNotify(AsyncValue<List<T>> previous, AsyncValue<List<T>> next) {
+    bool wasLoading = previous.isLoading;
+    bool isLoading = next.isLoading;
+
+    if (wasLoading || isLoading) {
+      return wasLoading != isLoading;
+    }
+
+    return !listEquals(previous.value, next.value);
   }
 }
 

@@ -1,5 +1,5 @@
 import 'package:beerstory/i18n/translations.g.dart';
-import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
+import 'package:beerstory/widgets/circular_progress_indicator.dart';
 import 'package:beerstory/widgets/empty.dart';
 import 'package:beerstory/widgets/error.dart';
 import 'package:flutter/material.dart' hide ErrorWidget;
@@ -14,7 +14,7 @@ List<Widget> buildAsyncValueWidgetList<T>({
 }) {
   if (asyncValue.isLoading) {
     return [
-      const CenteredCircularProgressIndicator(),
+      const CenteredProgressIndicator(),
     ];
   }
   if (asyncValue.hasError) {

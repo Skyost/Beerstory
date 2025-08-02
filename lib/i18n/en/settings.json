@@ -1,0 +1,39 @@
+{
+  "page": {
+    "name": "Settings"
+  },
+  "application": {
+    "label": "Application",
+    "theme": {
+      "title": "Application theme",
+      "subtitle": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      }
+    },
+    "groupObjects": {
+      "title": "Group objects",
+      "subtitle": "Group bars and beers by alphabetical order."
+    }
+  },
+  "data": {
+    "label": "Data",
+    "backup": {
+      "title": "Backup data",
+      "subtitle": "Backup application data into a file.",
+      "success": "Data backup successful."
+    },
+    "restore": {
+      "title": "Restore data",
+      "subtitle": "Restore application data from a file.\nWarning : in case of conflict, your current data may be replaced.",
+      "success": "Data restore successful."
+    }
+  },
+  "about": {
+    "label": "About",
+    "about": {
+      "title": "About"
+    }
+  }
+}

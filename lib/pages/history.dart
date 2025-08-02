@@ -4,9 +4,7 @@ import 'package:beerstory/model/beer/repository.dart';
 import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/pages/body.dart';
-import 'package:beerstory/spacing.dart';
 import 'package:beerstory/widgets/async_value_widget.dart';
-import 'package:beerstory/widgets/empty.dart';
 import 'package:beerstory/widgets/ordered_list_view.dart';
 import 'package:beerstory/widgets/repository/history_entry.dart';
 import 'package:flutter/material.dart';
@@ -26,61 +24,53 @@ class HistoryScaffoldBody extends ScaffoldBodyWidget<HistoryEntry> {
   AsyncNotifierProvider<History, List<HistoryEntry>> get repositoryProvider => historyProvider;
 
   @override
-  Widget buildBodyWidget(
-    BuildContext context,
-    WidgetRef ref,
-    List<HistoryEntry> entries,
-  ) => AsyncValueWidget(
+  Widget buildBodyWidget(BuildContext context, WidgetRef ref, List<HistoryEntry> entries, {Comparator<HistoryEntry>? comparator}) => AsyncValueWidget(
     provider: beerRepositoryProvider,
     builder: (context, ref, beers) {
       Map<String, Beer> beersList = {
         for (Beer beer in beers) beer.uuid: beer,
       };
-      return LayoutBuilder(
-        builder: (context, constraints) => OrderedListView<HistoryEntry>(
-          objects: entries,
-          builder: (object) => HistoryEntryWidget(
-            historyEntry: object,
-          ),
-          reverseOrder: reverseOrder,
-          groupObjects: (entries) {
-            Map<DateTime, _DateGroupData> groupedEntries = {};
-            for (HistoryEntry entry in entries) {
-              DateTime date = entry.date;
-              if (groupedEntries.containsKey(date)) {
-                groupedEntries[date]!.add(entry);
-              } else {
-                groupedEntries[date] = _DateGroupData(entry: entry);
-              }
-            }
-            return groupedEntries.values.toList()..sort();
-          },
-          comparator: (a, b) {
-            Beer? aBeer = beersList[a.beerUuid];
-            Beer? bBeer = beersList[b.beerUuid];
-            if (aBeer != null && bBeer != null) {
-              int beerComparison = aBeer.compareTo(bBeer);
-              if (beerComparison != 0) {
-                return beerComparison;
-              }
-            }
-            return a.compareTo(b);
-          },
-          emptyWidgetBuilder: (context, search) => Container(
-            padding: const EdgeInsets.all(kSpace),
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight - 76,
-            ),
-            child: Center(
-              child: EmptyWidget(
-                text: translations.history.page.empty,
-              ),
-            ),
-          ),
-        ),
+      comparator ??= (a, b) {
+        Beer? aBeer = beersList[a.beerUuid];
+        Beer? bBeer = beersList[b.beerUuid];
+        if (aBeer != null && bBeer != null) {
+          int beerComparison = aBeer.compareTo(bBeer);
+          if (beerComparison != 0) {
+            return beerComparison;
+          }
+        }
+        return a.compareTo(b);
+      };
+      return super.buildBodyWidget(
+        context,
+        ref,
+        entries,
+        comparator: comparator,
       );
     },
   );
+
+  @override
+  HistoryEntryWidget buildObjectWidget(HistoryEntry object) => HistoryEntryWidget(historyEntry: object);
+
+  @override
+  String getEmptyWidgetText(String? search) => translations.history.page.empty;
+
+  @override
+  List<GroupData<HistoryEntry>> Function(List<HistoryEntry>)? groupObjects(BuildContext context, WidgetRef ref) {
+    return (entries) {
+      Map<DateTime, _DateGroupData> groupedEntries = {};
+      for (HistoryEntry entry in entries) {
+        DateTime date = entry.date;
+        if (groupedEntries.containsKey(date)) {
+          groupedEntries[date]!.add(entry);
+        } else {
+          groupedEntries[date] = _DateGroupData(entry: entry);
+        }
+      }
+      return groupedEntries.values.toList()..sort();
+    };
+  }
 }
 
 /// A group data that contains a [date].
@@ -114,7 +104,7 @@ class _DateGroupData extends GroupData<HistoryEntry> {
   );
 
   @override
-  TextSpan? get description => result.quantity == null
+  TextSpan? get description => result.trueQuantity == null
       ? null
       : TextSpan(
           children: [
@@ -126,7 +116,7 @@ class _DateGroupData extends GroupData<HistoryEntry> {
             TextSpan(
               text: translations.history.page.quantity(
                 prefix: result.moreThanQuantity ? '+' : '',
-                quantity: NumberFormat.decimalPattern().format(result.quantity),
+                quantity: NumberFormat.decimalPattern().format(result.trueQuantity),
               ),
             ),
           ],

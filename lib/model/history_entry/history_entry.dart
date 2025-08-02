@@ -133,4 +133,7 @@ class AbsorbResult {
 
     times += historyEntry.times;
   }
+
+  /// Calculates the true quantity drunk.
+  double? get trueQuantity => quantity == null ? null : (quantity! * times);
 }

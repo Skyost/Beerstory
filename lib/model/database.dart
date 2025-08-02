@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
@@ -104,7 +108,7 @@ class StringListConverter extends TypeConverter<List<String>, String> {
 
 /// The database provider.
 final databaseProvider = Provider.autoDispose<Database>((ref) {
-  Database database = Database();
+  Database database = Database._(ref: ref);
   ref.onDispose(database.close);
   ref.cacheFor(const Duration(seconds: 1));
   return database;
@@ -114,13 +118,20 @@ final databaseProvider = Provider.autoDispose<Database>((ref) {
 @DriftDatabase(tables: [Bars, Beers, BeerPrices, HistoryEntries])
 class Database extends _$Database {
   /// The database file name.
-  static const _dbFileName = 'data';
+  static const String _dbFileName = 'data';
+
+  /// The Riverpod ref instance.
+  final Ref _ref;
 
   /// Creates a new database instance.
-  Database()
-    : super(
-        SqliteUtils.openConnection(_dbFileName),
-      );
+  Database._({
+    required Ref ref,
+  }) : _ref = ref,
+        super(
+         SqliteUtils.openConnection(
+               _dbFileName,
+             ),
+       );
 
   @override
   int get schemaVersion => 1;
@@ -129,4 +140,26 @@ class Database extends _$Database {
   MigrationStrategy get migration => MigrationStrategy(
     beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
   );
+
+  /// Exports the database from a given [file].
+  Future<void> importFrom(File file) async {
+    if (path.isWithin((await getApplicationSupportDirectory()).path, file.path) && path.basenameWithoutExtension(file.path) == _dbFileName && path.extension(file.path) == '.db') {
+      return;
+    }
+    await customStatement('ATTACH DATABASE ? AS imported', [file.path]);
+    for (TableInfo<Table, Object?> table in allTables) {
+      await customStatement('INSERT OR REPLACE INTO ${table.actualTableName} SELECT * FROM imported.${table.actualTableName}');
+    }
+    await customStatement('DETACH DATABASE imported');
+    _ref.invalidateSelf();
+  }
+
+  /// Exports the database into a given [file].
+  Future<void> exportInto(File file) async {
+    await file.parent.create(recursive: true);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+    await customStatement('VACUUM INTO ?', [file.path]);
+  }
 }

@@ -18,16 +18,13 @@ class AddBarDialog extends FormDialog<Bar> {
   FormDialogState<Bar, AddBarDialog> createState() => _AddBarDialogState();
 
   /// Shows a new bar editor.
-  static Future<Bar?> show({
+  static Future<FormDialogResult<Bar>> show({
     required BuildContext context,
-    Bar? beer,
-  }) => showFDialog<Bar>(
+    Bar? bar,
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => AddBarDialog._(
-      object: beer ?? Bar(),
-      style: style.call,
-      animation: animation,
-    ),
+    object: bar ?? Bar(),
+    builder: AddBarDialog._,
   );
 }
 
@@ -69,16 +66,13 @@ class BarNameEditorDialog extends FormDialog<String> {
   FormDialogState<String, BarNameEditorDialog> createState() => _BarNameEditorDialogState();
 
   /// Shows a new bar name editor.
-  static Future<String?> show({
+  static Future<FormDialogResult<String>> show({
     required BuildContext context,
     required String barName,
-  }) => showFDialog<String>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BarNameEditorDialog._(
-      object: barName,
-      style: style.call,
-      animation: animation,
-    ),
+    object: barName,
+    builder: BarNameEditorDialog._,
   );
 }
 
@@ -100,38 +94,30 @@ class _BarNameEditorDialogState extends FormDialogState<String, BarNameEditorDia
 }
 
 /// Allows to edit a bar address.
-class BarAddressEditorDialog extends FormDialog<String> {
-  /// The bar address.
-  final String? barAddress;
-
+class BarAddressEditorDialog extends FormDialog<String?> {
   /// The bar address editor internal constructor.
   const BarAddressEditorDialog._({
     required super.object,
-    this.barAddress,
     super.animation,
     super.style,
   });
 
   @override
-  FormDialogState<String, BarAddressEditorDialog> createState() => _BarAddressEditorDialogState();
+  FormDialogState<String?, BarAddressEditorDialog> createState() => _BarAddressEditorDialogState();
 
   /// Shows a new bar address editor.
-  static Future<String?> show({
+  static Future<FormDialogResult<String?>> show({
     required BuildContext context,
     required String? barAddress,
-  }) => showFDialog<String>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BarAddressEditorDialog._(
-      object: barAddress ?? '',
-      barAddress: barAddress,
-      style: style.call,
-      animation: animation,
-    ),
+    object: barAddress,
+    builder: BarAddressEditorDialog._,
   );
 }
 
 /// The bar address editor dialog state.
-class _BarAddressEditorDialogState extends FormDialogState<String, BarAddressEditorDialog> {
+class _BarAddressEditorDialogState extends FormDialogState<String?, BarAddressEditorDialog> {
   /// The current bar address.
   late String? barAddress = widget.object;
 
@@ -139,7 +125,7 @@ class _BarAddressEditorDialogState extends FormDialogState<String, BarAddressEdi
   List<Widget> createChildren(BuildContext context) => [
     _BarAddressFormField(
       initialText: barAddress,
-      onSaved: (value) => barAddress = value?.trim(),
+      onSaved: (value) => barAddress = value?.trimOrNullIfEmpty,
     ),
   ];
 

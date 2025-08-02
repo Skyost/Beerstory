@@ -15,13 +15,9 @@ import 'package:forui/forui.dart';
 
 /// The add history entry dialog.
 class AddHistoryEntryDialog extends FormDialog<HistoryEntry> {
-  /// Whether to show the "more than quantity" field.
-  final bool showMoreThanQuantityField;
-
   /// The history entry internal constructor.
   const AddHistoryEntryDialog._({
     required super.object,
-    required this.showMoreThanQuantityField,
     super.style,
     super.animation,
   });
@@ -30,18 +26,14 @@ class AddHistoryEntryDialog extends FormDialog<HistoryEntry> {
   FormDialogState<HistoryEntry, AddHistoryEntryDialog> createState() => _AddHistoryEntryDialogState();
 
   /// Shows a history entry editor.
-  static Future<HistoryEntry?> show({
+  static Future<FormDialogResult<HistoryEntry>> show({
     required BuildContext context,
     required HistoryEntry historyEntry,
     bool? showMoreThanQuantityField,
-  }) => showFDialog<HistoryEntry>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => AddHistoryEntryDialog._(
-      object: historyEntry,
-      showMoreThanQuantityField: showMoreThanQuantityField ?? (historyEntry.quantity != null),
-      style: style.call,
-      animation: animation,
-    ),
+    object: historyEntry,
+    builder: AddHistoryEntryDialog._,
   );
 }
 
@@ -94,7 +86,9 @@ class _AddHistoryEntryDialogState extends FormDialogState<HistoryEntry, AddHisto
         _BeerTimesFormField(
           initialValue: historyEntry.times,
           maxHeight: MediaQuery.sizeOf(context).height,
-          onSaved: (value) => historyEntry = historyEntry.copyWith(times: value),
+          onSaved: (value) => historyEntry = historyEntry.copyWith(
+            times: value,
+          ),
         ),
       ],
     );
@@ -117,16 +111,13 @@ class HistoryEntryBeerEditorDialog extends FormDialog<String> {
   FormDialogState<String, HistoryEntryBeerEditorDialog> createState() => _HistoryEntryBeerEditorDialogState();
 
   /// Shows a new history entry beer editor.
-  static Future<String?> show({
+  static Future<FormDialogResult<String>> show({
     required BuildContext context,
     required String beerUuid,
-  }) => showFDialog<String>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => HistoryEntryBeerEditorDialog._(
-      object: beerUuid,
-      style: style.call,
-      animation: animation,
-    ),
+    object: beerUuid,
+    builder: HistoryEntryBeerEditorDialog._,
   );
 }
 
@@ -189,16 +180,13 @@ class HistoryEntryQuantityEditorDialog extends FormDialog<BeerQuantity> {
   FormDialogState<BeerQuantity, HistoryEntryQuantityEditorDialog> createState() => _HistoryEntryQuantityEditorDialogState();
 
   /// Shows a new history entry quantity editor.
-  static Future<BeerQuantity?> show({
+  static Future<FormDialogResult<BeerQuantity>> show({
     required BuildContext context,
-    double? quantity,
-  }) => showFDialog<BeerQuantity>(
+    required BeerQuantity quantity,
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => HistoryEntryQuantityEditorDialog._(
-      object: BeerQuantity(value: quantity),
-      style: style.call,
-      animation: animation,
-    ),
+    object: quantity,
+    builder: HistoryEntryQuantityEditorDialog._,
   );
 }
 
@@ -232,16 +220,13 @@ class HistoryEntryTimesEditorDialog extends FormDialog<int> {
   FormDialogState<int, HistoryEntryTimesEditorDialog> createState() => _HistoryEntryTimesEditorDialogState();
 
   /// Shows a new history entry times editor.
-  static Future<int?> show({
+  static Future<FormDialogResult<int>> show({
     required BuildContext context,
     required int times,
-  }) => showFDialog<int>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => HistoryEntryTimesEditorDialog._(
-      object: times,
-      style: style.call,
-      animation: animation,
-    ),
+    object: times,
+    builder: HistoryEntryTimesEditorDialog._,
   );
 }
 
@@ -279,7 +264,7 @@ class _BeerQuantityFormField extends FormField<BeerQuantity> {
              spacing: kSpace,
              children: [
                FSelectMenuTile<BeerQuantity>(
-                 onSaved: (quantities) => onSaved?.call(quantities?.firstOrNull),
+                 onSaved: state.value is CustomBeerQuantity ? null : (quantities) => onSaved?.call(quantities?.firstOrNull),
                  validator: (quantities) => validator?.call(quantities?.firstOrNull),
                  prefix: const Icon(FIcons.rotateCcw),
                  label: Text(translations.history.dialog.quantity.label),
@@ -325,6 +310,7 @@ class _BeerQuantityFormField extends FormField<BeerQuantity> {
                      state.didChange(CustomBeerQuantity(value: quantity));
                    },
                    validator: (value) => numbersValidator(value, allowEmpty: false),
+                   onSaved: (value) => onSaved?.call(state.value),
                  ),
              ],
            );

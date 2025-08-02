@@ -11,6 +11,7 @@ import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/async_value_widget.dart';
 import 'package:beerstory/widgets/editors/beer_prices.dart';
+import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/empty.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:flutter/foundation.dart';
@@ -157,18 +158,18 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
               title: Text(title),
               subtitle: subtitle == null ? null : Text(subtitle),
               onPress: () async {
-                BeerPrice? editedPrice = await BeerPriceEditorDialog.show<T>(
+                FormDialogResult<BeerPrice> editedPrice = await BeerPriceEditorDialog.show<T>(
                   context: context,
                   beerPrice: beerPrice,
                   availableObjects: availableObjects,
                 );
-                if (editedPrice == null || !context.mounted) {
+                if (editedPrice is! FormDialogResultSaved<BeerPrice> || !context.mounted) {
                   return;
                 }
                 if (editedPrice is DeletedBeerPrice) {
-                  await deleteObject(context, ref, editedPrice);
-                } else if (editedPrice != beerPrice) {
-                  await editObject(context, ref, editedPrice);
+                  await deleteObject(context, ref, editedPrice.value);
+                } else if (editedPrice.value != beerPrice) {
+                  await editObject(context, ref, editedPrice.value);
                 }
               },
             ),
@@ -196,14 +197,14 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
               style: FButtonStyle.primary(),
               child: Text(translations.beerPrices.details.add),
               onPress: () async {
-                BeerPrice? addedPrice = await BeerPriceEditorDialog.show<T>(
+                FormDialogResult<BeerPrice> addedPrice = await BeerPriceEditorDialog.show<T>(
                   context: context,
                   beerPrice: createNewBeerPrice(availableObjects),
                   availableObjects: availableObjects,
                   showDeleteButton: false,
                 );
-                if (addedPrice != null && context.mounted) {
-                  await addObject(context, ref, addedPrice);
+                if (addedPrice is FormDialogResultSaved<BeerPrice> && context.mounted) {
+                  await addObject(context, ref, addedPrice.value);
                 }
               },
             ),

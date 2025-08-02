@@ -6,7 +6,7 @@ import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/compare_fields.dart';
 import 'package:beerstory/utils/searchable.dart';
 import 'package:beerstory/utils/utils.dart';
-import 'package:beerstory/widgets/centered_circular_progress_indicator.dart';
+import 'package:beerstory/widgets/circular_progress_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
@@ -98,7 +98,7 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
   @override
   Widget build(BuildContext context) {
     if (orderedObjects == null) {
-      return const CenteredCircularProgressIndicator();
+      return const CenteredProgressIndicator();
     }
 
     List<Widget> children = [];
@@ -201,19 +201,21 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
 
 /// A group data.
 class GroupData<T> implements Comparable<GroupData> {
+  /// The group label.
+  final TextSpan? label;
+
+  /// The group description.
+  final TextSpan? description;
+
   /// The group objects.
   final List<T> objects;
 
   /// Creates a new group data instance.
   const GroupData({
+    this.label,
+    this.description,
     this.objects = const [],
   });
-
-  /// Returns the group label.
-  TextSpan? get label => null;
-
-  /// Returns the group description.
-  TextSpan? get description => null;
 
   @override
   int compareTo(GroupData other) => compareAccordingToFields(

@@ -2,10 +2,10 @@ import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/utils.dart';
+import 'package:beerstory/widgets/adaptive_actions_wrapper.dart';
 import 'package:beerstory/widgets/async_value_widget.dart';
 import 'package:beerstory/widgets/scrollable_sheet_content.dart';
 import 'package:beerstory/widgets/waiting_overlay.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -90,7 +90,7 @@ abstract class DetailsWidget<T extends RepositoryObject, S> extends ConsumerWidg
           title: Text(translations.error.generic),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: context.theme.colors.errorForeground,
+              color: context.theme.colors.error,
             ),
           ),
         );
@@ -113,7 +113,7 @@ abstract class DetailsWidget<T extends RepositoryObject, S> extends ConsumerWidg
           title: Text(translations.error.generic),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: context.theme.colors.errorForeground,
+              color: context.theme.colors.error,
             ),
           ),
         );
@@ -136,7 +136,7 @@ abstract class DetailsWidget<T extends RepositoryObject, S> extends ConsumerWidg
           title: Text(translations.error.generic),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: context.theme.colors.errorForeground,
+              color: context.theme.colors.error,
             ),
           ),
         );
@@ -182,7 +182,9 @@ abstract class RepositoryObjectDetailsWidget<T extends RepositoryObject> extends
             ),
             child: children[i],
           ),
-        buildActions(context, ref, object).adaptiveWrapper,
+        AdaptiveActionsWrapper(
+          actions: buildActions(context, ref, object),
+        ),
       ],
     );
   }
@@ -230,25 +232,4 @@ abstract class RepositoryObjectDetailsWidget<T extends RepositoryObject> extends
         ),
       )) ==
       true;
-}
-
-/// Allows to adapt the widget list to the platform.
-extension Adaptive on List<FButton> {
-  /// Returns the wrapper according to the platform.
-  Widget get adaptiveWrapper => defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android
-      ? Column(
-          spacing: kSpace,
-          children: this,
-        )
-      : Wrap(
-          spacing: kSpace / 2,
-          runSpacing: kSpace,
-          alignment: WrapAlignment.end,
-          children: [
-            for (Widget button in this)
-              IntrinsicWidth(
-                child: button,
-              ),
-          ],
-        );
 }

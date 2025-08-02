@@ -5,6 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Allows to blur a widget. Kudos to "jagritjkh/blur" for the initial implementation.
 class BlurWidget extends ConsumerStatefulWidget {
+  /// A widget to display below the blur effect.
+  final Widget? below;
+
+  /// A widget to display above the blur effect.
+  final Widget? above;
+
   /// Value of blur effect, higher the blur more the blur effect.
   final double blur;
 
@@ -23,6 +29,8 @@ class BlurWidget extends ConsumerStatefulWidget {
   /// Creates a new blur widget instance.
   const BlurWidget({
     super.key,
+    this.below,
+    this.above,
     this.blur = 5,
     this.borderRadius,
     this.colorOpacity = 0.5,
@@ -39,15 +47,24 @@ class _BlurWidgetState extends ConsumerState<BlurWidget> {
   @override
   Widget build(BuildContext context) => ClipRRect(
     borderRadius: widget.borderRadius ?? BorderRadius.zero,
-    child: BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur),
-      child: Container(
-        decoration: BoxDecoration(
-          color: (MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white).withValues(alpha: widget.colorOpacity),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        if (widget.below != null) widget.below!,
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur),
+            child: Container(
+              decoration: BoxDecoration(
+                color: (MediaQuery.of(context).platformBrightness == Brightness.dark ? Colors.black : Colors.white).withValues(alpha: widget.colorOpacity),
+              ),
+              alignment: widget.alignment,
+              child: widget.child,
+            ),
+          ),
         ),
-        alignment: widget.alignment,
-        child: widget.child,
-      ),
+        if (widget.above != null) widget.above!,
+      ],
     ),
   );
 }

@@ -1,8 +1,6 @@
-import 'dart:math' as math;
-import 'dart:ui';
-
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/spacing.dart';
+import 'package:beerstory/widgets/adaptive_actions_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -29,6 +27,28 @@ abstract class FormDialog<T> extends ConsumerStatefulWidget {
 
   @override
   FormDialogState<T, FormDialog<T>> createState();
+
+  /// Shows a form dialog.
+  static Future<FormDialogResult<T>> show<T>({
+    required BuildContext context,
+    required T object,
+    required FormDialog<T> Function({
+      required T object,
+      FDialogStyle Function(FDialogStyle)? style,
+      Animation<double>? animation,
+    })
+    builder,
+  }) async {
+    T? value = await showFDialog<T>(
+      context: context,
+      builder: (context, style, animation) => builder(
+        object: object,
+        style: style.call,
+        animation: animation,
+      ),
+    );
+    return value == null ? FormDialogResultCancelled<T>() : FormDialogResultSaved<T>(value: value);
+  }
 }
 
 /// The form dialog state class.
@@ -39,49 +59,42 @@ abstract class FormDialogState<T, W extends FormDialog<T>> extends ConsumerState
   @override
   Widget build(BuildContext context) {
     List<Widget> children = createChildren(context);
-    FlutterView window = PlatformDispatcher.instance.views.first;
-    EdgeInsets viewInsets = EdgeInsets.fromViewPadding(
-      window.viewInsets,
-      window.devicePixelRatio,
-    );
-    return FDialog.adaptive(
+    return FDialog.raw(
       style: widget._style,
       animation: widget._animation,
-      body: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: math.max(0, MediaQuery.sizeOf(context).height - 192 - viewInsets.bottom),
-        ),
-        child: Form(
-          key: formKey,
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              for (int i = 0; i < children.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: i < children.length - 1 ? kSpace : kSpace * 2,
-                  ),
-                  child: children[i],
+      builder: (context, style) => Form(
+        key: formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(kSpace),
+          shrinkWrap: true,
+          children: [
+            for (int i = 0; i < children.length; i++)
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: i < children.length - 1 ? kSpace : kSpace * 2,
                 ),
-            ],
-          ),
+                child: children[i],
+              ),
+            AdaptiveActionsWrapper(
+              actions: [
+                FButton(
+                  style: FButtonStyle.outline(),
+                  child: Text(translations.misc.cancel),
+                  onPress: () => Navigator.pop(context),
+                ),
+                FButton(
+                  child: Text(translations.misc.ok),
+                  onPress: () async {
+                    if (formKey.currentState!.validate()) {
+                      saveAndPop(context);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-      actions: [
-        FButton(
-          style: FButtonStyle.outline(),
-          child: Text(translations.misc.cancel),
-          onPress: () => Navigator.pop(context),
-        ),
-        FButton(
-          child: Text(translations.misc.ok),
-          onPress: () async {
-            if (formKey.currentState!.validate()) {
-              saveAndPop(context);
-            }
-          },
-        ),
-      ],
     );
   }
 
@@ -99,4 +112,24 @@ abstract class FormDialogState<T, W extends FormDialog<T>> extends ConsumerState
 
   /// Triggered when the form has been validated and saved.
   T? onSaved();
+}
+
+/// Represents a dialog result.
+sealed class FormDialogResult<T> {
+  /// Creates a new form dialog result instance.
+  const FormDialogResult();
+}
+
+/// Represents a cancelled form dialog result.
+class FormDialogResultCancelled<T> extends FormDialogResult<T> {}
+
+/// Represents a saved form dialog result.
+class FormDialogResultSaved<T> extends FormDialogResult<T> {
+  /// The result.
+  final T value;
+
+  /// Creates a new saved form dialog result instance.
+  const FormDialogResultSaved({
+    required this.value,
+  });
 }

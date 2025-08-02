@@ -33,20 +33,26 @@ class BeerPriceEditorDialog<T extends HasName> extends FormDialog<BeerPrice> {
   FormDialogState<BeerPrice, BeerPriceEditorDialog<T>> createState() => _BeerPriceEditorDialogState<T>();
 
   /// Shows a new beer price editor.
-  static Future<BeerPrice?> show<T extends HasName>({
+  static Future<FormDialogResult<BeerPrice>> show<T extends HasName>({
     required BuildContext context,
     required BeerPrice beerPrice,
     required List<T> availableObjects,
     bool showDeleteButton = true,
-  }) => showFDialog<BeerPrice>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BeerPriceEditorDialog<T>._(
-      object: beerPrice,
-      style: style.call,
-      animation: animation,
-      availableObjects: availableObjects,
-      showDeleteButton: showDeleteButton,
-    ),
+    object: beerPrice,
+    builder:
+        ({
+          required BeerPrice object,
+          FDialogStyle Function(FDialogStyle)? style,
+          Animation<double>? animation,
+        }) => BeerPriceEditorDialog<T>._(
+          object: object,
+          style: style,
+          animation: animation,
+          availableObjects: availableObjects,
+          showDeleteButton: showDeleteButton,
+        ),
   );
 }
 

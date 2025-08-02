@@ -9,6 +9,7 @@ import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/editors/bar_edit.dart';
+import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/repository/beer_prices.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:beerstory/widgets/scrollable_sheet_content.dart';
@@ -88,12 +89,12 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
           subtitle: _BarName(bar: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            String? newName = await BarNameEditorDialog.show(
+            FormDialogResult<String> newName = await BarNameEditorDialog.show(
               context: context,
               barName: object.name,
             );
-            if (newName != null && newName != object.name && context.mounted) {
-              await editObject(context, ref, object.copyWith(name: newName));
+            if (newName is FormDialogResultSaved<String> && newName.value != object.name && context.mounted) {
+              await editObject(context, ref, object.copyWith(name: newName.value));
             }
           },
         ),
@@ -103,15 +104,15 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
           subtitle: _BarAddress(bar: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            String? newAddress = await BarAddressEditorDialog.show(
+            FormDialogResult<String?> newAddress = await BarAddressEditorDialog.show(
               context: context,
               barAddress: object.address,
             );
-            if (newAddress != null && newAddress != object.address && context.mounted) {
+            if (newAddress is FormDialogResultSaved<String?> && newAddress.value != object.address && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.overwriteAddress(address: newAddress),
+                object.overwriteAddress(address: newAddress.value),
               );
             }
           },

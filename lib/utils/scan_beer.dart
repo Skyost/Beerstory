@@ -81,7 +81,7 @@ extension HandleScanResult on BuildContext {
           title: Text(translations.error.openFoodFacts.notFound),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: theme.colors.errorForeground,
+              color: theme.colors.error,
             ),
           ),
         );
@@ -92,7 +92,7 @@ extension HandleScanResult on BuildContext {
           title: Text(translations.error.openFoodFacts.genericError),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: theme.colors.errorForeground,
+              color: theme.colors.error,
             ),
           ),
         );

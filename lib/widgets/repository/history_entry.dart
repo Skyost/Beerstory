@@ -5,6 +5,8 @@ import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:beerstory/spacing.dart';
+import 'package:beerstory/utils/format.dart';
+import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/editors/history_entry_edit.dart';
 import 'package:beerstory/widgets/repository/beer.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
@@ -106,15 +108,15 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
         _BeerTile(
           beerUuid: object.beerUuid,
           onPressed: (beer) async {
-            String? newBeerUuid = await HistoryEntryBeerEditorDialog.show(
+            FormDialogResult<String> newBeerUuid = await HistoryEntryBeerEditorDialog.show(
               context: context,
               beerUuid: beer.uuid,
             );
-            if (newBeerUuid != null && newBeerUuid != beer.uuid && context.mounted) {
+            if (newBeerUuid is FormDialogResultSaved<String> && newBeerUuid.value != beer.uuid && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.copyWith(beerUuid: newBeerUuid),
+                object.copyWith(beerUuid: newBeerUuid.value),
               );
             }
           },
@@ -125,20 +127,20 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
             object.quantity == null
                 ? translations.history.details.quantity.empty
                 : translations.history.details.quantity.quantity(
-                    quantity: object.quantity!,
+                    quantity: NumberFormat.formatDouble(object.quantity!),
                   ),
           ),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            BeerQuantity? newQuantity = await HistoryEntryQuantityEditorDialog.show(
+            FormDialogResult<BeerQuantity> newQuantity = await HistoryEntryQuantityEditorDialog.show(
               context: context,
-              quantity: object.quantity,
+              quantity: BeerQuantity(value: object.quantity),
             );
-            if (newQuantity?.value != object.quantity && context.mounted) {
+            if (newQuantity is FormDialogResultSaved<BeerQuantity> && newQuantity.value.value != object.quantity && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.overwriteQuantity(quantity: newQuantity?.value),
+                object.overwriteQuantity(quantity: newQuantity.value.value),
               );
             }
           },
@@ -148,12 +150,12 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
           subtitle: Text(object.times.toString()),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            int? newTimes = await HistoryEntryTimesEditorDialog.show(
+            FormDialogResult<int> newTimes = await HistoryEntryTimesEditorDialog.show(
               context: context,
               times: object.times,
             );
-            if (newTimes != null && newTimes != object.times && context.mounted) {
-              await editObject(context, ref, object.copyWith(times: newTimes));
+            if (newTimes is FormDialogResultSaved<int> && newTimes.value != object.times && context.mounted) {
+              await editObject(context, ref, object.copyWith(times: newTimes.value));
             }
           },
         ),

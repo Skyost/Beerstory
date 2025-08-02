@@ -10,6 +10,7 @@ import 'package:beerstory/spacing.dart';
 import 'package:beerstory/utils/blank_image_provider.dart';
 import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/widgets/editors/beer_edit.dart';
+import 'package:beerstory/widgets/editors/form_dialog.dart';
 import 'package:beerstory/widgets/repository/beer_prices.dart';
 import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:beerstory/widgets/scrollable_sheet_content.dart';
@@ -128,12 +129,12 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           subtitle: _BeerTitle(beer: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            String? newName = await BeerNameEditorDialog.show(
+            FormDialogResult<String> newName = await BeerNameEditorDialog.show(
               context: context,
               beerName: object.name,
             );
-            if (newName != null && newName != object.name && context.mounted) {
-              await editObject(context, ref, object.copyWith(name: newName));
+            if (newName is FormDialogResultSaved<String> && newName.value != object.name && context.mounted) {
+              await editObject(context, ref, object.copyWith(name: newName.value));
             }
           },
         ),
@@ -143,15 +144,15 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           subtitle: _BeerDegrees(beer: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            double? newDegrees = await BeerDegreesEditorDialog.show(
+            FormDialogResult<double?> newDegrees = await BeerDegreesEditorDialog.show(
               context: context,
               beerDegrees: object.degrees,
             );
-            if (newDegrees != null && newDegrees != object.degrees && context.mounted) {
+            if (newDegrees is FormDialogResultSaved<double?> && newDegrees.value != object.degrees && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.overwriteDegrees(degrees: newDegrees),
+                object.overwriteDegrees(degrees: newDegrees.value),
               );
             }
           },
@@ -162,15 +163,15 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           subtitle: _BeerRating(beer: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            double? newRating = await BeerRatingEditorDialog.show(
+            FormDialogResult<double?> newRating = await BeerRatingEditorDialog.show(
               context: context,
               beerRating: object.rating,
             );
-            if (newRating != null && newRating != object.rating && context.mounted) {
+            if (newRating is FormDialogResultSaved<double?> && newRating.value != object.rating && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.overwriteRating(rating: newRating),
+                object.overwriteRating(rating: newRating.value),
               );
             }
           },
@@ -181,12 +182,12 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           subtitle: _BeerTags(beer: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            List<String>? newTags = await BeerTagsEditorDialog.show(
+            FormDialogResult<List<String>> newTags = await BeerTagsEditorDialog.show(
               context: context,
               beerTags: object.tags,
             );
-            if (newTags != null && !listEquals(newTags, object.tags) && context.mounted) {
-              await editObject(context, ref, object.copyWith(tags: newTags));
+            if (newTags is FormDialogResultSaved<List<String>> && !listEquals(newTags.value, object.tags) && context.mounted) {
+              await editObject(context, ref, object.copyWith(tags: newTags.value));
             }
           },
         ),

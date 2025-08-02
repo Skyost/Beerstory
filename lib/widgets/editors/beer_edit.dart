@@ -27,16 +27,13 @@ class AddBeerDialog extends FormDialog<Beer> {
   FormDialogState<Beer, AddBeerDialog> createState() => _AddBeerDialogState();
 
   /// Shows a new beer editor.
-  static Future<Beer?> show({
+  static Future<FormDialogResult<Beer>> show({
     required BuildContext context,
     Beer? beer,
-  }) => showFDialog<Beer>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => AddBeerDialog._(
-      object: beer ?? Beer(),
-      style: style.call,
-      animation: animation,
-    ),
+    object: beer ?? Beer(),
+    builder: AddBeerDialog._,
   );
 }
 
@@ -118,16 +115,13 @@ class BeerNameEditorDialog extends FormDialog<String> {
   FormDialogState<String, BeerNameEditorDialog> createState() => _BeerNameEditorDialogState();
 
   /// Shows a new beer name editor.
-  static Future<String?> show({
+  static Future<FormDialogResult<String>> show({
     required BuildContext context,
     required String beerName,
-  }) => showFDialog<String>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BeerNameEditorDialog._(
-      object: beerName,
-      style: style.call,
-      animation: animation,
-    ),
+    object: beerName,
+    builder: BeerNameEditorDialog._,
   );
 }
 
@@ -161,16 +155,13 @@ class BeerDegreesEditorDialog extends FormDialog<double?> {
   FormDialogState<double?, BeerDegreesEditorDialog> createState() => _BeerDegreesEditorDialogState();
 
   /// Shows a new beer degrees editor.
-  static Future<double?> show({
+  static Future<FormDialogResult<double?>> show({
     required BuildContext context,
     required double? beerDegrees,
-  }) => showFDialog<double?>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BeerDegreesEditorDialog._(
-      object: beerDegrees,
-      style: style.call,
-      animation: animation,
-    ),
+    object: beerDegrees,
+    builder: BeerDegreesEditorDialog._,
   );
 }
 
@@ -204,16 +195,13 @@ class BeerRatingEditorDialog extends FormDialog<double?> {
   FormDialogState<double?, BeerRatingEditorDialog> createState() => _BeerRatingEditorDialogState();
 
   /// Shows a new beer rating editor.
-  static Future<double?> show({
+  static Future<FormDialogResult<double?>> show({
     required BuildContext context,
     required double? beerRating,
-  }) => showFDialog<double?>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BeerRatingEditorDialog._(
-      object: beerRating,
-      style: style.call,
-      animation: animation,
-    ),
+    object: beerRating,
+    builder: BeerRatingEditorDialog._,
   );
 }
 
@@ -235,7 +223,7 @@ class _BeerRatingEditorDialogState extends FormDialogState<double?, BeerRatingEd
 }
 
 /// Allows to edit a beer tags.
-class BeerTagsEditorDialog extends FormDialog<List<String>?> {
+class BeerTagsEditorDialog extends FormDialog<List<String>> {
   /// The beer tags editor internal constructor.
   const BeerTagsEditorDialog._({
     required super.object,
@@ -244,24 +232,21 @@ class BeerTagsEditorDialog extends FormDialog<List<String>?> {
   });
 
   @override
-  FormDialogState<List<String>?, BeerTagsEditorDialog> createState() => _BeerTagsEditorDialogState();
+  FormDialogState<List<String>, BeerTagsEditorDialog> createState() => _BeerTagsEditorDialogState();
 
   /// Shows a new beer tags editor.
-  static Future<List<String>?> show({
+  static Future<FormDialogResult<List<String>>> show({
     required BuildContext context,
     required List<String> beerTags,
-  }) => showFDialog<List<String>?>(
+  }) => FormDialog.show(
     context: context,
-    builder: (context, style, animation) => BeerTagsEditorDialog._(
-      object: beerTags,
-      style: style.call,
-      animation: animation,
-    ),
+    object: beerTags,
+    builder: BeerTagsEditorDialog._,
   );
 }
 
 /// The beer tags editor dialog state.
-class _BeerTagsEditorDialogState extends FormDialogState<List<String>?, BeerTagsEditorDialog> {
+class _BeerTagsEditorDialogState extends FormDialogState<List<String>, BeerTagsEditorDialog> {
   /// The current beer tags.
   late List<String>? beerTags = widget.object;
 
@@ -436,10 +421,11 @@ class _BeerNameFormField extends FTextFormField {
 class _BeerRatingFormField extends FormField<double> {
   /// Creates a new beer rating form field instance.
   _BeerRatingFormField({
-    super.onSaved,
+    FormFieldSetter<double>? onSaved,
     super.initialValue,
     double size = 50,
   }) : super(
+         onSaved: onSaved == null ? null : (value) => onSaved((value ?? 0) <= 0 ? null : value),
          builder: (state) => FLabel(
            label: Text(translations.beers.dialog.rating.label),
            axis: Axis.vertical,
