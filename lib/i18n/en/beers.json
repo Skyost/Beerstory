@@ -2,7 +2,11 @@
   "page": {
     "name": "Beers",
     "empty": "No beer added for the moment.",
-    "searchEmpty": "No beer found."
+    "searchEmpty": "No beer found.",
+    "menu": {
+      "addFromScan": "Scan a barcode",
+      "manualAdd": "Add manually"
+    }
   },
   "dialog": {
     "edit": "Edit beer",

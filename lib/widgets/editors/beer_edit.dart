@@ -43,6 +43,9 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
   /// The current beer instance.
   late Beer beer = widget.object.copyWith();
 
+  /// The beer name.
+  late String beerName = beer.name;
+
   /// The add form focus node.
   final FocusNode addFormFocusNode = FocusNode();
 
@@ -57,7 +60,7 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
         child: BeerImageFormField(
           initialValue: beer.image,
           beerUuid: beer.uuid,
-          beerName: beer.name,
+          beerName: beerName,
           onSaved: (value) => beer = beer.overwriteImage(
             image: value,
           ),
@@ -66,6 +69,9 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
     ),
     _BeerNameFormField(
       initialText: beer.name,
+      onChange: (value) {
+        setState(() => beerName = value);
+      },
       onSaved: (value) => beer = beer.copyWith(
         name: value?.trim(),
       ),
@@ -296,7 +302,7 @@ class BeerImageFormField extends FormField<String?> {
              image: state.value,
              radius: 100,
            );
-           return (enabled ?? currentPlatform != Platform.web)
+           return (enabled ?? currentPlatform == Platform.web)
                ? child
                : FPopover(
                    controller: (state as _BeerImageFormState).imagePopoverController,
@@ -415,11 +421,13 @@ class _BeerNameFormField extends FTextFormField {
   /// Creates a new beer name form field instance.
   _BeerNameFormField({
     super.initialText,
+    Function(String)? onChange,
     FormFieldSetter<String>? onSaved,
   }) : super(
          label: Text(translations.beers.dialog.name.label),
          hint: translations.beers.dialog.name.hint,
          validator: emptyStringValidator,
+         onChange: (value) => onChange?.call(value.trimOrNullIfEmpty ?? ''),
          onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
        );
 }

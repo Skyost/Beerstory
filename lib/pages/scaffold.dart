@@ -79,18 +79,17 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Sing
   /// Returns the suffixes corresponding to the current body widget.
   List<Widget> get suffixes => areBeersDisplayed
       ? [
-          const _ScanBeerButton(),
-          _AddButton(
-            showEditor: (context) => AddBeerDialog.show(context: context),
-            repositoryProvider: beerRepositoryProvider,
-            addedString: translations.beers.dialog.added,
-          ),
+          const _AddBeerButton(),
         ]
       : [
-          _AddButton(
+          _AddObjectWidget(
             showEditor: (context) => AddBarDialog.show(context: context),
             repositoryProvider: barRepositoryProvider,
             addedString: translations.bars.dialog.added,
+            builder: (onPress) => FHeaderAction(
+              icon: const Icon(FIcons.ellipsis),
+              onPress: onPress,
+            ),
           ),
         ];
 
@@ -320,7 +319,67 @@ class _HistoryButton extends StatelessWidget {
 }
 
 /// The add beer button.
-class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
+class _AddBeerButton extends ConsumerWidget {
+  /// Creates a new add beer button instance.
+  const _AddBeerButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => currentPlatform.isMobile
+      ? FPopoverMenu(
+          menuAnchor: Alignment.topRight,
+          childAnchor: Alignment.bottomRight,
+          menu: [
+            FItemGroup(
+              children: [
+                FItem(
+                  prefix: const Icon(FIcons.barcode),
+                  title: Text(translations.beers.page.menu.addFromScan),
+                  onPress: () async {
+                    ScanResult result = await scanBeer(context);
+                    if (context.mounted) {
+                      context.handleScanResult(
+                        result,
+                        onSuccess: (beer) async {
+                          await showWaitingOverlay(
+                            context,
+                            future: ref.read(beerRepositoryProvider.notifier).add(beer),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+                _AddObjectWidget(
+                  showEditor: (context) => AddBeerDialog.show(context: context),
+                  repositoryProvider: beerRepositoryProvider,
+                  addedString: translations.beers.dialog.added,
+                  builder: (onPress) => FItem(
+                    prefix: const Icon(FIcons.textCursor),
+                    title: Text(translations.beers.page.menu.manualAdd),
+                    onPress: onPress,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          builder: (context, controller, child) => FHeaderAction(
+            icon: const Icon(FIcons.ellipsis),
+            onPress: controller.toggle,
+          ),
+        )
+      : _AddObjectWidget(
+          showEditor: (context) => AddBeerDialog.show(context: context),
+          repositoryProvider: beerRepositoryProvider,
+          addedString: translations.beers.dialog.added,
+          builder: (onPress) => FHeaderAction(
+            icon: const Icon(FIcons.plus),
+            onPress: onPress,
+          ),
+        );
+}
+
+/// The add object widget.
+class _AddObjectWidget<T extends RepositoryObject> extends ConsumerWidget with FItemMixin {
   /// The show editor function.
   final Future<FormDialogResult<T>> Function(BuildContext) showEditor;
 
@@ -330,17 +389,20 @@ class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
   /// The string displayed when the object is added.
   final String addedString;
 
+  /// The widget builder.
+  final Function(VoidCallback) builder;
+
   /// Creates a new add beer button instance.
-  const _AddButton({
+  const _AddObjectWidget({
     required this.showEditor,
     required this.repositoryProvider,
     required this.addedString,
+    required this.builder,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => FHeaderAction(
-    icon: const Icon(FIcons.plus),
-    onPress: () async {
+  Widget build(BuildContext context, WidgetRef ref) => builder(
+    () async {
       FormDialogResult<T?> object = await showEditor(context);
       if (object is FormDialogResultSaved<T> && context.mounted) {
         try {
@@ -371,33 +433,6 @@ class _AddButton<T extends RepositoryObject> extends ConsumerWidget {
       }
     },
   );
-}
-
-/// The scan beer button.
-class _ScanBeerButton extends ConsumerWidget {
-  /// Creates a new scan beer button instance.
-  const _ScanBeerButton();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => currentPlatform.isMobile
-      ? FHeaderAction(
-          icon: const Icon(FIcons.barcode),
-          onPress: () async {
-            ScanResult result = await scanBeer(context);
-            if (context.mounted) {
-              context.handleScanResult(
-                result,
-                onSuccess: (beer) async {
-                  await showWaitingOverlay(
-                    context,
-                    future: ref.read(beerRepositoryProvider.notifier).add(beer),
-                  );
-                },
-              );
-            }
-          },
-        )
-      : const SizedBox.shrink();
 }
 
 /// The clear history button.

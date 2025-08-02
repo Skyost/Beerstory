@@ -1,3 +1,4 @@
+import 'package:beerstory/widgets/blur.dart';
 import 'package:beerstory/widgets/scan/scanner_button_widgets.dart';
 import 'package:beerstory/widgets/scan/scanner_error_widget.dart';
 import 'package:flutter/material.dart';
@@ -26,32 +27,29 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
   );
 
   @override
-  Widget build(BuildContext context) => Stack(
-    fit: StackFit.expand,
-    children: [
-      Center(
-        child: MobileScanner(
-          onDetect: widget.onScan,
-          fit: BoxFit.contain,
-          controller: controller,
-          // scanWindow: scanWindow,
-          errorBuilder: (context, error) => ScannerErrorWidget(error: error),
+  Widget build(BuildContext context) => BlurWidget(
+    above: Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ToggleFlashlightButton(controller: controller),
+            SwitchCameraButton(controller: controller),
+          ],
         ),
       ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ToggleFlashlightButton(controller: controller),
-              SwitchCameraButton(controller: controller),
-            ],
-          ),
-        ),
+    ),
+    child: Center(
+      child: MobileScanner(
+        onDetect: widget.onScan,
+        fit: BoxFit.contain,
+        controller: controller,
+        // scanWindow: scanWindow,
+        errorBuilder: (context, error) => ScannerErrorWidget(error: error),
       ),
-    ],
+    ),
   );
 
   @override

@@ -2,7 +2,11 @@
   "page": {
     "name": "Bières",
     "empty": "Pas de bière enregistrée pour le moment.",
-    "searchEmpty": "Aucune bière trouvée."
+    "searchEmpty": "Aucune bière trouvée.",
+    "menu": {
+      "addFromScan": "Scanner un code-barre",
+      "manualAdd": "Ajouter manuellement"
+    }
   },
   "dialog": {
     "edit": "Modifier la bière",
