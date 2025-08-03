@@ -2,6 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+/// The close button.
+class CloseButton extends StatelessWidget {
+  /// Creates a new close button instance.
+  const CloseButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => FButton.icon(
+    onPress: () => Navigator.pop(context),
+    style: FButtonStyle.secondary(),
+    child: const Icon(FIcons.x),
+  );
+}
+
 /// The button that allows to switch camera.
 class SwitchCameraButton extends StatelessWidget {
   /// The mobile scanner controller instance.
@@ -75,13 +90,10 @@ class ToggleFlashlightButton extends StatelessWidget {
             child: const Icon(Icons.flash_on),
           );
         case TorchState.unavailable:
-          return const SizedBox.square(
-            dimension: 48,
-            child: Icon(
-              Icons.flash_off,
-              size: 32,
-              color: Colors.grey,
-            ),
+          return FButton.icon(
+            style: FButtonStyle.secondary(),
+            onPress: null,
+            child: const Icon(Icons.flash_off),
           );
       }
     },

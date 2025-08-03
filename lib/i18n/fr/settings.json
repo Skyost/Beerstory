@@ -26,7 +26,7 @@
     },
     "restore": {
       "title": "Importer les données",
-      "subtitle": "Importer les données de l'application depuis un fichier.\nAttention, en cas de conflit, vos données actuelles pourront être remplacées.",
+      "subtitle": "Importer les données de l'application depuis un fichier.\nAttention : en cas de conflit, vos données actuelles pourront être remplacées.",
       "success": "Données importées avec succès."
     }
   },

@@ -79,6 +79,7 @@ class BeerWidget extends RepositoryObjectWidget<Beer> {
         ),
         side: FLayout.btt,
         mainAxisMaxRatio: null,
+        useSafeArea: true,
       );
     },
   );
@@ -198,12 +199,7 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           suffix: const Icon(FIcons.chevronRight),
           onPress: onBeerPricesPress,
         ),
-        if (kDebugMode)
-          FTile(
-            prefix: const Icon(FIcons.hash),
-            title: const Text('UUID'),
-            subtitle: Text(object.uuid),
-          ),
+
       ],
     ),
   ];

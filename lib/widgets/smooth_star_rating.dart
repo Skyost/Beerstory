@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 
 /// Thanks [`smooth_star_rating`](https://raw.githubusercontent.com/thangmam/smoothratingbar/master/lib/smooth_star_rating.dart) !
@@ -30,6 +31,7 @@ class SmoothStarRating extends StatelessWidget {
     this.allowHalfRating = true,
   });
 
+  /// Builds a star widget.
   Widget buildStar(BuildContext context, int index) {
     Icon icon;
     if (index >= rating) {
@@ -38,7 +40,7 @@ class SmoothStarRating extends StatelessWidget {
         color: borderColor ?? context.theme.colors.primary,
         size: size,
       );
-    } else if (index > rating - (allowHalfRating ? 0.5 : 1.0) && index < rating) {
+    } else if (index >= rating - (allowHalfRating ? 0.5 : 1.0) && index < rating) {
       icon = Icon(
         halfFilledIconData,
         color: color ?? context.theme.colors.primary,
@@ -52,22 +54,31 @@ class SmoothStarRating extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
+    return onRatingChanged == null ? icon : GestureDetector(
       onTap: () {
-        onRatingChanged?.call(index + 1.0);
+        double newRating = index + 1.0;
+        if (newRating != rating) {
+          onRatingChanged!.call(newRating);
+          HapticFeedback.lightImpact();
+        }
       },
       onHorizontalDragUpdate: (dragDetails) {
         RenderBox box = context.findRenderObject() as RenderBox;
-        var pos = box.globalToLocal(dragDetails.globalPosition);
-        var i = pos.dx / size;
-        var newRating = allowHalfRating ? i : i.round().toDouble();
+        Offset pos = box.globalToLocal(dragDetails.globalPosition);
+        double i = pos.dx / size;
+        double newRating = allowHalfRating ? i : i.round().toDouble();
         if (newRating > starCount) {
           newRating = starCount.toDouble();
         }
         if (newRating < 0) {
           newRating = 0.0;
+        } else {
+          newRating = (2 * newRating).roundToDouble() / 2;
         }
-        onRatingChanged?.call(newRating);
+        if (newRating != rating) {
+          onRatingChanged!.call(newRating);
+          HapticFeedback.lightImpact();
+        }
       },
       child: icon,
     );

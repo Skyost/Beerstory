@@ -18,8 +18,8 @@
       "quantities": {
         "unspecified": "Unspecified",
         "bottle": "Bottle / Can (33cL)",
-        "halfPint": "Half-pint (50cL)",
-        "pint": "Pint (100cL)",
+        "halfPint": "Half-pint (25cL)",
+        "pint": "Pint (50cL)",
         "custom": "Custom"
       }
     },

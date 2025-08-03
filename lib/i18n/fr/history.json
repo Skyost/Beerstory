@@ -18,8 +18,8 @@
       "quantities": {
         "unspecified": "Non spécifiée",
         "bottle": "Bouteille / Canette (33cL)",
-        "halfPint": "Demi-pinte (50cL)",
-        "pint": "Pinte (100cL)",
+        "halfPint": "Demi-pinte (25cL)",
+        "pint": "Pinte (50cL)",
         "custom": "Personnalisée"
       }
     },

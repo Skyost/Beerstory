@@ -143,7 +143,11 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
     builder: (context, ref, availableObjects) {
       Widget child;
       if (beerPrices.isEmpty) {
-        child = EmptyWidget(text: translations.beerPrices.details.empty);
+        child = Center(
+          child: EmptyWidget(
+            text: translations.beerPrices.details.empty,
+          ),
+        );
       } else {
         List<FTileMixin> children = [];
         for (BeerPrice beerPrice in beerPrices) {
@@ -189,9 +193,7 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
               constraints: BoxConstraints(
                 minHeight: constraints.maxHeight - 42,
               ),
-              child: Center(
-                child: child,
-              ),
+              child: child,
             ),
             FButton(
               style: FButtonStyle.primary(),

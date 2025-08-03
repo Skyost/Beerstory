@@ -34,6 +34,7 @@ abstract class RepositoryObjectWidget<T extends RepositoryObject> extends Consum
       ),
       side: FLayout.btt,
       mainAxisMaxRatio: null,
+      useSafeArea: true,
     ),
   );
 

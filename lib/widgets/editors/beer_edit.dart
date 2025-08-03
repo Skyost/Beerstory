@@ -351,7 +351,7 @@ class BeerImageFormField extends FormField<String?> {
                              ),
                              if (state.value != null)
                                FItem(
-                                 prefix: const Icon(FIcons.cross),
+                                 prefix: const Icon(FIcons.x),
                                  title: Text(translations.beers.dialog.image.remove),
                                  onPress: () {
                                    state.didChange(null);

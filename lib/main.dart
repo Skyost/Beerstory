@@ -91,6 +91,7 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> with BrightnessLis
     FThemeData themeData = currentBrightness == Brightness.dark ? _BeerstoryApp.tealTheme.dark : _BeerstoryApp.tealTheme.light;
     return MaterialApp(
       title: 'Beerstory',
+      debugShowCheckedModeBanner: false,
       builder: (context, child) => FTheme(
         data: themeData.copyWith(
           headerStyles: themeData.headerStyles.copyWith(

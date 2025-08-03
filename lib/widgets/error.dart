@@ -1,3 +1,4 @@
+import 'package:beerstory/app.dart';
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/spacing.dart';
 import 'package:flutter/material.dart';
@@ -130,8 +131,14 @@ class _ErrorWidgetState extends State<ErrorWidget> with SingleTickerProviderStat
   }
 
   /// The issues URL.
-  Uri get reportIssueUrl => Uri.parse(
-    'https://github.com/Skyost/Beerstory/issues?labels=bug&title=${Uri.encodeComponent('`${widget.error}`')}&body=${Uri.encodeComponent((widget.stackTrace ?? 'No stacktrace').toString())}',
+  Uri get reportIssueUrl => Uri.https(
+    'github.com',
+    '$kGithubRepository/issues',
+    {
+      'labels': 'bug',
+      'title': '`${widget.error}`',
+      'body': (widget.stackTrace ?? 'No stacktrace').toString(),
+    },
   );
 
   /// Toggles the stacktrace.

@@ -51,6 +51,7 @@ class BarWidget extends RepositoryObjectWidget<Bar> {
         ),
         side: FLayout.btt,
         mainAxisMaxRatio: null,
+        useSafeArea: true,
       );
     },
   );

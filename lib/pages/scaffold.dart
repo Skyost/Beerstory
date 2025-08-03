@@ -76,23 +76,6 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Sing
   /// Returns the current page title.
   String get pageTitle => areBeersDisplayed ? translations.beers.page.name : translations.bars.page.name;
 
-  /// Returns the suffixes corresponding to the current body widget.
-  List<Widget> get suffixes => areBeersDisplayed
-      ? [
-          const _AddBeerButton(),
-        ]
-      : [
-          _AddObjectWidget(
-            showEditor: (context) => AddBarDialog.show(context: context),
-            repositoryProvider: barRepositoryProvider,
-            addedString: translations.bars.dialog.added,
-            builder: (onPress) => FHeaderAction(
-              icon: const Icon(FIcons.ellipsis),
-              onPress: onPress,
-            ),
-          ),
-        ];
-
   @override
   Widget build(BuildContext context) {
     int historyLength = ref.watch(historyProvider.select((history) => history.value?.length ?? 0));
@@ -100,12 +83,28 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Sing
 
     return FScaffold(
       header: FHeader.nested(
-        title: GestureDetector(
-          child: Text(pageTitle),
-          onTap: () => Navigator.pushNamed(context, kSettingsRoute),
-        ),
-        prefixes: [if (historyLength > 0) _HistoryButton()],
-        suffixes: suffixes,
+        title: Text(pageTitle),
+        prefixes: [
+          FHeaderAction(
+            icon: const Icon(FIcons.settings),
+            onPress: () => Navigator.pushNamed(context, kSettingsRoute),
+          ),
+        ],
+        suffixes: [
+          if (historyLength > 0) _HistoryButton(),
+          if (areBeersDisplayed)
+            const _AddBeerButton()
+          else
+            _AddObjectWidget(
+              showEditor: (context) => AddBarDialog.show(context: context),
+              repositoryProvider: barRepositoryProvider,
+              addedString: translations.bars.dialog.added,
+              builder: (onPress) => FHeaderAction(
+                icon: const Icon(FIcons.plus),
+                onPress: onPress,
+              ),
+            ),
+        ],
       ),
       footer: FBottomNavigationBar(
         index: currentMenuIndex,
@@ -127,7 +126,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Sing
             icon: const Icon(FIcons.beer),
             label: Text(translations.beers.page.name),
           ),
-          if (beerCount > 0) _NewHistoryEntryButton() else const SizedBox.shrink(),
+          if (beerCount > 0) const _NewHistoryEntryButton() else const SizedBox.shrink(),
           FBottomNavigationBarItem(
             icon: const Icon(FIcons.mapPin),
             label: Text(translations.bars.page.name),
@@ -166,6 +165,7 @@ class _NewHistoryEntryButton extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _NewHistoryEntryButtonState();
 }
 
+/// The new history entry button state.
 class _NewHistoryEntryButtonState extends ConsumerState<_NewHistoryEntryButton> with SingleTickerProviderStateMixin<_NewHistoryEntryButton> {
   /// The gradient animation controller.
   late AnimationController gradientAnimationController =
@@ -335,9 +335,10 @@ class _AddBeerButton extends ConsumerWidget {
                   prefix: const Icon(FIcons.barcode),
                   title: Text(translations.beers.page.menu.addFromScan),
                   onPress: () async {
-                    ScanResult result = await scanBeer(context);
+                    ScanResult result = await BeerScan.scanAndFetchFromOpenFoodFacts(context);
                     if (context.mounted) {
-                      context.handleScanResult(
+                      BeerScan.handleScanResult(
+                        context,
                         result,
                         onSuccess: (beer) async {
                           await showWaitingOverlay(
@@ -363,7 +364,7 @@ class _AddBeerButton extends ConsumerWidget {
             ),
           ],
           builder: (context, controller, child) => FHeaderAction(
-            icon: const Icon(FIcons.ellipsis),
+            icon: const Icon(FIcons.plus),
             onPress: controller.toggle,
           ),
         )

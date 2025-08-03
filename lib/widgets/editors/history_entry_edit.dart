@@ -377,7 +377,7 @@ class BottleBeerQuantity extends BeerQuantity {
 /// Represents a half pint beer quantity.
 class HalfPintBeerQuantity extends BeerQuantity {
   /// The half pint quantity.
-  static const double quantity = 50;
+  static const double quantity = 25;
 
   /// Creates a new half pint beer quantity instance.
   const HalfPintBeerQuantity()
@@ -392,7 +392,7 @@ class HalfPintBeerQuantity extends BeerQuantity {
 /// Represents a pint beer quantity.
 class PintBeerQuantity extends BeerQuantity {
   /// The pint quantity.
-  static const double quantity = 100;
+  static const double quantity = 50;
 
   /// Creates a new pint beer quantity instance.
   const PintBeerQuantity()

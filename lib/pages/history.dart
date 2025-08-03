@@ -4,12 +4,13 @@ import 'package:beerstory/model/beer/repository.dart';
 import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/pages/body.dart';
+import 'package:beerstory/utils/format.dart';
 import 'package:beerstory/widgets/async_value_widget.dart';
 import 'package:beerstory/widgets/ordered_list_view.dart';
 import 'package:beerstory/widgets/repository/history_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 
 /// The history scaffold body widget.
 class HistoryScaffoldBody extends ScaffoldBodyWidget<HistoryEntry> {
@@ -98,29 +99,30 @@ class _DateGroupData extends GroupData<HistoryEntry> {
 
   @override
   TextSpan get label => TextSpan(
-    text: DateFormat.yMMMMd(
-      LocaleSettings.currentLocale.languageCode,
-    ).format(date),
+    text: intl.DateFormat.yMMMMd(LocaleSettings.currentLocale.languageCode).format(date),
   );
 
   @override
-  TextSpan? get description => result.trueQuantity == null
-      ? null
-      : TextSpan(
-          children: [
-            TextSpan(
-              text: translations.history.page.total,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const TextSpan(text: ' '),
-            TextSpan(
-              text: translations.history.page.quantity(
-                prefix: result.moreThanQuantity ? '+' : '',
-                quantity: NumberFormat.decimalPattern().format(result.trueQuantity),
-              ),
-            ),
-          ],
-        );
+  TextSpan? get description {
+    double? trueQuantity = result.trueQuantity;
+    return trueQuantity == null
+        ? null
+        : TextSpan(
+      children: [
+        TextSpan(
+          text: translations.history.page.total,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const TextSpan(text: ' '),
+        TextSpan(
+          text: translations.history.page.quantity(
+            prefix: result.moreThanQuantity ? '+' : '',
+            quantity: NumberFormat.formatDouble(trueQuantity!),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   bool operator ==(Object other) {

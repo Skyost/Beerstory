@@ -6,93 +6,96 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 
-/// Tries to scan a beer thanks to [BarcodeScanner].
-Future<ScanResult> scanBeer(BuildContext context) async =>
-    (await showFDialog<ScanResult>(
-      context: context,
-      builder: (context, style, animation) => BarcodeScanner(
-        onScan: (barcodes) async {
-          String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
-          if (barcode.isEmpty) {
-            return;
-          }
+/// Contains some methods to scan a beer.
+class BeerScan {
+  /// Tries to scan a beer thanks to [BarcodeScanner].
+  static Future<String?> _scan(BuildContext context) async =>
+      (await showFDialog<String>(
+        context: context,
+        builder: (context, style, animation) => BarcodeScanner(
+          onScan: (barcodes) async {
+            String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
+            if (barcode.isEmpty) {
+              return;
+            }
 
-          OpenFoodFactsLanguage? language = OpenFoodFactsLanguage.fromOffTag(TranslationProvider.of(context).locale.languageCode);
-          ProductQueryConfiguration config = ProductQueryConfiguration(
-            barcode,
-            version: ProductQueryVersion.v3,
-          );
-          ProductResultV3 result = await showWaitingOverlay(
-            context,
-            future: OpenFoodAPIClient.getProductV3(config),
-          );
-          if (!context.mounted) {
-            return;
-          }
-          if (result.product == null) {
-            Navigator.pop(context, ScanResultError(errorId: result.result?.id));
-            return;
-          }
+            Navigator.pop(context, barcode);
+          },
+        ),
+      ));
 
-          Product product = result.product!;
-          String? name = product.productNameInLanguages?[language] ?? product.productName;
-          if (product.brands != null && product.brands != name) {
-            String brand = product.brands!.split(',').first;
-            name = name == null ? brand : '$brand - $name';
-          }
+  /// Scans a beer and fetches its metadata on the Open Food Facts API.
+  static Future<ScanResult> scanAndFetchFromOpenFoodFacts(BuildContext context) async {
+    String? barcode = await _scan(context);
+    if (!context.mounted || barcode == null) {
+      return ScanResultCancelled();
+    }
 
-          String? image;
-          if (product.imageFrontUrl != null) {
-            image = await showWaitingOverlay(
-              context,
-              future: BeerImage.copyImage(
-                originalFilePath: product.imageFrontUrl!,
-                filenamePrefix: barcode,
-                source: 'openFoodFacts',
-              ),
-            );
-          }
+    OpenFoodFactsLanguage? language = OpenFoodFactsLanguage.fromOffTag(TranslationProvider.of(context).locale.languageCode);
+    ProductQueryConfiguration config = ProductQueryConfiguration(
+      barcode,
+      version: ProductQueryVersion.v3,
+    );
+    ProductResultV3 result = await showWaitingOverlay(
+      context,
+      future: OpenFoodAPIClient.getProductV3(config),
+    );
+    if (result.product == null) {
+      return ScanResultError(errorId: result.result?.id);
+    }
 
-          if (context.mounted) {
-            Navigator.pop(
-              context,
-              ScanResultSuccess(
-                beer: Beer(
-                  name: name ?? '',
-                  image: image,
-                  tags: product.categories?.split(', ') ?? [],
-                ),
-              ),
-            );
-          }
-        },
+    Product product = result.product!;
+    String? name = product.productNameInLanguages?[language] ?? product.productName;
+    if (product.brands != null && product.brands != name) {
+      String brand = product.brands!.split(',').first;
+      name = name == null ? brand : '$brand - $name';
+    }
+
+    if (!context.mounted) {
+      return ScanResultCancelled();
+    }
+    String? image;
+    if (product.imageFrontUrl != null) {
+      image = await showWaitingOverlay(
+        context,
+        future: BeerImage.copyImage(
+          originalFilePath: product.imageFrontUrl!,
+          filenamePrefix: barcode,
+          source: 'openFoodFacts',
+        ),
+      );
+    }
+
+    return ScanResultSuccess(
+      beer: Beer(
+        name: name ?? '',
+        image: image,
+        tags: product.categories?.split(', ') ?? [],
       ),
-    )) ??
-    ScanResultCancelled();
+    );
+  }
 
-/// Allows to handle a scan result.
-extension HandleScanResult on BuildContext {
   /// Handles a scan result.
-  void handleScanResult(ScanResult result, {Function(Beer)? onSuccess}) async {
+  static void handleScanResult(BuildContext context, ScanResult result, {Function(Beer)? onSuccess}) async {
     switch (result) {
       case ScanResultNotFound():
         showFToast(
-          context: this,
+          context: context,
           title: Text(translations.error.openFoodFacts.notFound),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: theme.colors.error,
+              color: context.theme.colors.error,
             ),
           ),
         );
         break;
       case ScanResultError():
         showFToast(
-          context: this,
+          context: context,
           title: Text(translations.error.openFoodFacts.genericError),
           style: (style) => style.copyWith(
             titleTextStyle: style.titleTextStyle.copyWith(
-              color: theme.colors.error,
+              color: context.theme.colors.error,
             ),
           ),
         );

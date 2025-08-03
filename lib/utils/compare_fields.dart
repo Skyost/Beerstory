@@ -11,7 +11,10 @@ int compareAccordingToFields<T>(T a, T b, List<Comparable?> Function(T) fields) 
       }
       return -1;
     }
-    int compareResult = aValues[i]!.compareTo(bValues[i]);
+    if (bValue == null) {
+      return 1;
+    }
+    int compareResult = aValue.compareTo(bValue);
     if (compareResult != 0) {
       return compareResult;
     }
