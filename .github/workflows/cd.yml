@@ -24,7 +24,7 @@ jobs:
     - name: Create .nojekyll file 🧪
       run: touch ./build/web/.nojekyll
     - name: Deploy 🚀
-      uses: peaceiris/actions-gh-pages@v4
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: ./build/web
         branch: gh-pages
