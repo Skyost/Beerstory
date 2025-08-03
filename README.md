@@ -8,19 +8,16 @@ Never forget a great brew again — Beerstory helps you keep track of your favor
 
 Beerstory is more than just a memory aid — it becomes your very own beer journal, letting you build a true history of your tastings.
 
-<img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/1.png" height="500" alt="Screenshot 1">
-<img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/2.png" height="500" alt="Screenshot 2">
-<img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/3.png" height="500" alt="Screenshot 3">
-<img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/4.png" height="500" alt="Screenshot 4">
+<img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/1.png" height="500" alt="Screenshot 1"> <img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/2.png" height="500" alt="Screenshot 2"> <img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/3.png" height="500" alt="Screenshot 3"> <img src="https://github.com/Skyost/Beerstory/blob/main/screenshots/4.png" height="500" alt="Screenshot 4">
 
 ## Features
 
 Here are some highlights :
 
-• Lightweight and easy to use.
-• 100% open-source.
-• Save beers, bars, and even your consumption history.
-• Powerful tagging and search to quickly find any beer.
+* Lightweight and easy to use.
+* 100% open-source.
+* Save beers, bars, and even your consumption history.
+* Powerful tagging and search to quickly find any beer.
 
 ## So what are your waiting for ?
 

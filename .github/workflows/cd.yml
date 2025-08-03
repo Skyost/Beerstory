@@ -22,10 +22,10 @@ jobs:
     - name: Build ⚙️
       run: dart run beerstory:compile_svg && dart run slang && dart run build_runner build && flutter build web --base-href "/Beerstory/"
     - name: Create .nojekyll file 🧪
-      run: touch ./dist/.nojekyll
+      run: touch ./build/web/.nojekyll
     - name: Deploy 🚀
       uses: peaceiris/actions-gh-pages@v4
       with:
-        folder: dist
+        folder: ./build/web
         branch: gh-pages
         single-commit: true
