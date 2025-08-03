@@ -1,25 +1,34 @@
-import 'dart:io';
-
+import 'package:beerstory/i18n/translations.g.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// Allows to check if a string is numeric.
-extension Numeric on String {
-  /// Checks whether the current string is numeric.
-  bool get isNumeric => double.tryParse(this) != null;
+extension StringUtils on String {
+  /// Checks whether the current string is empty, and if so, returns a `null` object.
+  String? get trimOrNullIfEmpty => trim().isEmpty ? null : trim();
 }
 
-/// Allows to move a file.
-extension Move on File {
-  /// Moves this file to another path.
-  Future<File> move(String to) async {
-    try {
-      return await rename(to);
-    } on FileSystemException catch (_) {
-      final newFile = await copy(to);
-      await delete();
-      return newFile;
-    }
+/// Checks whether a string is empty, and if so, returns an error message.
+String? emptyStringValidator(String? value) {
+  if (value?.trimOrNullIfEmpty == null) {
+    return translations.error.fields.empty;
   }
+  return null;
+}
+
+/// Checks whether a string is not a valid number, and if so, returns an error message.
+String? numbersValidator(String? value, {bool allowEmpty = true}) {
+  if (value?.trimOrNullIfEmpty == null) {
+    return allowEmpty ? null : translations.error.fields.empty;
+  }
+  NumberFormat numberFormat = NumberFormat.decimalPattern(
+    translations.$meta.locale.languageCode,
+  );
+  if (numberFormat.tryParse(value!) == null) {
+    return translations.error.fields.number;
+  }
+  return null;
 }
 
 /// Allows to get the dark variant of the primary color of the current color scheme.
@@ -32,9 +41,6 @@ extension PrimaryDark on ColorScheme {
 extension IntegerUtils on num {
   /// Returns whether this number is an integer.
   bool get isInteger => this is int || this == truncateToDouble();
-
-  /// Returns an integer if possible.
-  num toIntIfPossible() => isInteger ? toInt() : this;
 }
 
 /// Contains some useful iterable methods.
@@ -47,3 +53,22 @@ extension IterableUtils<T> on Iterable<T> {
     return null;
   }
 }
+
+/// Contains some useful date time methods.
+extension DateTimeUtils on DateTime {
+  /// Returns the date without the time.
+  DateTime withoutTime() => DateTime(year, month, day);
+}
+
+/// Prints an error.
+void printError(Object error, StackTrace? stackTrace) {
+  if (kDebugMode) {
+    print(error);
+    if (stackTrace != null) {
+      print(stackTrace);
+    }
+  }
+}
+
+/// Allows to check if a type is a subtype of another.
+bool isSubtype<S, T>() => <S>[] is List<T>;

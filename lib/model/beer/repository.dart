@@ -1,35 +1,43 @@
-import 'package:beerstory/model/bar/bar.dart';
 import 'package:beerstory/model/beer/beer.dart';
+import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/model/repository.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The beer repository provider.
-final beerRepositoryProvider = ChangeNotifierProvider<BeerRepository>((ref) => BeerRepository()..init());
+final beerRepositoryProvider = AsyncNotifierProvider<BeerRepository, List<Beer>>(BeerRepository.new);
 
 /// The repository that handles beers.
-class BeerRepository extends Repository<Beer> {
-  /// Creates a new beer repository instance.
-  BeerRepository()
-      : super(
-          file: 'beers',
-        );
-
-  /// Removes a bar reference from all beers.
-  void removeBar(Bar bar) {
-    for (Beer beer in objects) {
-      beer.removeBarPrices(bar, notify: false);
-    }
-    notifyListeners();
-  }
+class BeerRepository extends Repository<Beer> with DatabaseRepository<Beer, DriftBeer, Beers> {
+  @override
+  TableInfo<Beers, DriftBeer> getTable(Database database) => database.beers;
 
   @override
-  Future<void> remove(Beer object, {bool notify = true}) async {
-    super.remove(object, notify: notify);
-    if (object.image != null && await storage.fileExists(object.image!)) {
-      storage.deleteFile(file);
-    }
-  }
+  Insertable<DriftBeer> toInsertable(Beer object) => DriftBeer(
+    uuid: object.uuid,
+    name: object.name,
+    image: object.image,
+    tags: object.tags,
+    degrees: object.degrees,
+    rating: object.rating,
+  );
 
   @override
-  Beer createObjectFromJson(Map<String, dynamic> jsonData) => Beer.fromJson(jsonData);
+  Beer toObject(DriftBeer insertable) => Beer(
+    uuid: insertable.uuid,
+    name: insertable.name,
+    image: insertable.image,
+    tags: insertable.tags,
+    degrees: insertable.degrees,
+    rating: insertable.rating,
+  );
+
+  @override
+  Future<void> remove(Beer object) async {
+    await super.remove(object);
+    if (object.uuid == ref.read(lastInsertedBeerProvider)) {
+      ref.read(lastInsertedBeerProvider.notifier).state = null;
+    }
+  }
 }

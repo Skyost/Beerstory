@@ -1,200 +1,160 @@
-import 'package:beerstory/model/bar/bar.dart';
-import 'package:beerstory/model/repository_object.dart';
+import 'dart:io';
+
+import 'package:beerstory/model/repository.dart';
+import 'package:beerstory/utils/compare_fields.dart';
+import 'package:beerstory/utils/searchable.dart';
+import 'package:beerstory/utils/utils.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 /// Represents a beer.
-class Beer extends RepositoryObject {
-  /// The beer name.
-  String _name;
+class Beer extends RepositoryObject with HasName, Searchable implements Comparable<Beer> {
+  @override
+  final String name;
 
   /// The beer image.
-  String? _image;
+  final String? image;
 
   /// The beer tags.
-  List<String> _tags;
+  final List<String> _tags;
 
   /// The beer degrees.
-  double? _degrees;
+  final double? degrees;
 
   /// The beer rating.
-  double? _rating;
-
-  /// The beer prices.
-  List<BeerPrice> _prices;
+  final double? rating;
 
   /// Creates a new beer instance.
   Beer({
     super.uuid,
-    required String name,
+    this.name = '',
+    this.image,
+    List<String> tags = const [],
+    this.degrees,
+    this.rating,
+  }) : _tags = List.of(tags);
+
+  /// Returns the beer tags.
+  List<String> get tags => List.of(_tags);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Beer) {
+      return super == other;
+    }
+    return identical(this, other) || (uuid == other.uuid && name == other.name && image == other.image && _tags == other._tags && degrees == other.degrees && rating == other.rating);
+  }
+
+  @override
+  int get hashCode => Object.hash(uuid, name, image, tags, degrees, rating);
+
+  @override
+  Beer copyWith({
+    String? uuid,
+    String? name,
     String? image,
     List<String>? tags,
     double? degrees,
     double? rating,
-    List<BeerPrice>? prices,
-  })  : _name = name,
-        _image = image,
-        _tags = tags ?? [],
-        _degrees = degrees,
-        _rating = rating,
-        _prices = prices ?? [];
+  }) => Beer(
+    uuid: uuid ?? this.uuid,
+    name: name ?? this.name,
+    image: image ?? this.image,
+    tags: tags ?? _tags,
+    degrees: degrees ?? this.degrees,
+    rating: rating ?? this.rating,
+  );
 
-  /// Creates a new beer instance from a JSON map.
-  Beer.fromJson(Map<String, dynamic> jsonData)
-      : this(
-          uuid: jsonData['uuid'],
-          name: jsonData['name'],
-          image: jsonData['image'],
-          tags: [for (dynamic tag in jsonData['tags']) tag.toString()],
-          degrees: jsonData['degrees'],
-          rating: jsonData['rating'],
-          prices: [
-            for (dynamic jsonPrice in jsonData['prices']) BeerPrice.fromJson(jsonPrice),
-          ],
-        );
+  /// Overwrites the [Beer.image] field.
+  Beer overwriteImage({String? image}) => Beer(
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
-  /// Returns the beer name.
-  String get name => _name;
+  /// Overwrites the [Beer.degrees] field.
+  Beer overwriteDegrees({double? degrees}) => Beer(
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
-  /// Changes the beer name.
-  set name(String name) {
-    _name = name;
-    notifyListeners();
-  }
-
-  /// Returns the beer image.
-  String? get image => _image;
-
-  /// Changes the beer image.
-  set image(String? image) {
-    _image = image;
-    notifyListeners();
-  }
-
-  /// Returns the beer tags.
-  List<String> get tags => List<String>.from(_tags);
-
-  /// Changes the beer tags.
-  set tags(List<String> tags) {
-    _tags = tags;
-    notifyListeners();
-  }
-
-  /// Returns the beer degrees.
-  double? get degrees => _degrees;
-
-  /// Changes the beer degrees.
-  set degrees(double? degrees) {
-    _degrees = degrees;
-    notifyListeners();
-  }
-
-  /// Returns the beer rating.
-  double? get rating => _rating;
-
-  /// Changes the beer rating.
-  set rating(double? rating) {
-    _rating = rating;
-    notifyListeners();
-  }
-
-  /// Returns the beer prices.
-  List<BeerPrice> get prices => List<BeerPrice>.from(_prices);
-
-  /// Changes the beer prices.
-  set prices(List<BeerPrice> prices) {
-    _prices = prices.where((price) => !price.isEmpty).toList();
-    notifyListeners();
-  }
-
-  /// Returns the minimum price.
-  BeerPrice? get minimumPrice {
-    BeerPrice? result;
-    for (BeerPrice price in _prices) {
-      if (price.price != null && (result == null || price.price! < result.price!)) {
-        result = price;
-      }
-    }
-    return result;
-  }
-
-  /// Returns the maximum price.
-  BeerPrice? get maximumPrice {
-    BeerPrice? result;
-    for (BeerPrice price in _prices) {
-      if (price.price != null && (result == null || price.price! > result.price!)) {
-        result = price;
-      }
-    }
-    return result;
-  }
-
-  /// Removes all bar prices from this beer.
-  void removeBarPrices(Bar bar, {bool notify = true}) {
-    bool hasChanged = false;
-    for (BeerPrice price in prices) {
-      if (price.barUuid == bar.uuid) {
-        _prices.remove(price);
-        hasChanged = true;
-      }
-    }
-
-    if (hasChanged && notify) {
-      notifyListeners();
-    }
-  }
+  /// Overwrites the [Beer.rating] field.
+  Beer overwriteRating({double? rating}) => Beer(
+    uuid: uuid,
+    name: name,
+    image: image,
+    tags: _tags,
+    degrees: degrees,
+    rating: rating,
+  );
 
   @override
-  String get orderKey => _name.toLowerCase();
+  int compareTo(Beer other) => compareAccordingToFields<Beer>(
+    this,
+    other,
+    (beer) => [
+      beer.name,
+      beer.rating,
+      beer.degrees,
+      beer.uuid,
+    ],
+  );
 
   @override
   List<String> get searchTerms => [
-        _name,
-        ..._tags,
-      ];
-
-  @override
-  Map<String, dynamic> get jsonData => {
-        'name': _name,
-        'image': _image,
-        'tags': _tags,
-        'degrees': _degrees,
-        'rating': _rating,
-        'prices': _prices,
-      };
+    name,
+    ..._tags,
+  ];
 }
 
-/// Represents a beer price.
-class BeerPrice {
-  /// The bar UUID.
-  String? barUuid;
+/// Contains some methods to work with beers images.
+class BeerImage {
+  /// Returns the beer image path.
+  static Future<Directory> getImagesTargetDirectory({
+    bool create = true,
+  }) async => Directory(
+    path.join((await getApplicationSupportDirectory()).path, 'images'),
+  );
 
-  /// The price.
-  double? price;
-
-  /// Creates a new beer price instance.
-  BeerPrice({
-    this.barUuid,
-    this.price,
-  });
-
-  /// Creates a new beer instance from a JSON map.
-  BeerPrice.fromJson(Map<String, dynamic> jsonData)
-      : this(
-          barUuid: jsonData['barUuid'],
-          price: jsonData['price'],
-        );
-
-  /// Returns whether this price is empty.
-  bool get isEmpty => barUuid == null && price == null;
-
-  /// Converts this price to a JSON map.
-  Map<String, dynamic> toJson() => {
-        'barUuid': barUuid,
-        'price': price,
-      };
-
-  /// Copies this beer price.
-  BeerPrice copy() => BeerPrice(
-        barUuid: barUuid,
-        price: price,
+  /// Copies the image to the target directory and returns the path.
+  static Future<String?> copyImage({
+    required String originalFilePath,
+    required String filenamePrefix,
+    String source = 'manual',
+  }) async {
+    try {
+      Uri uri = Uri.parse(originalFilePath);
+      String extension = path.extension(uri.pathSegments.last);
+      Directory directory = await getImagesTargetDirectory();
+      String filename = filenamePrefix;
+      if (source == 'manual') {
+        filename += '-${DateTime.now().millisecondsSinceEpoch}';
+      }
+      File file = File(
+        path.join(directory.path, source, '$filename$extension'),
       );
+      file.parent.createSync(recursive: true);
+      if (uri.scheme == 'http' || uri.scheme == 'https') {
+        file.writeAsBytesSync((await http.get(uri)).bodyBytes);
+      } else {
+        File originalFile = File(uri.path);
+        if (!originalFile.existsSync()) {
+          return null;
+        }
+        originalFile.copySync(file.path);
+      }
+      return file.path;
+    } catch (ex, stackTrace) {
+      printError(ex, stackTrace);
+    }
+    return null;
+  }
 }

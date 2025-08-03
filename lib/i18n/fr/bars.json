@@ -1,0 +1,34 @@
+{
+  "page": {
+    "name": "Bars",
+    "empty": "Pas de bar enregistré pour le moment.",
+    "searchEmpty": "Aucun bar trouvé."
+  },
+  "dialog": {
+    "name": {
+      "label": "Nom du bar",
+      "hint": "Nom"
+    },
+    "address": {
+      "label": "Adresse du bar",
+      "hint": "Adresse"
+    },
+    "added": "Bar ajouté avec succès."
+  },
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce bar ?",
+  "details": {
+    "title": "Détails",
+    "name": {
+      "label": "Nom"
+    },
+    "address": {
+      "label": "Adresse",
+      "empty": "Pas d'adresse spécifiée"
+    },
+    "prices": {
+      "label": "Prix",
+      "empty": "Pas de prix spécifié"
+    },
+    "showOnMap": "Afficher sur la carte"
+  }
+}

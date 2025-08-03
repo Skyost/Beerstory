@@ -1,0 +1,59 @@
+{
+  "page": {
+    "name": "Historique",
+    "empty": "Rien dans votre historique pour le moment.",
+    "clearConfirm": "Voulez-vous vraiment vider votre historique ?",
+    "quantity": "$prefix$quantity cl",
+    "total": "Total :"
+  },
+  "dialog": {
+    "beer": {
+      "label": "Bière",
+      "title": "Bière que vous venez de boire"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "title": "Quantité de bière bue",
+      "hint": "Quantité (en cL)",
+      "quantities": {
+        "unspecified": "Non spécifiée",
+        "bottle": "Bouteille / Canette (33cL)",
+        "halfPint": "Demi-pinte (25cL)",
+        "pint": "Pinte (50cL)",
+        "custom": "Personnalisée"
+      }
+    },
+    "times": {
+      "label": "Nombre de fois",
+      "title": "Nombre de fois où vous l'avez bue"
+    },
+    "moreThanQuantity": {
+      "label": "Plus que la quantité affichée ?"
+    },
+    "date": {
+      "label": "Date"
+    }
+  },
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+  "details": {
+    "title": "Détails",
+    "beer": {
+      "label": "Bière"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "empty": "Inconnue",
+      "quantity": "$quantity cL"
+    },
+    "times": {
+      "label": "Nombre de fois",
+      "empty": "Inconnu"
+    },
+    "moreThanQuantity": {
+      "label": "Plus que la quantité affichée ?"
+    },
+    "date": {
+      "label": "Date"
+    }
+  }
+}

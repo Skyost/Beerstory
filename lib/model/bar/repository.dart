@@ -1,18 +1,28 @@
 import 'package:beerstory/model/bar/bar.dart';
+import 'package:beerstory/model/database.dart';
 import 'package:beerstory/model/repository.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The bar repository provider.
-final barRepositoryProvider = ChangeNotifierProvider<BarRepository>((ref) => BarRepository()..init());
+final barRepositoryProvider = AsyncNotifierProvider<BarRepository, List<Bar>>(BarRepository.new);
 
 /// The repository that handles bars.
-class BarRepository extends Repository<Bar> {
-  /// Creates a new bar repository instance.
-  BarRepository()
-      : super(
-          file: 'bars',
-        );
+class BarRepository extends Repository<Bar> with DatabaseRepository<Bar, DriftBar, Bars> {
+  @override
+  TableInfo<Bars, DriftBar> getTable(Database database) => database.bars;
 
   @override
-  Bar createObjectFromJson(Map<String, dynamic> jsonData) => Bar.fromJson(jsonData);
+  Insertable<DriftBar> toInsertable(Bar object) => DriftBar(
+    uuid: object.uuid,
+    name: object.name,
+    address: object.address,
+  );
+
+  @override
+  Bar toObject(DriftBar insertable) => Bar(
+    uuid: insertable.uuid,
+    name: insertable.name,
+    address: insertable.address,
+  );
 }

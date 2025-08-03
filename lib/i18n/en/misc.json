@@ -1,0 +1,13 @@
+{
+  "search": "Search...",
+  "edit": "Edit",
+  "delete": "Delete",
+  "more": "More",
+  "yes": "Yes",
+  "no": "No",
+  "ok": "Ok",
+  "cancel": "Cancel",
+  "loading": "Loading... Please wait.",
+  "notFound": "Object not found.",
+  "migration": "Migrating old data... Please wait.\nThis will only be displayed once."
+}

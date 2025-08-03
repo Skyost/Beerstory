@@ -1,0 +1,13 @@
+{
+  "search": "Rechercher...",
+  "edit": "Éditer",
+  "delete": "Supprimer",
+  "more": "Plus",
+  "yes": "Oui",
+  "no": "Non",
+  "ok": "Ok",
+  "cancel": "Annuler",
+  "loading": "Chargement... Veuillez patienter.",
+  "notFound": "Objet introuvable.",
+  "migration": "Mise à jour des données anciennes... Veuillez patienter.\nCette information ne sera plus affichée."
+}

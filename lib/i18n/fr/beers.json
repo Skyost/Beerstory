@@ -1,0 +1,61 @@
+{
+  "page": {
+    "name": "Bières",
+    "empty": "Pas de bière enregistrée pour le moment.",
+    "searchEmpty": "Aucune bière trouvée.",
+    "menu": {
+      "addFromScan": "Scanner un code-barre",
+      "manualAdd": "Ajouter manuellement"
+    }
+  },
+  "dialog": {
+    "edit": "Modifier la bière",
+    "barcode": "Scanner code-barre",
+    "image": {
+      "gallery": "Depuis la galerie",
+      "camera": "Depuis l'appareil photo",
+      "remove": "Enlever l'image"
+    },
+    "name": {
+      "label": "Nom de la bière",
+      "hint": "Nom"
+    },
+    "degrees": {
+      "label": "Degré de la bière",
+      "hint": "Degré"
+    },
+    "rating": {
+      "label": "Avis sur la bière"
+    },
+    "tags": {
+      "label": "Tags de la bière",
+      "hint": "Entrer un tag"
+    },
+    "replace": "Voulez-vous remplacer la bière actuelle ?",
+    "added": "Bière ajoutée avec succès.",
+    "found": "{element} ajouté avec succès. Merci OpenFoodFacts !"
+  },
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette bière ?",
+  "details": {
+    "title": "Détails",
+    "name": {
+      "label": "Nom"
+    },
+    "degrees": {
+      "label": "Degré",
+      "empty": "Pas de degré spécifié"
+    },
+    "prices": {
+      "label": "Prix",
+      "empty": "Pas de prix spécifié"
+    },
+    "rating": {
+      "label": "Avis",
+      "empty": "Pas d'avis spécifié"
+    },
+    "tags": {
+      "label": "Tags",
+      "empty": "Pas de tag spécifié"
+    }
+  }
+}

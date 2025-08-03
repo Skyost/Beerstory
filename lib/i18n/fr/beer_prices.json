@@ -1,0 +1,23 @@
+{
+  "details": {
+    "label": "Prix",
+    "empty": "Pas de prix ajouté.",
+    "add": "Ajouter un prix"
+  },
+  "dialog": {
+    "bar": {
+      "title": "Bar",
+      "label": "Où avez-vous vu ce prix ?",
+      "unspecified": "Bar non spécifié"
+    },
+    "beer": {
+      "title": "Bière",
+      "label": "Quelle bière avez-vous vu ce prix pour ?"
+    },
+    "price": {
+      "title": "Prix",
+      "label": "Quel est le prix ?"
+    },
+    "delete": "Supprimer le prix"
+  }
+}

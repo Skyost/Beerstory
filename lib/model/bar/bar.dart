@@ -1,56 +1,65 @@
-import 'package:beerstory/model/repository_object.dart';
+import 'package:beerstory/model/repository.dart';
+import 'package:beerstory/utils/compare_fields.dart';
+import 'package:beerstory/utils/searchable.dart';
 
 /// Represents a bar.
-class Bar extends RepositoryObject {
-  /// The bar name.
-  String _name;
+class Bar extends RepositoryObject with HasName, Searchable implements Comparable<Bar> {
+  @override
+  final String name;
 
   /// The bar address.
-  String? _address;
+  final String? address;
 
   /// Creates a new bar instance.
   Bar({
     super.uuid,
-    required String name,
+    this.name = '',
+    this.address,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Bar) {
+      return super == other;
+    }
+    return identical(this, other) || (uuid == other.uuid && name == other.name && address == other.address);
+  }
+
+  @override
+  int get hashCode => Object.hash(uuid, name, address);
+
+  @override
+  Bar copyWith({
+    String? uuid,
+    String? name,
     String? address,
-  })  : _name = name,
-        _address = address;
+  }) => Bar(
+    uuid: uuid ?? this.uuid,
+    name: name ?? this.name,
+    address: address ?? this.address,
+  );
 
-  /// Creates a new bar instance from a JSON map.
-  Bar.fromJson(Map<String, dynamic> jsonData)
-      : this(
-          uuid: jsonData['uuid'],
-          name: jsonData['name'],
-          address: jsonData['address'],
-        );
-
-  /// Returns the bar name.
-  String get name => _name;
-
-  /// Changes the bar name.
-  set name(String name) {
-    _name = name;
-    notifyListeners();
-  }
-
-  /// Returns the bar address.
-  String? get address => _address;
-
-  /// Changes the bar address.
-  set address(String? address) {
-    _address = address;
-    notifyListeners();
-  }
+  /// Overwrites the [Bar.address] field.
+  Bar overwriteAddress({String? address}) => Bar(
+    uuid: uuid,
+    name: name,
+    address: address,
+  );
 
   @override
-  String get orderKey => _name.toLowerCase();
+  int compareTo(Bar other) => compareAccordingToFields<Bar>(
+    this,
+    other,
+    (bar) => [
+      bar.name,
+      bar.address,
+      bar.uuid,
+    ],
+  );
 
   @override
-  List<String> get searchTerms => [_name, _address ?? ''];
-
-  @override
-  Map<String, dynamic> get jsonData => {
-        'name': _name,
-        'address': _address,
-      };
+  List<String> get searchTerms => [
+    name,
+    if (address != null) address!,
+  ];
 }

@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:forui/forui.dart';
+
+/// Thanks [`smooth_star_rating`](https://raw.githubusercontent.com/thangmam/smoothratingbar/master/lib/smooth_star_rating.dart) !
+class SmoothStarRating extends StatelessWidget {
+  final int starCount;
+  final double rating;
+  final Function(double)? onRatingChanged;
+  final Color? color;
+  final Color? borderColor;
+  final double size;
+  final bool allowHalfRating;
+  final IconData filledIconData;
+  final IconData halfFilledIconData;
+  final IconData defaultIconData; //this is needed only when having fullRatedIconData && halfRatedIconData
+  final double spacing;
+
+  const SmoothStarRating({
+    super.key,
+    this.starCount = 5,
+    this.spacing = 0.0,
+    this.rating = 0.0,
+    this.defaultIconData = Icons.star_border,
+    this.onRatingChanged,
+    this.color,
+    this.borderColor,
+    this.size = 25,
+    this.filledIconData = Icons.star,
+    this.halfFilledIconData = Icons.star_half,
+    this.allowHalfRating = true,
+  });
+
+  /// Builds a star widget.
+  Widget buildStar(BuildContext context, int index) {
+    Icon icon;
+    if (index >= rating) {
+      icon = Icon(
+        defaultIconData,
+        color: borderColor ?? context.theme.colors.primary,
+        size: size,
+      );
+    } else if (index >= rating - (allowHalfRating ? 0.5 : 1.0) && index < rating) {
+      icon = Icon(
+        halfFilledIconData,
+        color: color ?? context.theme.colors.primary,
+        size: size,
+      );
+    } else {
+      icon = Icon(
+        filledIconData,
+        color: color ?? context.theme.colors.primary,
+        size: size,
+      );
+    }
+
+    return onRatingChanged == null ? icon : GestureDetector(
+      onTap: () {
+        double newRating = index + 1.0;
+        if (newRating != rating) {
+          onRatingChanged!.call(newRating);
+          HapticFeedback.lightImpact();
+        }
+      },
+      onHorizontalDragUpdate: (dragDetails) {
+        RenderBox box = context.findRenderObject() as RenderBox;
+        Offset pos = box.globalToLocal(dragDetails.globalPosition);
+        double i = pos.dx / size;
+        double newRating = allowHalfRating ? i : i.round().toDouble();
+        if (newRating > starCount) {
+          newRating = starCount.toDouble();
+        }
+        if (newRating < 0) {
+          newRating = 0.0;
+        } else {
+          newRating = (2 * newRating).roundToDouble() / 2;
+        }
+        if (newRating != rating) {
+          onRatingChanged!.call(newRating);
+          HapticFeedback.lightImpact();
+        }
+      },
+      child: icon,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    alignment: WrapAlignment.start,
+    spacing: spacing,
+    children: [
+      for (int i = 0; i < starCount; i++) buildStar(context, i),
+    ],
+  );
+}

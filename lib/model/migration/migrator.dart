@@ -1,128 +1,120 @@
+import 'dart:convert';
+
 import 'package:beerstory/model/bar/bar.dart';
 import 'package:beerstory/model/bar/repository.dart';
 import 'package:beerstory/model/beer/beer.dart';
+import 'package:beerstory/model/beer/price/price.dart';
+import 'package:beerstory/model/beer/price/repository.dart';
 import 'package:beerstory/model/beer/repository.dart';
-import 'package:beerstory/model/history/entries.dart';
-import 'package:beerstory/model/history/entry.dart';
-import 'package:beerstory/model/history/history.dart';
-import 'package:beerstory/model/migration/old_objects/bar.dart';
-import 'package:beerstory/model/migration/old_objects/beer.dart';
-import 'package:beerstory/model/migration/old_objects/history.dart';
-import 'package:beerstory/model/repository.dart';
-import 'package:beerstory/model/repository_object.dart';
+import 'package:beerstory/model/history_entry/history_entry.dart';
+import 'package:beerstory/model/history_entry/repository.dart';
+import 'package:beerstory/model/migration/storage/storage.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 /// Allows to migrate old app data.
 class Migrator {
-  /// Initializes the migrator.
-  static Future<void> init() async {
-    await Hive.initFlutter();
-    Hive.registerAdapter<OldBeer>(BeerAdapter());
-    Hive.registerAdapter<OldBeerPrice>(BeerPriceAdapter());
-    Hive.registerAdapter<OldBar>(BarAdapter());
-    Hive.registerAdapter<OldHistoryEntries>(HistoryEntriesAdapter());
-    Hive.registerAdapter<OldHistoryEntry>(HistoryEntryAdapter());
+  /// Returns `true` if the repositories need to be migrated.
+  static Future<bool> needsMigration(WidgetRef ref) async {
+    Storage storage = Storage();
+    return await storage.fileExists('bars') || await storage.fileExists('beers') || await storage.fileExists('history');
   }
 
   /// Migrates all repositories.
   static Future<void> migrate(WidgetRef ref) async {
-    Map<Type, Map<dynamic, RepositoryObject>> oldIds = {};
-    await _migrateRepository(ref.read(barRepositoryProvider), oldIds);
-    await _migrateRepository(ref.read(beerRepositoryProvider), oldIds);
-    await _migrateRepository(ref.read(historyProvider), oldIds);
-  }
-
-  /// Starts the migration for the given repository.
-  static Future<void> _migrateRepository<T extends HiveObject>(Repository repository, Map<Type, Map<dynamic, RepositoryObject>> oldIds) async {
-    if (!(await Hive.boxExists(repository.file))) {
-      return;
-    }
-    Box<T> box = await Hive.openBox<T>(repository.file);
-    for (T value in box.values) {
-      RepositoryObject? newObject = _migrateOldObject<T>(value, oldIds);
-      if (newObject != null) {
-        oldIds[value.runtimeType] = (oldIds[value.runtimeType] ?? {})..[value.key] = newObject;
-        repository.add(newObject);
+    Storage storage = Storage();
+    Map<String, String> migratedBarsUuids = {};
+    if (await storage.fileExists('bars')) {
+      try {
+        BarRepository barRepository = ref.read(barRepositoryProvider.notifier);
+        Map objects = jsonDecode(await storage.readFile('bars'));
+        for (Map object in objects.values) {
+          Bar bar = Bar(
+            name: object['name'],
+            address: object['address'],
+          );
+          await barRepository.add(bar);
+          migratedBarsUuids[object['uuid']] = bar.uuid;
+        }
+      } catch (ex, stackTrace) {
+        printError(ex, stackTrace);
+      } finally {
+        await storage.deleteFile('bars');
       }
     }
-    await repository.save();
-    await box.deleteFromDisk();
-  }
-
-  /// Migrates an old object to a new one.
-  static RepositoryObject? _migrateOldObject<T extends HiveObject>(T object, Map<Type, Map<dynamic, RepositoryObject>> oldIds) {
-    if (object is OldBeer) {
-      return _migrateOldBeer(object, oldIds[OldBar] ?? {});
-    }
-    if (object is OldBar) {
-      return _migrateOldBar(object);
-    }
-    if (object is OldHistoryEntries) {
-      return _migrateOldHistoryEntries(object, oldIds[OldBeer] ?? {});
-    }
-    return null;
-  }
-
-  /// Migrates an old beer object.
-  static Beer _migrateOldBeer(OldBeer oldBeer, Map<dynamic, RepositoryObject> oldBarIds) => Beer(
-        name: oldBeer.name,
-        image: oldBeer.image,
-        tags: oldBeer.tags,
-        degrees: oldBeer.degrees,
-        rating: oldBeer.rating,
-        prices: oldBeer.prices?.map((price) => _migrateOldBeerPrice(price, oldBarIds)).toList(),
-      );
-
-  /// Migrates an old beer price object.
-  static BeerPrice _migrateOldBeerPrice(OldBeerPrice oldBeerPrice, Map<dynamic, RepositoryObject> oldBarIds) => BeerPrice(
-        barUuid: oldBarIds[oldBeerPrice.barId]?.uuid,
-        price: oldBeerPrice.price,
-      );
-
-  /// Migrates an old bar object.
-  static Bar _migrateOldBar(OldBar oldBar) => Bar(
-        name: oldBar.name,
-        address: oldBar.address,
-      );
-
-  /// Migrates an old history entries object.
-  static HistoryEntries _migrateOldHistoryEntries(OldHistoryEntries oldHistoryEntries, Map<dynamic, RepositoryObject> oldBeerIds) {
-    List<HistoryEntry> entries = [];
-    for (OldHistoryEntry oldHistoryEntry in oldHistoryEntries.entries ?? []) {
-      HistoryEntry? entry = _migrateOldHistoryEntry(oldHistoryEntry, oldBeerIds);
-      if (entry != null) {
-        entries.add(entry);
+    Map<String, String> migratedBeersUuids = {};
+    if (await storage.fileExists('beers')) {
+      try {
+        BeerRepository beerRepository = ref.read(beerRepositoryProvider.notifier);
+        BeerPriceRepository beerPriceRepository = ref.read(
+          beerPriceRepositoryProvider.notifier,
+        );
+        Map objects = jsonDecode(await storage.readFile('beers'));
+        for (Map object in objects.values) {
+          String? image = object['image'];
+          if (image != null) {
+            image = await BeerImage.copyImage(
+              originalFilePath: image,
+              filenamePrefix: object['uuid'],
+            );
+          }
+          Beer beer = Beer(
+            name: object['name'],
+            image: image,
+            tags: object['tags'].cast<String>(),
+            degrees: object['degrees'],
+            rating: object['rating'],
+          );
+          await beerRepository.add(beer);
+          migratedBeersUuids[object['uuid']] = beer.uuid;
+          List? prices = object['prices'];
+          if (prices != null) {
+            for (Map price in prices) {
+              await beerPriceRepository.add(
+                BeerPrice(
+                  beerUuid: beer.uuid,
+                  barUuid: migratedBarsUuids[price['barUuid']],
+                  amount: price['price'] ?? 0,
+                ),
+              );
+            }
+          }
+        }
+      } catch (ex, stackTrace) {
+        printError(ex, stackTrace);
+      } finally {
+        await storage.deleteFile('beers');
       }
     }
-    return HistoryEntries(
-      date: OldHistoryEntries.formatter.parse(oldHistoryEntries.key),
-      entries: entries,
-    );
+    if (await storage.fileExists('history')) {
+      try {
+        DateFormat formatter = DateFormat('yyyy-MM-dd');
+        History history = ref.read(historyProvider.notifier);
+        Map objects = jsonDecode(await storage.readFile('history'));
+        for (Map object in objects.values) {
+          DateTime date = formatter.parse(object['date']);
+          List entries = object['entries'];
+          for (Map entry in entries) {
+            String? beerUuid = migratedBeersUuids[entry['beer']];
+            if (beerUuid != null) {
+              await history.add(
+                HistoryEntry(
+                  date: date,
+                  beerUuid: beerUuid,
+                  quantity: entry['quantity'],
+                  times: entry['times'],
+                  moreThanQuantity: entry['moreThanQuantity'],
+                ),
+              );
+            }
+          }
+        }
+      } catch (ex, stackTrace) {
+        printError(ex, stackTrace);
+      } finally {
+        await storage.deleteFile('history');
+      }
+    }
   }
-
-  /// Migrates an old history entry object.
-  static HistoryEntry? _migrateOldHistoryEntry(OldHistoryEntry oldHistoryEntry, Map<dynamic, RepositoryObject> oldBeerIds) => oldBeerIds.containsKey(oldHistoryEntry.beerId)
-      ? HistoryEntry(
-          beer: oldBeerIds[oldHistoryEntry.beerId] as Beer,
-          quantity: oldHistoryEntry.quantity,
-          times: oldHistoryEntry.times,
-          moreThanQuantity: oldHistoryEntry.moreThanQuantity,
-        )
-      : null;
-}
-
-/// A repository object with an old Hive id.
-class RepositoryObjectOldId {
-  /// The object.
-  final RepositoryObject object;
-
-  /// The old Hive id.
-  final dynamic oldId;
-
-  /// Creates a new repository object old id instance.
-  const RepositoryObjectOldId({
-    required this.object,
-    required this.oldId,
-  });
 }

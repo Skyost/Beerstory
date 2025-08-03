@@ -1,0 +1,27 @@
+{
+  "generic": "Une erreur est survenue. Veuillez réessayer plus tard.",
+  "fields": {
+    "empty": "Ce champ ne doit pas être vide.",
+    "number": "Veuillez entrer un nombre valide."
+  },
+  "openFoodFacts": {
+    "notFound": "Impossible de trouver votre bière sur les serveurs d'OpenFoodFacts serveurs avec ce code-barre.",
+    "genericError": "Une erreur est survenue en cherchant votre bière sur OpenFoodFacts.\nVeuillez réessayer plus tard."
+  },
+  "scan": {
+    "uninitialized": "Controlleur non initialisé.",
+    "permissionDenied": "Permission refusée.",
+    "unsupported": "Scan non supporté sur cet appareil.",
+    "genericError": "Erreur générique."
+  },
+  "widget": {
+    "title": "Erreur",
+    "subtitle": "Une erreur est survenue : $error.",
+    "button": {
+      "showTrace": "Afficher la trace",
+      "hideTrace": "Masquer la trace",
+      "report": "Signaler",
+      "retry": "Réessayer"
+    }
+  }
+}

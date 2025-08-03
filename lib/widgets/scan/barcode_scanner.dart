@@ -1,6 +1,7 @@
+import 'package:beerstory/widgets/blur.dart';
 import 'package:beerstory/widgets/scan/scanner_button_widgets.dart';
 import 'package:beerstory/widgets/scan/scanner_error_widget.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide CloseButton;
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// A barcode scanner widget.
@@ -26,33 +27,39 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
   );
 
   @override
-  Widget build(BuildContext context) => Stack(
-      fit: StackFit.expand,
-      children: [
-        Center(
-          child: MobileScanner(
-            onDetect: widget.onScan,
-            fit: BoxFit.contain,
-            controller: controller,
-            // scanWindow: scanWindow,
-            errorBuilder: (context, error, child) => ScannerErrorWidget(error: error),
+  Widget build(BuildContext context) => BlurWidget(
+    above: SafeArea(
+      child: Column(
+        children: [
+          const Align(
+            alignment: Alignment.topCenter,
+            child: CloseButton(),
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ToggleFlashlightButton(controller: controller),
-                SwitchCameraButton(controller: controller),
-              ],
+          Expanded(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ToggleFlashlightButton(controller: controller),
+                  SwitchCameraButton(controller: controller),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      ),
+    ),
+    child: Center(
+      child: MobileScanner(
+        onDetect: widget.onScan,
+        fit: BoxFit.contain,
+        controller: controller,
+        // scanWindow: scanWindow,
+        errorBuilder: (context, error) => ScannerErrorWidget(error: error),
+      ),
+    ),
+  );
 
   @override
   Future<void> dispose() async {
