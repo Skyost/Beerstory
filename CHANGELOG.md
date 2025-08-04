@@ -1,5 +1,10 @@
 # 📰 Beerstory Changelog
 
+## v2.0.0
+Released on Aug 4, 2025.
+
+* **BREAKING REFACTOR** : Brand new design and codebase. ([#7afd682](https://github.com/Skyost/Beerstory/commit/7afd682))
+
 ## v1.0.3
 Released on Nov 3, 2024.
 
