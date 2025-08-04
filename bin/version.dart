@@ -104,12 +104,6 @@ ${fileContent.substring(changeLogHeader.length + 2)}''';
   pubspecFile.writeAsStringSync(editor.toString());
   await Process.run('dart', ['pub', 'get']);
   stdout.writeln('Done.');
-  stdout.writeln('Writing version to "snap/snapcraft.yaml"...');
-  File snapcraftFile = File('./snap/snapcraft.yaml');
-  editor = YamlEditor(snapcraftFile.readAsStringSync());
-  editor.update(['version'], newVersion.buildName());
-  snapcraftFile.writeAsStringSync(editor.toString());
-  stdout.writeln('Done.');
   bool commit = askYNQuestion('Do you want to commit the changes ?');
   if (commit) {
     stdout.writeln('Committing changes...');
