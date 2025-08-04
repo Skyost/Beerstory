@@ -31,6 +31,7 @@ You can also try it directly in your [web browser](https://skyost.github.io/Beer
 
 Beerstory has been entirely created using [Flutter](https://flutter.dev). Internally, the beers, bars, and
 history entries are stored in a SQLite database using [Drift](https://drift.simonbinder.eu/setup/).
+State management is handled with [Riverpod](https://riverpod.dev).
 
 [OpenFoodFacts](https://openfoodfacts.org) is used to fetch the beers metadata by barcode scanning.
 It's a great initiative that you should check out !
