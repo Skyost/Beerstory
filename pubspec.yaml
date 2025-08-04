@@ -2,6 +2,7 @@ name: beerstory
 description: Save your favorite beers and find them back instantly !
 version: 2.0.0+8
 publish_to: none
+repository: https://github.com/Skyost/Beerstory
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -53,6 +54,11 @@ flutter:
     - family: BirdsOfParadise
       fonts:
         - asset: assets/fonts/BirdsOfParadise.ttf
+
+release:
+  changelog:
+    header: '# 📰 Beerstory Changelog'
+
 flutter_native_splash:
   color: "#009688"
   image: assets/splash/default.png
