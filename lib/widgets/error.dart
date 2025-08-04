@@ -133,11 +133,11 @@ class _ErrorWidgetState extends State<ErrorWidget> with SingleTickerProviderStat
   /// The issues URL.
   Uri get reportIssueUrl => Uri.https(
     'github.com',
-    '$kGithubRepository/issues',
+    '$kGithubRepository/issues/new',
     {
       'labels': 'bug',
       'title': '`${widget.error}`',
-      'body': (widget.stackTrace ?? 'No stacktrace').toString(),
+      'body': 'Sadly, an exception has occurred. Here is the stacktrace :\n\n${widget.stackTrace ?? '_No stacktrace_'}',
     },
   );
 

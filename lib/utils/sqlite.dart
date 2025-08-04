@@ -9,15 +9,18 @@ class SqliteUtils {
   static QueryExecutor openConnection(
     String dbFileName, {
     bool addDebugModeSuffix = true,
-    Future<Object> Function()? directory,
   }) {
     if (addDebugModeSuffix && kDebugMode) {
       dbFileName += '_debug';
     }
     return driftDatabase(
       name: dbFileName,
-      native: DriftNativeOptions(
-        databaseDirectory: directory ?? getApplicationSupportDirectory,
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js'),
       ),
     );
   }

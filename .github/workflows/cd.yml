@@ -20,7 +20,7 @@ jobs:
         channel: 'stable'
         cache: true
     - name: Build ⚙️
-      run: dart run beerstory:compile_svg && dart run slang && dart run build_runner build && flutter build web --base-href "/Beerstory/"
+      run: dart run beerstory:compile_svg && dart run slang && dart run build_runner build && dart run beerstory:download_web_dependencies && flutter build web --base-href "/Beerstory/"
     - name: Create .nojekyll file 🧪
       run: touch ./build/web/.nojekyll
     - name: Deploy 🚀
