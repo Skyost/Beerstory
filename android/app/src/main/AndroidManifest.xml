@@ -11,7 +11,8 @@
     <application
         android:name="${applicationName}"
         android:label="Beerstory"
-        android:icon="@mipmap/app_icon">
+        android:icon="@mipmap/app_icon"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

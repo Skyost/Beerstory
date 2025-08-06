@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/price/price.dart';
@@ -10,19 +12,32 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 /// Contains some methods to scan a beer.
 class BeerScan {
   /// Tries to scan a beer thanks to [BarcodeScanner].
-  static Future<String?> scan(BuildContext context) async => (await showFDialog<String>(
-    context: context,
-    builder: (context, style, animation) => BarcodeScanner(
-      onScan: (barcodes) async {
-        String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
-        if (barcode.isEmpty) {
-          return;
-        }
-
-        Navigator.pop(context, barcode);
-      },
-    ),
-  ));
+  static Future<String?> scan(BuildContext context) async {
+    OverlayEntry? entry;
+    String? result;
+    try {
+      Completer<String> completer = Completer();
+      entry = OverlayEntry(
+        builder: (context) => BarcodeScanner(
+          onScan: (barcodes) async {
+            String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
+            if (barcode.isEmpty) {
+              return;
+            }
+            completer.complete(barcode);
+          },
+          onScanError: completer.completeError,
+        ),
+      );
+      Overlay.of(context).insert(entry);
+      result = await completer.future;
+    } catch (ex, stackTrace) {
+      printError(ex, stackTrace);
+    } finally {
+      entry?.remove();
+    }
+    return result;
+  }
 
   /// Scans a beer and fetches its metadata on the Open Food Facts API.
   static Future<ScanResult> fetchFromOpenFoodFacts(String barcode) async {

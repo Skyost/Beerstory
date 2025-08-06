@@ -64,7 +64,7 @@ class _BeerPriceEditorDialogState<T extends HasName> extends FormDialogState<Bee
   @override
   List<Widget> createChildren(BuildContext context) => [
     FSelectMenuTile<T?>(
-      title: Text(title),
+      title: MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm ? const SizedBox.shrink() : Text(title),
       label: Text(label),
       detailsBuilder: (_, values, _) => Text(
         values.firstOrNull == null ? translations.beerPrices.dialog.bar.unspecified : values.firstOrNull!.name,

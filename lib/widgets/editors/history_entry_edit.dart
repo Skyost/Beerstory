@@ -60,8 +60,8 @@ class _AddHistoryEntryDialogState extends FormDialogState<HistoryEntry, AddHisto
           prefix: const Icon(FIcons.beer),
           label: Text(translations.history.dialog.beer.label),
           initialValue: historyEntry.beerUuid,
-          maxHeight: MediaQuery.sizeOf(context).height,
-          title: Text(translations.history.dialog.beer.title),
+          maxHeight: MediaQuery.sizeOf(context).height - MediaQuery.paddingOf(context).top - MediaQuery.paddingOf(context).bottom,
+          title: MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm ? const SizedBox.shrink() : Text(translations.history.dialog.beer.title),
           detailsBuilder: (_, values, _) {
             String? name = beersList.findByUuid(values.first)?.name;
             return name == null ? const SizedBox.shrink() : Text(name);
@@ -85,7 +85,6 @@ class _AddHistoryEntryDialogState extends FormDialogState<HistoryEntry, AddHisto
         ),
         _BeerTimesFormField(
           initialValue: historyEntry.times,
-          maxHeight: MediaQuery.sizeOf(context).height,
           onSaved: (value) => historyEntry = historyEntry.copyWith(
             times: value,
           ),
@@ -144,8 +143,8 @@ class _HistoryEntryBeerEditorDialogState extends FormDialogState<String, History
           prefix: const Icon(FIcons.beer),
           label: Text(translations.history.dialog.beer.label),
           initialValue: beerUuid,
-          maxHeight: MediaQuery.sizeOf(context).height,
-          title: Text(translations.history.dialog.beer.title),
+          maxHeight: MediaQuery.sizeOf(context).height - MediaQuery.paddingOf(context).top - MediaQuery.paddingOf(context).bottom,
+          title: MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm ? const SizedBox.shrink() : Text(translations.history.dialog.beer.title),
           detailsBuilder: (_, values, _) {
             String? name = beers.value!.findByUuid(values.first)?.name;
             return name == null ? const SizedBox.shrink() : Text(name);
@@ -239,7 +238,6 @@ class _HistoryEntryTimesEditorDialogState extends FormDialogState<int, HistoryEn
   List<Widget> createChildren(BuildContext context) => [
     _BeerTimesFormField(
       initialValue: times,
-      maxHeight: MediaQuery.sizeOf(context).height,
       onSaved: (value) => times = value,
     ),
   ];
@@ -292,7 +290,7 @@ class _HistoryEntryCommentEditorDialogState extends FormDialogState<String?, His
 class _BeerQuantityFormField extends FormField<BeerQuantity> {
   /// Creates a new beer quantity form field instance.
   _BeerQuantityFormField({
-    FormFieldSetter<BeerQuantity>? onSaved,
+    super.onSaved,
     super.validator,
     super.initialValue = const UnspecifiedBeerQuantity(),
   }) : super(
@@ -304,11 +302,10 @@ class _BeerQuantityFormField extends FormField<BeerQuantity> {
              spacing: kSpace,
              children: [
                FSelectMenuTile<BeerQuantity>(
-                 onSaved: state.value is CustomBeerQuantity ? null : (quantities) => onSaved?.call(quantities?.firstOrNull),
                  validator: (quantities) => validator?.call(quantities?.firstOrNull),
                  prefix: const Icon(FIcons.rotateCcw),
                  label: Text(translations.history.dialog.quantity.label),
-                 title: Text(translations.history.dialog.quantity.title),
+                 title: MediaQuery.sizeOf(state.context).width < state.context.theme.breakpoints.sm ? const SizedBox.shrink() : Text(translations.history.dialog.quantity.title),
                  initialValue: initialValue,
                  forceErrorText: state.errorText,
                  detailsBuilder: (_, values, _) {
@@ -350,7 +347,6 @@ class _BeerQuantityFormField extends FormField<BeerQuantity> {
                      state.didChange(CustomBeerQuantity(value: quantity));
                    },
                    validator: (value) => numbersValidator(value, allowEmpty: false),
-                   onSaved: (value) => onSaved?.call(state.value),
                  ),
              ],
            );
@@ -456,22 +452,25 @@ class CustomBeerQuantity extends BeerQuantity {
 }
 
 /// The beer times form field.
-class _BeerTimesFormField extends FSelectMenuTile<int> {
+class _BeerTimesFormField extends FormField<int> {
   /// Creates a new beer times form field instance.
   _BeerTimesFormField({
     Function(int)? onSaved,
-    super.maxHeight,
     super.initialValue = 1,
-  }) : super.builder(
-         prefix: const Icon(FIcons.asterisk),
-         label: Text(translations.history.dialog.times.label),
-         title: Text(translations.history.dialog.times.title),
-         detailsBuilder: (_, values, _) => Text(values.firstOrNull?.toString() ?? ''),
-         menuBuilder: (context, index) => FSelectTile<int>(
-           value: index + 1,
-           title: Text('${index + 1}'),
+  }) : super(
+         builder: (state) => FSelectMenuTile<int>.builder(
+           maxHeight: MediaQuery.sizeOf(state.context).height - MediaQuery.paddingOf(state.context).top - MediaQuery.paddingOf(state.context).bottom,
+           prefix: const Icon(FIcons.asterisk),
+           label: Text(translations.history.dialog.times.label),
+           title: MediaQuery.sizeOf(state.context).width < state.context.theme.breakpoints.sm ? const SizedBox.shrink() : Text(translations.history.dialog.times.title),
+           detailsBuilder: (_, values, _) => Text(values.firstOrNull?.toString() ?? ''),
+           menuBuilder: (context, index) => FSelectTile<int>(
+             value: index + 1,
+             title: Text('${index + 1}'),
+           ),
+           onChange: (value) => state.didChange(value.firstOrNull ?? 1),
          ),
-         onSaved: (value) => onSaved?.call(value?.firstOrNull ?? 1),
+         onSaved: onSaved == null ? null : (value) => onSaved(value ?? 1),
        );
 }
 
@@ -486,6 +485,6 @@ class _HistoryEntryCommentFormField extends FTextFormField {
          hint: translations.history.dialog.comment.hint,
          minLines: 1,
          maxLines: 3,
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }

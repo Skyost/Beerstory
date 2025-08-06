@@ -1,3 +1,4 @@
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/blur.dart';
 import 'package:beerstory/widgets/scan/scanner_button_widgets.dart';
 import 'package:beerstory/widgets/scan/scanner_error_widget.dart';
@@ -9,10 +10,14 @@ class BarcodeScanner extends StatefulWidget {
   /// Triggered when a barcode has been scanned.
   final Function(BarcodeCapture barcodes)? onScan;
 
+  /// Triggered when an error occurred.
+  final Function(Object error, StackTrace? stackTrace)? onScanError;
+
   /// Creates a new barcode scanner instance.
   const BarcodeScanner({
     super.key,
     this.onScan,
+    this.onScanError,
   });
 
   @override
@@ -22,7 +27,7 @@ class BarcodeScanner extends StatefulWidget {
 /// The barcode scanner state.
 class _BarcodeScannerState extends State<BarcodeScanner> {
   /// The mobile scanner controller controller.
-  MobileScannerController controller = MobileScannerController(
+  late final MobileScannerController controller = MobileScannerController(
     formats: const [BarcodeFormat.all],
   );
 
@@ -53,6 +58,7 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
     child: Center(
       child: MobileScanner(
         onDetect: widget.onScan,
+        onDetectError: widget.onScanError ?? printError,
         fit: BoxFit.contain,
         controller: controller,
         // scanWindow: scanWindow,

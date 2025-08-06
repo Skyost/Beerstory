@@ -183,7 +183,7 @@ class _BarNameFormField extends FTextFormField {
          label: Text(translations.bars.dialog.name.label),
          hint: translations.bars.dialog.name.hint,
          validator: emptyStringValidator,
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }
 
@@ -198,7 +198,7 @@ class _BarAddressFormField extends FTextFormField {
          hint: translations.bars.dialog.address.hint,
          minLines: 1,
          maxLines: 3,
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }
 
@@ -213,6 +213,6 @@ class _BarCommentFormField extends FTextFormField {
          hint: translations.bars.dialog.comment.hint,
          minLines: 1,
          maxLines: 3,
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }

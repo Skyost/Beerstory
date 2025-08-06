@@ -70,7 +70,7 @@ class _AddBeerDialogState extends FormDialogState<Beer, AddBeerDialog> {
     _BeerNameFormField(
       initialText: beer.name,
       onChange: (value) {
-        setState(() => beerName = value);
+        setState(() => beerName = value ?? '');
       },
       onSaved: (value) => beer = beer.copyWith(
         name: value?.trim(),
@@ -461,14 +461,14 @@ class _BeerNameFormField extends FTextFormField {
   /// Creates a new beer name form field instance.
   _BeerNameFormField({
     super.initialText,
-    Function(String)? onChange,
+    FormFieldSetter<String>? onChange,
     FormFieldSetter<String>? onSaved,
   }) : super(
          label: Text(translations.beers.dialog.name.label),
          hint: translations.beers.dialog.name.hint,
          validator: emptyStringValidator,
-         onChange: (value) => onChange?.call(value.trimOrNullIfEmpty ?? ''),
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onChange: onChange == null ? null : (value) => onChange(value.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }
 
@@ -509,7 +509,7 @@ class _BeerDegreesFormField extends FTextFormField {
          initialText: initialValue == null ? null : NumberFormat.formatDouble(initialValue),
          keyboardType: const TextInputType.numberWithOptions(decimal: true),
          validator: numbersValidator,
-         onSaved: (value) => onSaved?.call(NumberFormat.tryParseDouble(value)),
+         onSaved: onSaved == null ? null : (value) => onSaved(NumberFormat.tryParseDouble(value)),
        );
 }
 
@@ -584,6 +584,6 @@ class _BeerCommentFormField extends FTextFormField {
          hint: translations.beers.dialog.comment.hint,
          minLines: 1,
          maxLines: 3,
-         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+         onSaved: onSaved == null ? null : (value) => onSaved(value?.trimOrNullIfEmpty),
        );
 }
