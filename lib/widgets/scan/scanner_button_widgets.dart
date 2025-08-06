@@ -4,14 +4,18 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 /// The close button.
 class CloseButton extends StatelessWidget {
+  /// Triggered when the button has been pressed.
+  final VoidCallback? onPress;
+
   /// Creates a new close button instance.
   const CloseButton({
     super.key,
+    this.onPress,
   });
 
   @override
   Widget build(BuildContext context) => FButton.icon(
-    onPress: () => Navigator.pop(context),
+    onPress: onPress,
     style: FButtonStyle.secondary(),
     child: const Icon(FIcons.x),
   );

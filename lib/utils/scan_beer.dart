@@ -19,6 +19,7 @@ class BeerScan {
       Completer<String> completer = Completer();
       entry = OverlayEntry(
         builder: (context) => BarcodeScanner(
+          onCloseButtonPress: completer.complete,
           onScan: (barcodes) async {
             String barcode = barcodes.barcodes.firstOrNull?.rawValue ?? '';
             if (barcode.isEmpty) {

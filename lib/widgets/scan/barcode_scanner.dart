@@ -13,11 +13,15 @@ class BarcodeScanner extends StatefulWidget {
   /// Triggered when an error occurred.
   final Function(Object error, StackTrace? stackTrace)? onScanError;
 
+  /// Triggered when the close button has been pressed.
+  final VoidCallback? onCloseButtonPress;
+
   /// Creates a new barcode scanner instance.
   const BarcodeScanner({
     super.key,
     this.onScan,
     this.onScanError,
+    this.onCloseButtonPress,
   });
 
   @override
@@ -36,9 +40,11 @@ class _BarcodeScannerState extends State<BarcodeScanner> {
     above: SafeArea(
       child: Column(
         children: [
-          const Align(
+          Align(
             alignment: Alignment.topCenter,
-            child: CloseButton(),
+            child: CloseButton(
+              onPress: widget.onCloseButtonPress,
+            ),
           ),
           Expanded(
             child: Align(
