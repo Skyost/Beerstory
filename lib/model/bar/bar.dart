@@ -10,15 +10,15 @@ class Bar extends RepositoryObject with HasName, Searchable implements Comparabl
   /// The bar address.
   final String? address;
 
-  /// Additional comments on the bar.
-  final String? comments;
+  /// Additional comment on the bar.
+  final String? comment;
 
   /// Creates a new bar instance.
   Bar({
     super.uuid,
     this.name = '',
     this.address,
-    this.comments,
+    this.comment,
   });
 
   @override
@@ -26,23 +26,23 @@ class Bar extends RepositoryObject with HasName, Searchable implements Comparabl
     if (other is! Bar) {
       return super == other;
     }
-    return identical(this, other) || (uuid == other.uuid && name == other.name && address == other.address && comments == other.comments);
+    return identical(this, other) || (uuid == other.uuid && name == other.name && address == other.address && comment == other.comment);
   }
 
   @override
-  int get hashCode => Object.hash(uuid, name, address, comments);
+  int get hashCode => Object.hash(uuid, name, address, comment);
 
   @override
   Bar copyWith({
     String? uuid,
     String? name,
     String? address,
-    String? comments,
+    String? comment,
   }) => Bar(
     uuid: uuid ?? this.uuid,
     name: name ?? this.name,
     address: address ?? this.address,
-    comments: comments ?? this.comments,
+    comment: comment ?? this.comment,
   );
 
   /// Overwrites the [Bar.address] field.
@@ -50,15 +50,15 @@ class Bar extends RepositoryObject with HasName, Searchable implements Comparabl
     uuid: uuid,
     name: name,
     address: address,
-    comments: comments,
+    comment: comment,
   );
 
-  /// Overwrites the [Bar.comments] field.
-  Bar overwriteComments({String? comments}) => Bar(
+  /// Overwrites the [Bar.comment] field.
+  Bar overwriteComment({String? comment}) => Bar(
     uuid: uuid,
     name: name,
     address: address,
-    comments: comments,
+    comment: comment,
   );
 
   @override
@@ -76,6 +76,6 @@ class Bar extends RepositoryObject with HasName, Searchable implements Comparabl
   List<String> get searchTerms => [
     name,
     if (address != null) address!,
-    if (comments != null) comments!,
+    if (comment != null) comment!,
   ];
 }

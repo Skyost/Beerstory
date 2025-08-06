@@ -17,7 +17,7 @@ class BarRepository extends Repository<Bar> with DatabaseRepository<Bar, DriftBa
     uuid: object.uuid,
     name: object.name,
     address: object.address,
-    comments: object.comments,
+    comment: object.comment,
   );
 
   @override
@@ -25,6 +25,6 @@ class BarRepository extends Repository<Bar> with DatabaseRepository<Bar, DriftBa
     uuid: insertable.uuid,
     name: insertable.name,
     address: insertable.address,
-    comments: insertable.comments,
+    comment: insertable.comment,
   );
 }

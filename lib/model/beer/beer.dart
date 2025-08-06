@@ -26,8 +26,8 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
   /// The beer rating.
   final double? rating;
 
-  /// Additional comments on the beer.
-  final String? comments;
+  /// Additional comment on the beer.
+  final String? comment;
 
   /// Creates a new beer instance.
   Beer({
@@ -37,7 +37,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     List<String> tags = const [],
     this.degrees,
     this.rating,
-    this.comments,
+    this.comment,
   }) : _tags = List.of(tags);
 
   /// Returns the beer tags.
@@ -49,11 +49,11 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
       return super == other;
     }
     return identical(this, other) ||
-        (uuid == other.uuid && name == other.name && image == other.image && listEquals(_tags, other._tags) && degrees == other.degrees && rating == other.rating && comments == other.comments);
+        (uuid == other.uuid && name == other.name && image == other.image && listEquals(_tags, other._tags) && degrees == other.degrees && rating == other.rating && comment == other.comment);
   }
 
   @override
-  int get hashCode => Object.hash(uuid, name, image, tags, degrees, rating, comments);
+  int get hashCode => Object.hash(uuid, name, image, tags, degrees, rating, comment);
 
   @override
   Beer copyWith({
@@ -63,7 +63,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     List<String>? tags,
     double? degrees,
     double? rating,
-    String? comments,
+    String? comment,
   }) => Beer(
     uuid: uuid ?? this.uuid,
     name: name ?? this.name,
@@ -71,7 +71,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     tags: tags ?? _tags,
     degrees: degrees ?? this.degrees,
     rating: rating ?? this.rating,
-    comments: comments ?? this.comments,
+    comment: comment ?? this.comment,
   );
 
   /// Overwrites the [Beer.image] field.
@@ -82,7 +82,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     tags: _tags,
     degrees: degrees,
     rating: rating,
-    comments: comments,
+    comment: comment,
   );
 
   /// Overwrites the [Beer.degrees] field.
@@ -93,7 +93,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     tags: _tags,
     degrees: degrees,
     rating: rating,
-    comments: comments,
+    comment: comment,
   );
 
   /// Overwrites the [Beer.rating] field.
@@ -104,18 +104,18 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
     tags: _tags,
     degrees: degrees,
     rating: rating,
-    comments: comments,
+    comment: comment,
   );
 
-  /// Overwrites the [Beer.comments] field.
-  Beer overwriteComments({String? comments}) => Beer(
+  /// Overwrites the [Beer.comment] field.
+  Beer overwriteComment({String? comment}) => Beer(
     uuid: uuid,
     name: name,
     image: image,
     tags: _tags,
     degrees: degrees,
     rating: rating,
-    comments: comments,
+    comment: comment,
   );
 
   @override
@@ -134,7 +134,7 @@ class Beer extends RepositoryObject with HasName, Searchable implements Comparab
   List<String> get searchTerms => [
     name,
     ..._tags,
-    if (comments != null) comments!,
+    if (comment != null) comment!,
   ];
 }
 

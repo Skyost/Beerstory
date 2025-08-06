@@ -248,44 +248,44 @@ class _HistoryEntryTimesEditorDialogState extends FormDialogState<int, HistoryEn
   int? onSaved() => times;
 }
 
-/// Allows to edit a history entry comments.
-class HistoryEntryCommentsEditorDialog extends FormDialog<String?> {
-  /// The history entry comments editor internal constructor.
-  const HistoryEntryCommentsEditorDialog._({
+/// Allows to edit a history entry comment.
+class HistoryEntryCommentEditorDialog extends FormDialog<String?> {
+  /// The history entry comment editor internal constructor.
+  const HistoryEntryCommentEditorDialog._({
     required super.object,
     super.animation,
     super.style,
   });
 
   @override
-  FormDialogState<String?, HistoryEntryCommentsEditorDialog> createState() => _BeerCommentsEditorDialogState();
+  FormDialogState<String?, HistoryEntryCommentEditorDialog> createState() => _HistoryEntryCommentEditorDialogState();
 
-  /// Shows a new history entry comments editor.
+  /// Shows a new history entry comment editor.
   static Future<FormDialogResult<String?>> show({
     required BuildContext context,
-    required String? comments,
+    required String? comment,
   }) => FormDialog.show(
     context: context,
-    object: comments,
-    builder: HistoryEntryCommentsEditorDialog._,
+    object: comment,
+    builder: HistoryEntryCommentEditorDialog._,
   );
 }
 
-/// The history entry comments editor dialog state.
-class _BeerCommentsEditorDialogState extends FormDialogState<String?, HistoryEntryCommentsEditorDialog> {
-  /// The current history entry comments.
-  late String? comments = widget.object;
+/// The history entry comment editor dialog state.
+class _HistoryEntryCommentEditorDialogState extends FormDialogState<String?, HistoryEntryCommentEditorDialog> {
+  /// The current history entry comment.
+  late String? comment = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    _HistoryEntryCommentsFormField(
-      initialText: comments,
-      onSaved: (value) => comments = value?.trimOrNullIfEmpty,
+    _HistoryEntryCommentFormField(
+      initialText: comment,
+      onSaved: (value) => comment = value?.trimOrNullIfEmpty,
     ),
   ];
 
   @override
-  String? onSaved() => comments;
+  String? onSaved() => comment;
 }
 
 /// The beer quantity form field.
@@ -475,15 +475,15 @@ class _BeerTimesFormField extends FSelectMenuTile<int> {
        );
 }
 
-/// The history entry comments form field.
-class _HistoryEntryCommentsFormField extends FTextFormField {
-  /// Creates a new history entry comments form field instance.
-  _HistoryEntryCommentsFormField({
+/// The history entry comment form field.
+class _HistoryEntryCommentFormField extends FTextFormField {
+  /// Creates a new history entry comment form field instance.
+  _HistoryEntryCommentFormField({
     super.initialText,
     FormFieldSetter<String>? onSaved,
   }) : super(
-         label: Text(translations.history.dialog.comments.label),
-         hint: translations.history.dialog.comments.hint,
+         label: Text(translations.history.dialog.comment.label),
+         hint: translations.history.dialog.comment.hint,
          minLines: 1,
          maxLines: 3,
          onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),

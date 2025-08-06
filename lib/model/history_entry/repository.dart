@@ -47,7 +47,7 @@ class History extends Repository<HistoryEntry> with DatabaseRepository<HistoryEn
     quantity: object.quantity,
     times: object.times,
     moreThanQuantity: object.moreThanQuantity,
-    comments: object.comments,
+    comment: object.comment,
   );
 
   @override
@@ -58,7 +58,7 @@ class History extends Repository<HistoryEntry> with DatabaseRepository<HistoryEn
     quantity: insertable.quantity,
     times: insertable.times,
     moreThanQuantity: insertable.moreThanQuantity,
-    comments: insertable.comments,
+    comment: insertable.comment,
   );
 }
 

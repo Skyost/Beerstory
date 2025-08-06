@@ -133,44 +133,44 @@ class _BarAddressEditorDialogState extends FormDialogState<String?, BarAddressEd
   String? onSaved() => address;
 }
 
-/// Allows to edit a bar comments.
-class BarCommentsEditorDialog extends FormDialog<String?> {
-  /// The bar comments editor internal constructor.
-  const BarCommentsEditorDialog._({
+/// Allows to edit a bar comment.
+class BarCommentEditorDialog extends FormDialog<String?> {
+  /// The bar comment editor internal constructor.
+  const BarCommentEditorDialog._({
     required super.object,
     super.animation,
     super.style,
   });
 
   @override
-  FormDialogState<String?, BarCommentsEditorDialog> createState() => _BarCommentsEditorDialogState();
+  FormDialogState<String?, BarCommentEditorDialog> createState() => _BarCommentEditorDialogState();
 
-  /// Shows a new bar comments editor.
+  /// Shows a new bar comment editor.
   static Future<FormDialogResult<String?>> show({
     required BuildContext context,
-    required String? comments,
+    required String? comment,
   }) => FormDialog.show(
     context: context,
-    object: comments,
-    builder: BarCommentsEditorDialog._,
+    object: comment,
+    builder: BarCommentEditorDialog._,
   );
 }
 
-/// The bar comments editor dialog state.
-class _BarCommentsEditorDialogState extends FormDialogState<String?, BarCommentsEditorDialog> {
-  /// The current bar comments.
-  late String? comments = widget.object;
+/// The bar comment editor dialog state.
+class _BarCommentEditorDialogState extends FormDialogState<String?, BarCommentEditorDialog> {
+  /// The current bar comment.
+  late String? comment = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
-    _BarCommentsFormField(
-      initialText: comments,
-      onSaved: (value) => comments = value?.trimOrNullIfEmpty,
+    _BarCommentFormField(
+      initialText: comment,
+      onSaved: (value) => comment = value?.trimOrNullIfEmpty,
     ),
   ];
 
   @override
-  String? onSaved() => comments;
+  String? onSaved() => comment;
 }
 
 /// The bar name form field.
@@ -202,15 +202,15 @@ class _BarAddressFormField extends FTextFormField {
        );
 }
 
-/// The bar comments form field.
-class _BarCommentsFormField extends FTextFormField {
-  /// Creates a new bar comments form field instance.
-  _BarCommentsFormField({
+/// The bar comment form field.
+class _BarCommentFormField extends FTextFormField {
+  /// Creates a new bar comment form field instance.
+  _BarCommentFormField({
     super.initialText,
     FormFieldSetter<String>? onSaved,
   }) : super(
-         label: Text(translations.bars.dialog.comments.label),
-         hint: translations.bars.dialog.comments.hint,
+         label: Text(translations.bars.dialog.comment.label),
+         hint: translations.bars.dialog.comment.hint,
          minLines: 1,
          maxLines: 3,
          onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),

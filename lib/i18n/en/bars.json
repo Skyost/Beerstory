@@ -13,9 +13,9 @@
       "label": "Bar address",
       "hint": "Address"
     },
-    "comments": {
-      "label": "Comments on the bar",
-      "hint": "Comments"
+    "comment": {
+      "label": "Comment on the bar",
+      "hint": "Comment"
     },
     "added": "Bar added with success."
   },
@@ -33,8 +33,8 @@
       "label": "Prices",
       "empty": "No price specified"
     },
-    "comments": {
-      "label": "Comments",
+    "comment": {
+      "label": "Comment",
       "empty": "No comment specified"
     },
     "showOnMap": "Show on map"

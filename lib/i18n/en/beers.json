@@ -10,7 +10,6 @@
   },
   "dialog": {
     "edit": "Edit beer",
-    "barcode": "Scan barcode",
     "image": {
       "gallery": "From photo gallery",
       "camera": "From camera",
@@ -31,9 +30,9 @@
       "label": "Beer tags",
       "hint": "Enter a tag"
     },
-    "comments": {
-      "label": "Comments on the beer",
-      "hint": "Comments"
+    "comment": {
+      "label": "Comment on the beer",
+      "hint": "Comment"
     },
     "replace": "Do you want to replace the current beer ?",
     "added": "Beer added with success.",
@@ -60,10 +59,17 @@
       "label": "Tags",
       "empty": "No tag specified"
     },
-    "comments": {
-      "label": "Comments",
+    "comment": {
+      "label": "Comment",
       "empty": "No comment specified"
     }
   },
-  "deleteConfirm": "Are you sure you want to delete this beer ?"
+  "deleteConfirm": "Are you sure you want to delete this beer ?",
+  "scanComment": {
+    "generic": "$generic",
+    "brand": "Brand : $brand.",
+    "quantity": "Quantity : $quantity.",
+    "barcode": "Barcode : $barcode.",
+    "footer": "Fetched from OpenFoodFacts."
+  }
 }

@@ -19,8 +19,8 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
   /// Whether this is more than the current [quantity].
   final bool moreThanQuantity;
 
-  /// Additional comments on the history entry.
-  final String? comments;
+  /// Additional comment on the history entry.
+  final String? comment;
 
   /// Creates a new history entry instance.
   HistoryEntry({
@@ -30,7 +30,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     this.quantity,
     this.times = 1,
     this.moreThanQuantity = false,
-    this.comments,
+    this.comment,
   }) : date = date ?? DateTime.now().withoutTime();
 
   @override
@@ -45,11 +45,11 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
             quantity == other.quantity &&
             times == other.times &&
             moreThanQuantity == other.moreThanQuantity &&
-            comments == other.comments);
+            comment == other.comment);
   }
 
   @override
-  int get hashCode => Object.hash(uuid, date, beerUuid, quantity, times, moreThanQuantity, comments);
+  int get hashCode => Object.hash(uuid, date, beerUuid, quantity, times, moreThanQuantity, comment);
 
   @override
   HistoryEntry copyWith({
@@ -59,7 +59,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     double? quantity,
     int? times,
     bool? moreThanQuantity,
-    String? comments,
+    String? comment,
   }) => HistoryEntry(
     uuid: uuid ?? this.uuid,
     date: date ?? this.date,
@@ -67,7 +67,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     quantity: quantity ?? this.quantity,
     times: times ?? this.times,
     moreThanQuantity: moreThanQuantity ?? this.moreThanQuantity,
-    comments: comments ?? this.comments,
+    comment: comment ?? this.comment,
   );
 
   /// Overwrites the [HistoryEntry.quantity] field.
@@ -78,18 +78,18 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     quantity: quantity,
     times: times,
     moreThanQuantity: moreThanQuantity,
-    comments: comments,
+    comment: comment,
   );
 
-  /// Overwrites the [HistoryEntry.comments] field.
-  HistoryEntry overwriteComments({String? comments}) => HistoryEntry(
+  /// Overwrites the [HistoryEntry.comment] field.
+  HistoryEntry overwriteComment({String? comment}) => HistoryEntry(
     uuid: uuid,
     date: date,
     beerUuid: beerUuid,
     quantity: quantity,
     times: times,
     moreThanQuantity: moreThanQuantity,
-    comments: comments,
+    comment: comment,
   );
 
   @override

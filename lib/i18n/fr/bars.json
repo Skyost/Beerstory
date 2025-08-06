@@ -13,9 +13,9 @@
       "label": "Adresse du bar",
       "hint": "Adresse"
     },
-    "comments": {
-      "label": "Commentaires sur le bar",
-      "hint": "Commentaires"
+    "comment": {
+      "label": "Commentaire sur le bar",
+      "hint": "Commentaire"
     },
     "added": "Bar ajouté avec succès."
   },
@@ -33,8 +33,8 @@
       "label": "Prix",
       "empty": "Pas de prix spécifié"
     },
-    "comments": {
-      "label": "Commentaires",
+    "comment": {
+      "label": "Commentaire",
       "empty": "Pas de commentaire spécifié"
     },
     "showOnMap": "Afficher sur la carte"

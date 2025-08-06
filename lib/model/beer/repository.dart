@@ -21,7 +21,7 @@ class BeerRepository extends Repository<Beer> with DatabaseRepository<Beer, Drif
     tags: object.tags,
     degrees: object.degrees,
     rating: object.rating,
-    comments: object.comments,
+    comment: object.comment,
   );
 
   @override
@@ -32,7 +32,7 @@ class BeerRepository extends Repository<Beer> with DatabaseRepository<Beer, Drif
     tags: insertable.tags,
     degrees: insertable.degrees,
     rating: insertable.rating,
-    comments: insertable.comments,
+    comment: insertable.comment,
   );
 
   @override

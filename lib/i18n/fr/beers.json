@@ -10,7 +10,6 @@
   },
   "dialog": {
     "edit": "Modifier la bière",
-    "barcode": "Scanner code-barre",
     "image": {
       "gallery": "Depuis la galerie",
       "camera": "Depuis l'appareil photo",
@@ -31,9 +30,9 @@
       "label": "Tags de la bière",
       "hint": "Entrer un tag"
     },
-    "comments": {
-      "label": "Commentaires sur la bière",
-      "hint": "Commentaires"
+    "comment": {
+      "label": "Commentaire sur la bière",
+      "hint": "Commentaire"
     },
     "replace": "Voulez-vous remplacer la bière actuelle ?",
     "added": "Bière ajoutée avec succès.",
@@ -61,9 +60,16 @@
       "label": "Tags",
       "empty": "Pas de tag spécifié"
     },
-    "comments": {
-      "label": "Commentaires",
+    "comment": {
+      "label": "Commentaire",
       "empty": "Pas de commentaire spécifié"
     }
+  },
+  "scanComment": {
+    "generic": "$generic",
+    "brand": "Marque : $brand.",
+    "quantity": "Quantité : $quantity.",
+    "barcode": "Code-barre : $barcode.",
+    "footer": "Récupéré depuis OpenFoodFacts."
   }
 }

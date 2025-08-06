@@ -30,9 +30,9 @@
     "moreThanQuantity": {
       "label": "More than the displayed quantity ?"
     },
-    "comments": {
-      "label": "Comments on this entry",
-      "hint": "Comments"
+    "comment": {
+      "label": "Comment on this entry",
+      "hint": "Comment"
     },
     "date": {
       "label": "Date"
@@ -59,8 +59,8 @@
     "date": {
       "label": "Date"
     },
-    "comments": {
-      "label": "Comments",
+    "comment": {
+      "label": "Comment",
       "empty": "No comment specified"
     }
   }

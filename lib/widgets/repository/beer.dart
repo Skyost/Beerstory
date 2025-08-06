@@ -201,19 +201,19 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
         ),
         FTile(
           prefix: const Icon(FIcons.messageSquare),
-          title: Text(translations.beers.details.comments.label),
-          subtitle: (object.comments?.isEmpty ?? true) ? Text(translations.bars.details.comments.empty) : Text(object.comments!),
+          title: Text(translations.beers.details.comment.label),
+          subtitle: (object.comment?.isEmpty ?? true) ? Text(translations.bars.details.comment.empty) : Text(object.comment!),
           suffix: const Icon(FIcons.chevronRight),
           onPress: () async {
-            FormDialogResult<String?> newComments = await BeerCommentsEditorDialog.show(
+            FormDialogResult<String?> newComment = await BeerCommentEditorDialog.show(
               context: context,
-              comments: object.comments,
+              comment: object.comment,
             );
-            if (newComments is FormDialogResultSaved<String?> && newComments.value != object.comments && context.mounted) {
+            if (newComment is FormDialogResultSaved<String?> && newComment.value != object.comment && context.mounted) {
               await editObject(
                 context,
                 ref,
-                object.overwriteComments(comments: newComments.value),
+                object.overwriteComment(comment: newComment.value),
               );
             }
           },

@@ -22,8 +22,8 @@ class Bars extends Table {
   /// The bar address.
   TextColumn get address => text().nullable()();
 
-  /// Additional comments on the bar.
-  TextColumn get comments => text().nullable()();
+  /// Additional comment on the bar.
+  TextColumn get comment => text().nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -50,8 +50,8 @@ class Beers extends Table {
   /// The beer rating.
   RealColumn get rating => real().nullable()();
 
-  /// Additional comments on the beer.
-  TextColumn get comments => text().nullable()();
+  /// Additional comment on the beer.
+  TextColumn get comment => text().nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -97,8 +97,8 @@ class HistoryEntries extends Table {
   /// Whether this is more than the current quantity.
   BoolColumn get moreThanQuantity => boolean()();
 
-  /// Additional comments on the history entry.
-  TextColumn get comments => text().nullable()();
+  /// Additional comment on the history entry.
+  TextColumn get comment => text().nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -155,9 +155,9 @@ class Database extends _$Database {
         to: to,
         steps: migrationSteps(
           from1To2: (migrator, schema) async {
-            await migrator.addColumn(schema.bars, schema.bars.comments);
-            await migrator.addColumn(schema.beers, schema.beers.comments);
-            await migrator.addColumn(schema.historyEntries, schema.historyEntries.comments);
+            await migrator.addColumn(schema.bars, schema.bars.comment);
+            await migrator.addColumn(schema.beers, schema.beers.comment);
+            await migrator.addColumn(schema.historyEntries, schema.historyEntries.comment);
           }
         )
       );
