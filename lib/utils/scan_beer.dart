@@ -1,6 +1,7 @@
 import 'package:beerstory/i18n/translations.g.dart';
 import 'package:beerstory/model/beer/beer.dart';
 import 'package:beerstory/model/beer/price/price.dart';
+import 'package:beerstory/utils/utils.dart';
 import 'package:beerstory/widgets/scan/barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
@@ -48,16 +49,16 @@ class BeerScan {
     }
 
     String comment = '';
-    if (product.genericName != null) {
-      comment += translations.beers.scanComment.generic(generic: product.genericName!);
+    if (product.genericName?.trimOrNullIfEmpty != null) {
+      comment += '${translations.beers.scanComment.generic(generic: product.genericName!)}\n';
     }
-    if (product.brands != null) {
-      comment += translations.beers.scanComment.brand(brand: product.brands!.split(',').first);
+    if (product.brands?.trimOrNullIfEmpty != null) {
+      comment += '${translations.beers.scanComment.brand(brand: product.brands!.split(',').first)}\n';
     }
-    if (product.quantity != null) {
-      comment += translations.beers.scanComment.quantity(quantity: product.quantity!);
+    if (product.quantity?.trimOrNullIfEmpty != null) {
+      comment += '${translations.beers.scanComment.quantity(quantity: product.quantity!)}\n';
     }
-    comment += translations.beers.scanComment.barcode(barcode: barcode);
+    comment += '${translations.beers.scanComment.barcode(barcode: barcode)}\n';
     comment += translations.beers.scanComment.footer;
 
     GetPricesParameters getPricesParameters = GetPricesParameters()
@@ -67,10 +68,12 @@ class BeerScan {
       };
     MaybeError<GetPricesResult> prices = await OpenPricesAPIClient.getPrices(getPricesParameters);
 
+    RegExp languageCategory = RegExp('^[a-z]{2}:');
+    List<String> categories = product.categories?.split(', ') ?? [];
     Beer beer = Beer(
       name: name ?? '',
       image: image,
-      tags: product.categories?.split(', ') ?? [],
+      tags: categories.where((category) => !category.startsWith(languageCategory)).toList(),
       comment: comment,
     );
     List<BeerPrice> beerPrices = [];
