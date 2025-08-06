@@ -1,5 +1,5 @@
 import 'package:beerstory/model/bar/bar.dart';
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +17,7 @@ class BarRepository extends Repository<Bar> with DatabaseRepository<Bar, DriftBa
     uuid: object.uuid,
     name: object.name,
     address: object.address,
+    comments: object.comments,
   );
 
   @override
@@ -24,5 +25,6 @@ class BarRepository extends Repository<Bar> with DatabaseRepository<Bar, DriftBa
     uuid: insertable.uuid,
     name: insertable.name,
     address: insertable.address,
+    comments: insertable.comments,
   );
 }

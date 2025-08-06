@@ -248,6 +248,46 @@ class _HistoryEntryTimesEditorDialogState extends FormDialogState<int, HistoryEn
   int? onSaved() => times;
 }
 
+/// Allows to edit a history entry comments.
+class HistoryEntryCommentsEditorDialog extends FormDialog<String?> {
+  /// The history entry comments editor internal constructor.
+  const HistoryEntryCommentsEditorDialog._({
+    required super.object,
+    super.animation,
+    super.style,
+  });
+
+  @override
+  FormDialogState<String?, HistoryEntryCommentsEditorDialog> createState() => _BeerCommentsEditorDialogState();
+
+  /// Shows a new history entry comments editor.
+  static Future<FormDialogResult<String?>> show({
+    required BuildContext context,
+    required String? comments,
+  }) => FormDialog.show(
+    context: context,
+    object: comments,
+    builder: HistoryEntryCommentsEditorDialog._,
+  );
+}
+
+/// The history entry comments editor dialog state.
+class _BeerCommentsEditorDialogState extends FormDialogState<String?, HistoryEntryCommentsEditorDialog> {
+  /// The current history entry comments.
+  late String? comments = widget.object;
+
+  @override
+  List<Widget> createChildren(BuildContext context) => [
+    _HistoryEntryCommentsFormField(
+      initialText: comments,
+      onSaved: (value) => comments = value?.trimOrNullIfEmpty,
+    ),
+  ];
+
+  @override
+  String? onSaved() => comments;
+}
+
 /// The beer quantity form field.
 class _BeerQuantityFormField extends FormField<BeerQuantity> {
   /// Creates a new beer quantity form field instance.
@@ -432,5 +472,20 @@ class _BeerTimesFormField extends FSelectMenuTile<int> {
            title: Text('${index + 1}'),
          ),
          onSaved: (value) => onSaved?.call(value?.firstOrNull ?? 1),
+       );
+}
+
+/// The history entry comments form field.
+class _HistoryEntryCommentsFormField extends FTextFormField {
+  /// Creates a new history entry comments form field instance.
+  _HistoryEntryCommentsFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.history.dialog.comments.label),
+         hint: translations.history.dialog.comments.hint,
+         minLines: 1,
+         maxLines: 3,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
        );
 }

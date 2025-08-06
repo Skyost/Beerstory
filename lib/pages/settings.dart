@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:beerstory/app.dart';
 import 'package:beerstory/i18n/translations.g.dart';
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/model/settings/group_objects.dart';
 import 'package:beerstory/model/settings/theme.dart';
 import 'package:beerstory/spacing.dart';

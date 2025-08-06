@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:beerstory/model/beer/price/price.dart';
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

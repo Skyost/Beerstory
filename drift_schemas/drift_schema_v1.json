@@ -1,0 +1,330 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.2.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": false
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "bars",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "uuid",
+            "getter_name": "uuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "address",
+            "getter_name": "address",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "uuid"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "beers",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "uuid",
+            "getter_name": "uuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "image",
+            "getter_name": "image",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "tags",
+            "getter_name": "tags",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const StringListConverter()",
+              "dart_type_name": "List<String>"
+            }
+          },
+          {
+            "name": "degrees",
+            "getter_name": "degrees",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "rating",
+            "getter_name": "rating",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "uuid"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "references": [
+        1,
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "beer_prices",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "uuid",
+            "getter_name": "uuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "beer_uuid",
+            "getter_name": "beerUuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES beers (uuid) ON UPDATE CASCADE ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES beers (uuid) ON UPDATE CASCADE ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "beers",
+                    "column": "uuid"
+                  },
+                  "initially_deferred": false,
+                  "on_update": "cascade",
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "bar_uuid",
+            "getter_name": "barUuid",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES bars (uuid) ON UPDATE CASCADE ON DELETE SET NULL",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES bars (uuid) ON UPDATE CASCADE ON DELETE SET NULL"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "bars",
+                    "column": "uuid"
+                  },
+                  "initially_deferred": false,
+                  "on_update": "cascade",
+                  "on_delete": "setNull"
+                }
+              }
+            ]
+          },
+          {
+            "name": "amount",
+            "getter_name": "amount",
+            "moor_type": "double",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "uuid"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "history_entries",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "uuid",
+            "getter_name": "uuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "date",
+            "getter_name": "date",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "beer_uuid",
+            "getter_name": "beerUuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "REFERENCES beers (uuid) ON UPDATE CASCADE ON DELETE CASCADE",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "REFERENCES beers (uuid) ON UPDATE CASCADE ON DELETE CASCADE"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "beers",
+                    "column": "uuid"
+                  },
+                  "initially_deferred": false,
+                  "on_update": "cascade",
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "quantity",
+            "getter_name": "quantity",
+            "moor_type": "double",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "times",
+            "getter_name": "times",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "more_than_quantity",
+            "getter_name": "moreThanQuantity",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"more_than_quantity\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"more_than_quantity\" IN (0, 1))"
+            },
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "uuid"
+        ]
+      }
+    }
+  ]
+}

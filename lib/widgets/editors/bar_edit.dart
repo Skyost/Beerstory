@@ -68,10 +68,10 @@ class BarNameEditorDialog extends FormDialog<String> {
   /// Shows a new bar name editor.
   static Future<FormDialogResult<String>> show({
     required BuildContext context,
-    required String barName,
+    required String name,
   }) => FormDialog.show(
     context: context,
-    object: barName,
+    object: name,
     builder: BarNameEditorDialog._,
   );
 }
@@ -79,18 +79,18 @@ class BarNameEditorDialog extends FormDialog<String> {
 /// The bar name editor dialog state.
 class _BarNameEditorDialogState extends FormDialogState<String, BarNameEditorDialog> {
   /// The current bar name.
-  late String? barName = widget.object;
+  late String? name = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BarNameFormField(
-      initialText: barName,
-      onSaved: (value) => barName = value?.trim(),
+      initialText: name,
+      onSaved: (value) => name = value?.trim(),
     ),
   ];
 
   @override
-  String? onSaved() => barName;
+  String? onSaved() => name;
 }
 
 /// Allows to edit a bar address.
@@ -108,10 +108,10 @@ class BarAddressEditorDialog extends FormDialog<String?> {
   /// Shows a new bar address editor.
   static Future<FormDialogResult<String?>> show({
     required BuildContext context,
-    required String? barAddress,
+    required String? address,
   }) => FormDialog.show(
     context: context,
-    object: barAddress,
+    object: address,
     builder: BarAddressEditorDialog._,
   );
 }
@@ -119,18 +119,58 @@ class BarAddressEditorDialog extends FormDialog<String?> {
 /// The bar address editor dialog state.
 class _BarAddressEditorDialogState extends FormDialogState<String?, BarAddressEditorDialog> {
   /// The current bar address.
-  late String? barAddress = widget.object;
+  late String? address = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BarAddressFormField(
-      initialText: barAddress,
-      onSaved: (value) => barAddress = value?.trimOrNullIfEmpty,
+      initialText: address,
+      onSaved: (value) => address = value?.trimOrNullIfEmpty,
     ),
   ];
 
   @override
-  String? onSaved() => barAddress;
+  String? onSaved() => address;
+}
+
+/// Allows to edit a bar comments.
+class BarCommentsEditorDialog extends FormDialog<String?> {
+  /// The bar comments editor internal constructor.
+  const BarCommentsEditorDialog._({
+    required super.object,
+    super.animation,
+    super.style,
+  });
+
+  @override
+  FormDialogState<String?, BarCommentsEditorDialog> createState() => _BarCommentsEditorDialogState();
+
+  /// Shows a new bar comments editor.
+  static Future<FormDialogResult<String?>> show({
+    required BuildContext context,
+    required String? comments,
+  }) => FormDialog.show(
+    context: context,
+    object: comments,
+    builder: BarCommentsEditorDialog._,
+  );
+}
+
+/// The bar comments editor dialog state.
+class _BarCommentsEditorDialogState extends FormDialogState<String?, BarCommentsEditorDialog> {
+  /// The current bar comments.
+  late String? comments = widget.object;
+
+  @override
+  List<Widget> createChildren(BuildContext context) => [
+    _BarCommentsFormField(
+      initialText: comments,
+      onSaved: (value) => comments = value?.trimOrNullIfEmpty,
+    ),
+  ];
+
+  @override
+  String? onSaved() => comments;
 }
 
 /// The bar name form field.
@@ -156,6 +196,21 @@ class _BarAddressFormField extends FTextFormField {
   }) : super(
          label: Text(translations.bars.dialog.address.label),
          hint: translations.bars.dialog.address.hint,
+         minLines: 1,
+         maxLines: 3,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
+       );
+}
+
+/// The bar comments form field.
+class _BarCommentsFormField extends FTextFormField {
+  /// Creates a new bar comments form field instance.
+  _BarCommentsFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.bars.dialog.comments.label),
+         hint: translations.bars.dialog.comments.hint,
          minLines: 1,
          maxLines: 3,
          onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),

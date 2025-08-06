@@ -19,6 +19,9 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
   /// Whether this is more than the current [quantity].
   final bool moreThanQuantity;
 
+  /// Additional comments on the history entry.
+  final String? comments;
+
   /// Creates a new history entry instance.
   HistoryEntry({
     super.uuid,
@@ -27,6 +30,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     this.quantity,
     this.times = 1,
     this.moreThanQuantity = false,
+    this.comments,
   }) : date = date ?? DateTime.now().withoutTime();
 
   @override
@@ -35,11 +39,17 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
       return super == other;
     }
     return identical(this, other) ||
-        (uuid == other.uuid && date == other.date && beerUuid == other.beerUuid && quantity == other.quantity && times == other.times && moreThanQuantity == other.moreThanQuantity);
+        (uuid == other.uuid &&
+            date == other.date &&
+            beerUuid == other.beerUuid &&
+            quantity == other.quantity &&
+            times == other.times &&
+            moreThanQuantity == other.moreThanQuantity &&
+            comments == other.comments);
   }
 
   @override
-  int get hashCode => Object.hash(uuid, date, beerUuid, quantity, times, moreThanQuantity);
+  int get hashCode => Object.hash(uuid, date, beerUuid, quantity, times, moreThanQuantity, comments);
 
   @override
   HistoryEntry copyWith({
@@ -49,6 +59,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     double? quantity,
     int? times,
     bool? moreThanQuantity,
+    String? comments,
   }) => HistoryEntry(
     uuid: uuid ?? this.uuid,
     date: date ?? this.date,
@@ -56,6 +67,7 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     quantity: quantity ?? this.quantity,
     times: times ?? this.times,
     moreThanQuantity: moreThanQuantity ?? this.moreThanQuantity,
+    comments: comments ?? this.comments,
   );
 
   /// Overwrites the [HistoryEntry.quantity] field.
@@ -66,6 +78,18 @@ class HistoryEntry extends RepositoryObject implements Comparable<HistoryEntry> 
     quantity: quantity,
     times: times,
     moreThanQuantity: moreThanQuantity,
+    comments: comments,
+  );
+
+  /// Overwrites the [HistoryEntry.comments] field.
+  HistoryEntry overwriteComments({String? comments}) => HistoryEntry(
+    uuid: uuid,
+    date: date,
+    beerUuid: beerUuid,
+    quantity: quantity,
+    times: times,
+    moreThanQuantity: moreThanQuantity,
+    comments: comments,
   );
 
   @override

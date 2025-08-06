@@ -132,7 +132,7 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           onPress: () async {
             FormDialogResult<String> newName = await BeerNameEditorDialog.show(
               context: context,
-              beerName: object.name,
+              name: object.name,
             );
             if (newName is FormDialogResultSaved<String> && newName.value != object.name && context.mounted) {
               await editObject(context, ref, object.copyWith(name: newName.value));
@@ -147,7 +147,7 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           onPress: () async {
             FormDialogResult<double?> newDegrees = await BeerDegreesEditorDialog.show(
               context: context,
-              beerDegrees: object.degrees,
+              degrees: object.degrees,
             );
             if (newDegrees is FormDialogResultSaved<double?> && newDegrees.value != object.degrees && context.mounted) {
               await editObject(
@@ -166,7 +166,7 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           onPress: () async {
             FormDialogResult<double?> newRating = await BeerRatingEditorDialog.show(
               context: context,
-              beerRating: object.rating,
+              rating: object.rating,
             );
             if (newRating is FormDialogResultSaved<double?> && newRating.value != object.rating && context.mounted) {
               await editObject(
@@ -185,7 +185,7 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           onPress: () async {
             FormDialogResult<List<String>> newTags = await BeerTagsEditorDialog.show(
               context: context,
-              beerTags: object.tags,
+              tags: object.tags,
             );
             if (newTags is FormDialogResultSaved<List<String>> && !listEquals(newTags.value, object.tags) && context.mounted) {
               await editObject(context, ref, object.copyWith(tags: newTags.value));
@@ -199,7 +199,31 @@ class _BeerDetailsWidget extends RepositoryObjectDetailsWidget<Beer> {
           suffix: const Icon(FIcons.chevronRight),
           onPress: onBeerPricesPress,
         ),
-
+        FTile(
+          prefix: const Icon(FIcons.messageSquare),
+          title: Text(translations.beers.details.comments.label),
+          subtitle: (object.comments?.isEmpty ?? true) ? Text(translations.bars.details.comments.empty) : Text(object.comments!),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            FormDialogResult<String?> newComments = await BeerCommentsEditorDialog.show(
+              context: context,
+              comments: object.comments,
+            );
+            if (newComments is FormDialogResultSaved<String?> && newComments.value != object.comments && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.overwriteComments(comments: newComments.value),
+              );
+            }
+          },
+        ),
+        if (kDebugMode)
+          FTile(
+            prefix: const Icon(FIcons.hash),
+            title: const Text('UUID'),
+            subtitle: Text(object.uuid),
+          ),
       ],
     ),
   ];

@@ -13,6 +13,10 @@
       "label": "Adresse du bar",
       "hint": "Adresse"
     },
+    "comments": {
+      "label": "Commentaires sur le bar",
+      "hint": "Commentaires"
+    },
     "added": "Bar ajouté avec succès."
   },
   "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce bar ?",
@@ -28,6 +32,10 @@
     "prices": {
       "label": "Prix",
       "empty": "Pas de prix spécifié"
+    },
+    "comments": {
+      "label": "Commentaires",
+      "empty": "Pas de commentaire spécifié"
     },
     "showOnMap": "Afficher sur la carte"
   }

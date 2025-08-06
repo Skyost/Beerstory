@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:beerstory/model/database/database.steps.dart';
 import 'package:beerstory/utils/riverpod.dart';
 import 'package:beerstory/utils/sqlite.dart';
 import 'package:drift/drift.dart';
@@ -20,6 +21,9 @@ class Bars extends Table {
 
   /// The bar address.
   TextColumn get address => text().nullable()();
+
+  /// Additional comments on the bar.
+  TextColumn get comments => text().nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -45,6 +49,9 @@ class Beers extends Table {
 
   /// The beer rating.
   RealColumn get rating => real().nullable()();
+
+  /// Additional comments on the beer.
+  TextColumn get comments => text().nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
@@ -90,6 +97,9 @@ class HistoryEntries extends Table {
   /// Whether this is more than the current quantity.
   BoolColumn get moreThanQuantity => boolean()();
 
+  /// Additional comments on the history entry.
+  TextColumn get comments => text().nullable()();
+
   @override
   Set<Column<Object>>? get primaryKey => {uuid};
 }
@@ -134,11 +144,24 @@ class Database extends _$Database {
        );
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
+    onUpgrade: (migrator, from, to) async {
+      await migrator.runMigrationSteps(
+        from: from,
+        to: to,
+        steps: migrationSteps(
+          from1To2: (migrator, schema) async {
+            await migrator.addColumn(schema.bars, schema.bars.comments);
+            await migrator.addColumn(schema.beers, schema.beers.comments);
+            await migrator.addColumn(schema.historyEntries, schema.historyEntries.comments);
+          }
+        )
+      );
+    }
   );
 
   /// Exports the database from a given [file].

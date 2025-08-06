@@ -173,6 +173,24 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
             );
           },
         ),
+        FTile(
+          title: Text(translations.history.dialog.comments.label),
+          subtitle: (object.comments?.isEmpty ?? true) ? Text(translations.bars.details.comments.empty) : Text(object.comments!),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            FormDialogResult<String?> newComments = await HistoryEntryCommentsEditorDialog.show(
+              context: context,
+              comments: object.comments,
+            );
+            if (newComments is FormDialogResultSaved<String?> && newComments.value != object.comments && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.overwriteComments(comments: newComments.value),
+              );
+            }
+          },
+        ),
         if (kDebugMode)
           FTile(
             prefix: const Icon(FIcons.hash),

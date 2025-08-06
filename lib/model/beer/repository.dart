@@ -1,5 +1,5 @@
 import 'package:beerstory/model/beer/beer.dart';
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/model/history_entry/repository.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:drift/drift.dart';
@@ -21,6 +21,7 @@ class BeerRepository extends Repository<Beer> with DatabaseRepository<Beer, Drif
     tags: object.tags,
     degrees: object.degrees,
     rating: object.rating,
+    comments: object.comments,
   );
 
   @override
@@ -31,6 +32,7 @@ class BeerRepository extends Repository<Beer> with DatabaseRepository<Beer, Drif
     tags: insertable.tags,
     degrees: insertable.degrees,
     rating: insertable.rating,
+    comments: insertable.comments,
   );
 
   @override

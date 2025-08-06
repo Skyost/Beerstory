@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/model/history_entry/history_entry.dart';
 import 'package:beerstory/model/repository.dart';
 import 'package:drift/drift.dart';
@@ -47,6 +47,7 @@ class History extends Repository<HistoryEntry> with DatabaseRepository<HistoryEn
     quantity: object.quantity,
     times: object.times,
     moreThanQuantity: object.moreThanQuantity,
+    comments: object.comments,
   );
 
   @override
@@ -57,6 +58,7 @@ class History extends Repository<HistoryEntry> with DatabaseRepository<HistoryEn
     quantity: insertable.quantity,
     times: insertable.times,
     moreThanQuantity: insertable.moreThanQuantity,
+    comments: insertable.comments,
   );
 }
 

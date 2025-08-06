@@ -31,6 +31,10 @@
       "label": "Beer tags",
       "hint": "Enter a tag"
     },
+    "comments": {
+      "label": "Comments on the beer",
+      "hint": "Comments"
+    },
     "replace": "Do you want to replace the current beer ?",
     "added": "Beer added with success.",
     "found": "{element} added with success. Thanks OpenFoodFacts !"
@@ -55,6 +59,10 @@
     "tags": {
       "label": "Tags",
       "empty": "No tag specified"
+    },
+    "comments": {
+      "label": "Comments",
+      "empty": "No comment specified"
     }
   },
   "deleteConfirm": "Are you sure you want to delete this beer ?"

@@ -31,6 +31,10 @@
       "label": "Tags de la bière",
       "hint": "Entrer un tag"
     },
+    "comments": {
+      "label": "Commentaires sur la bière",
+      "hint": "Commentaires"
+    },
     "replace": "Voulez-vous remplacer la bière actuelle ?",
     "added": "Bière ajoutée avec succès.",
     "found": "{element} ajouté avec succès. Merci OpenFoodFacts !"
@@ -56,6 +60,10 @@
     "tags": {
       "label": "Tags",
       "empty": "Pas de tag spécifié"
+    },
+    "comments": {
+      "label": "Commentaires",
+      "empty": "Pas de commentaire spécifié"
     }
   }
 }

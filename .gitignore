@@ -164,3 +164,4 @@ app.*.symbols
 *.g.dart
 assets/images/
 pubspec.lock
+lib/model/database/database.steps.dart

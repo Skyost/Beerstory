@@ -30,6 +30,10 @@
     "moreThanQuantity": {
       "label": "More than the displayed quantity ?"
     },
+    "comments": {
+      "label": "Comments on this entry",
+      "hint": "Comments"
+    },
     "date": {
       "label": "Date"
     }
@@ -54,6 +58,10 @@
     },
     "date": {
       "label": "Date"
+    },
+    "comments": {
+      "label": "Comments",
+      "empty": "No comment specified"
     }
   }
 }

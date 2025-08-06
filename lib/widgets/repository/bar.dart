@@ -92,7 +92,7 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
           onPress: () async {
             FormDialogResult<String> newName = await BarNameEditorDialog.show(
               context: context,
-              barName: object.name,
+              name: object.name,
             );
             if (newName is FormDialogResultSaved<String> && newName.value != object.name && context.mounted) {
               await editObject(context, ref, object.copyWith(name: newName.value));
@@ -107,7 +107,7 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
           onPress: () async {
             FormDialogResult<String?> newAddress = await BarAddressEditorDialog.show(
               context: context,
-              barAddress: object.address,
+              address: object.address,
             );
             if (newAddress is FormDialogResultSaved<String?> && newAddress.value != object.address && context.mounted) {
               await editObject(
@@ -124,6 +124,25 @@ class _BarDetailsWidget extends RepositoryObjectDetailsWidget<Bar> {
           subtitle: _BarBeerPrices(bar: object),
           suffix: const Icon(FIcons.chevronRight),
           onPress: onBeerPricesPress,
+        ),
+        FTile(
+          prefix: const Icon(FIcons.messageSquare),
+          title: Text(translations.bars.details.comments.label),
+          subtitle: (object.comments?.isEmpty ?? true) ? Text(translations.bars.details.comments.empty) : Text(object.comments!),
+          suffix: const Icon(FIcons.chevronRight),
+          onPress: () async {
+            FormDialogResult<String?> newComments = await BarCommentsEditorDialog.show(
+              context: context,
+              comments: object.comments,
+            );
+            if (newComments is FormDialogResultSaved<String?> && newComments.value != object.comments && context.mounted) {
+              await editObject(
+                context,
+                ref,
+                object.overwriteComments(comments: newComments.value),
+              );
+            }
+          },
         ),
         if (kDebugMode)
           FTile(

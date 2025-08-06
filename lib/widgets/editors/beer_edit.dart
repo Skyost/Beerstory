@@ -124,10 +124,10 @@ class BeerNameEditorDialog extends FormDialog<String> {
   /// Shows a new beer name editor.
   static Future<FormDialogResult<String>> show({
     required BuildContext context,
-    required String beerName,
+    required String name,
   }) => FormDialog.show(
     context: context,
-    object: beerName,
+    object: name,
     builder: BeerNameEditorDialog._,
   );
 }
@@ -135,18 +135,18 @@ class BeerNameEditorDialog extends FormDialog<String> {
 /// The beer name editor dialog state.
 class _BeerNameEditorDialogState extends FormDialogState<String, BeerNameEditorDialog> {
   /// The current beer name.
-  late String? beerName = widget.object;
+  late String? name = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BeerNameFormField(
-      initialText: beerName,
-      onSaved: (value) => beerName = value?.trimOrNullIfEmpty,
+      initialText: name,
+      onSaved: (value) => name = value?.trimOrNullIfEmpty,
     ),
   ];
 
   @override
-  String? onSaved() => beerName;
+  String? onSaved() => name;
 }
 
 /// Allows to edit a beer degrees.
@@ -164,10 +164,10 @@ class BeerDegreesEditorDialog extends FormDialog<double?> {
   /// Shows a new beer degrees editor.
   static Future<FormDialogResult<double?>> show({
     required BuildContext context,
-    required double? beerDegrees,
+    required double? degrees,
   }) => FormDialog.show(
     context: context,
-    object: beerDegrees,
+    object: degrees,
     builder: BeerDegreesEditorDialog._,
   );
 }
@@ -175,18 +175,18 @@ class BeerDegreesEditorDialog extends FormDialog<double?> {
 /// The beer degrees editor dialog state.
 class _BeerDegreesEditorDialogState extends FormDialogState<double?, BeerDegreesEditorDialog> {
   /// The current beer degrees.
-  late double? beerDegrees = widget.object;
+  late double? degrees = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BeerDegreesFormField(
-      initialValue: beerDegrees,
-      onSaved: (value) => beerDegrees = value,
+      initialValue: degrees,
+      onSaved: (value) => degrees = value,
     ),
   ];
 
   @override
-  double? onSaved() => beerDegrees;
+  double? onSaved() => degrees;
 }
 
 /// Allows to edit a beer rating.
@@ -204,10 +204,10 @@ class BeerRatingEditorDialog extends FormDialog<double?> {
   /// Shows a new beer rating editor.
   static Future<FormDialogResult<double?>> show({
     required BuildContext context,
-    required double? beerRating,
+    required double? rating,
   }) => FormDialog.show(
     context: context,
-    object: beerRating,
+    object: rating,
     builder: BeerRatingEditorDialog._,
   );
 }
@@ -215,18 +215,18 @@ class BeerRatingEditorDialog extends FormDialog<double?> {
 /// The beer rating editor dialog state.
 class _BeerRatingEditorDialogState extends FormDialogState<double?, BeerRatingEditorDialog> {
   /// The current beer rating.
-  late double? beerRating = widget.object;
+  late double? rating = widget.object;
 
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BeerRatingFormField(
-      initialValue: beerRating,
-      onSaved: (value) => beerRating = value,
+      initialValue: rating,
+      onSaved: (value) => rating = value,
     ),
   ];
 
   @override
-  double? onSaved() => beerRating;
+  double? onSaved() => rating;
 }
 
 /// Allows to edit a beer tags.
@@ -244,10 +244,10 @@ class BeerTagsEditorDialog extends FormDialog<List<String>> {
   /// Shows a new beer tags editor.
   static Future<FormDialogResult<List<String>>> show({
     required BuildContext context,
-    required List<String> beerTags,
+    required List<String> tags,
   }) => FormDialog.show(
     context: context,
-    object: beerTags,
+    object: tags,
     builder: BeerTagsEditorDialog._,
   );
 }
@@ -255,7 +255,7 @@ class BeerTagsEditorDialog extends FormDialog<List<String>> {
 /// The beer tags editor dialog state.
 class _BeerTagsEditorDialogState extends FormDialogState<List<String>, BeerTagsEditorDialog> {
   /// The current beer tags.
-  late List<String>? beerTags = widget.object;
+  late List<String>? tags = widget.object;
 
   /// The add form focus node.
   final FocusNode addFormFocusNode = FocusNode();
@@ -266,15 +266,15 @@ class _BeerTagsEditorDialogState extends FormDialogState<List<String>, BeerTagsE
   @override
   List<Widget> createChildren(BuildContext context) => [
     _BeerTagsFormField(
-      initialValue: beerTags,
+      initialValue: tags,
       addFormFocusNode: addFormFocusNode,
       addFormController: addFormController,
-      onSaved: (value) => beerTags = value,
+      onSaved: (value) => tags = value,
     ),
   ];
 
   @override
-  List<String>? onSaved() => beerTags;
+  List<String>? onSaved() => tags;
 
   @override
   void dispose() {
@@ -282,6 +282,46 @@ class _BeerTagsEditorDialogState extends FormDialogState<List<String>, BeerTagsE
     addFormController.dispose();
     super.dispose();
   }
+}
+
+/// Allows to edit a beer comments.
+class BeerCommentsEditorDialog extends FormDialog<String?> {
+  /// The beer comments editor internal constructor.
+  const BeerCommentsEditorDialog._({
+    required super.object,
+    super.animation,
+    super.style,
+  });
+
+  @override
+  FormDialogState<String?, BeerCommentsEditorDialog> createState() => _BeerCommentsEditorDialogState();
+
+  /// Shows a new beer comments editor.
+  static Future<FormDialogResult<String?>> show({
+    required BuildContext context,
+    required String? comments,
+  }) => FormDialog.show(
+    context: context,
+    object: comments,
+    builder: BeerCommentsEditorDialog._,
+  );
+}
+
+/// The beer comments editor dialog state.
+class _BeerCommentsEditorDialogState extends FormDialogState<String?, BeerCommentsEditorDialog> {
+  /// The current beer comments.
+  late String? comments = widget.object;
+
+  @override
+  List<Widget> createChildren(BuildContext context) => [
+    _BeerCommentsFormField(
+      initialText: comments,
+      onSaved: (value) => comments = value?.trimOrNullIfEmpty,
+    ),
+  ];
+
+  @override
+  String? onSaved() => comments;
 }
 
 /// The beer image form field.
@@ -530,5 +570,20 @@ class _BeerTagsFormField extends FormField<List<String>> {
              ),
            ],
          ),
+       );
+}
+
+/// The beer comments form field.
+class _BeerCommentsFormField extends FTextFormField {
+  /// Creates a new beer comments form field instance.
+  _BeerCommentsFormField({
+    super.initialText,
+    FormFieldSetter<String>? onSaved,
+  }) : super(
+         label: Text(translations.beers.dialog.comments.label),
+         hint: translations.beers.dialog.comments.hint,
+         minLines: 1,
+         maxLines: 3,
+         onSaved: (value) => onSaved?.call(value?.trimOrNullIfEmpty),
        );
 }

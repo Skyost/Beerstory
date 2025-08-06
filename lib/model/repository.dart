@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:beerstory/model/database.dart';
+import 'package:beerstory/model/database/database.dart';
 import 'package:beerstory/utils/utils.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
