@@ -27,7 +27,9 @@ either the [Google Play Store](https://play.google.com/store/apps/details?id=fr.
 
 You can also try it directly in your [web browser](https://skyost.github.io/Beerstory).
 
-## Under the hood
+## Developers
+
+### Technologies
 
 Beerstory has been entirely created using [Flutter](https://flutter.dev). Internally, the beers, bars, and
 history entries are stored in a SQLite database using [Drift](https://drift.simonbinder.eu/setup/).
@@ -35,6 +37,21 @@ State management is handled with [Riverpod](https://riverpod.dev).
 
 [OpenFoodFacts](https://openfoodfacts.org) is used to fetch the beers metadata by barcode scanning.
 It's a great initiative that you should check out !
+
+### Building
+
+Before everything, please make sure that Flutter is installed. Then clone this repository, and
+generate required files :
+
+```shell
+flutter pub get
+dart run slang
+dart run build_runner build
+dart run drift_dev schema steps drift_schemas lib/model/database/database.steps.dart
+dart run beerstory:compile_svg
+```
+
+Then you can build the app using `flutter build <platform>`.
 
 ## License
 
