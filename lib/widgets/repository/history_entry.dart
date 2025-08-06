@@ -122,6 +122,7 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
           },
         ),
         FTile(
+          prefix: const Icon(FIcons.rotateCcw),
           title: Text(translations.history.dialog.quantity.label),
           subtitle: Text(
             object.quantity == null
@@ -146,6 +147,7 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
           },
         ),
         FTile(
+          prefix: const Icon(FIcons.asterisk),
           title: Text(translations.history.dialog.times.label),
           subtitle: Text(object.times.toString()),
           suffix: const Icon(FIcons.chevronRight),
@@ -160,6 +162,7 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
           },
         ),
         FTile(
+          prefix: const Icon(FIcons.diff),
           suffix: FCheckbox(value: object.moreThanQuantity),
           title: Text(translations.history.dialog.moreThanQuantity.label),
           subtitle: Text(
@@ -174,6 +177,7 @@ class _HistoryEntryDetailsWidget extends RepositoryObjectDetailsWidget<HistoryEn
           },
         ),
         FTile(
+          prefix: const Icon(FIcons.messageSquare),
           title: Text(translations.history.dialog.comments.label),
           subtitle: (object.comments?.isEmpty ?? true) ? Text(translations.bars.details.comments.empty) : Text(object.comments!),
           suffix: const Icon(FIcons.chevronRight),
@@ -211,7 +215,10 @@ class _BeerTile extends ConsumerWidget with FTileMixin {
   final Function(Beer)? onPressed;
 
   /// Creates a new beer widget instance.
-  const _BeerTile({required this.beerUuid, this.onPressed});
+  const _BeerTile({
+    required this.beerUuid,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -223,6 +230,7 @@ class _BeerTile extends ConsumerWidget with FTileMixin {
     return beer == null
         ? const SizedBox.shrink()
         : FTile(
+            prefix: const Icon(FIcons.beer),
             title: Text(translations.history.dialog.beer.label),
             subtitle: Text(beer.name),
             suffix: const Icon(FIcons.chevronRight),
