@@ -335,19 +335,27 @@ class _AddBeerButton extends ConsumerWidget {
                   prefix: const Icon(FIcons.barcode),
                   title: Text(translations.beers.page.menu.addFromScan),
                   onPress: () async {
-                    ScanResult result = await BeerScan.scanAndFetchFromOpenFoodFacts(context);
-                    if (context.mounted) {
-                      BeerScan.handleScanResult(
-                        context,
-                        result,
-                        onSuccess: (beer) async {
-                          await showWaitingOverlay(
-                            context,
-                            future: ref.read(beerRepositoryProvider.notifier).add(beer),
-                          );
-                        },
-                      );
+                    String? barcode = await BeerScan.scan(context);
+                    if (barcode == null || !context.mounted) {
+                      return;
                     }
+                    ScanResult result = await showWaitingOverlay(
+                      context,
+                      future: BeerScan.fetchFromOpenFoodFacts(barcode),
+                    );
+                    if (!context.mounted) {
+                      return;
+                    }
+                    BeerScan.handleScanResult(
+                      context,
+                      result,
+                      onSuccess: (beer) async {
+                        await showWaitingOverlay(
+                          context,
+                          future: ref.read(beerRepositoryProvider.notifier).add(beer),
+                        );
+                      },
+                    );
                   },
                 ),
                 _AddObjectWidget(
