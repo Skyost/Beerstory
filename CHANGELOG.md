@@ -1,5 +1,15 @@
 # 📰 Beerstory Changelog
 
+## v2.0.1
+Released on August 6, 2025.
+
+* **FEAT**: Added some icons to history entries details. ([#f2a8e30](https://github.com/Skyost/Beerstory/commit/f2a8e30))
+* **FEAT**: Added the ability to add some comments to beers, bars and history entries. ([#5d5cc59](https://github.com/Skyost/Beerstory/commit/5d5cc59))
+* **FEAT**: Now fetching prices from OpenFoodFacts Prices. ([#14b8913](https://github.com/Skyost/Beerstory/commit/14b8913))
+* **FEAT**: Now filtering scanned beers categories. ([#c43f615](https://github.com/Skyost/Beerstory/commit/c43f615))
+* **CHORE**: Improved barcode scanning. ([#b670670](https://github.com/Skyost/Beerstory/commit/b670670))
+* **CHORE**: Improved the migrator. ([#33fb403](https://github.com/Skyost/Beerstory/commit/33fb403))
+
 ## v2.0.0
 Released on Aug 4, 2025.
 
