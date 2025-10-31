@@ -149,14 +149,14 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
       hint: translations.misc.search,
       controller: searchController,
       textInputAction: TextInputAction.search,
-      suffixBuilder: (context, value, child) => Padding(
+      suffixBuilder: (context, style, states) => Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: kSpace / 2,
           vertical: kSpace,
         ),
         child: Icon(
           FIcons.search,
-          color: value.$2.contains(WidgetState.focused) ? context.theme.colors.primary : null,
+          color: states.contains(WidgetState.focused) ? context.theme.colors.primary : null,
         ),
       ),
     ),

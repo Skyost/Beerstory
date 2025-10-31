@@ -63,4 +63,10 @@ class History extends Repository<HistoryEntry> with DatabaseRepository<HistoryEn
 }
 
 /// The last inserted beer provider.
-final lastInsertedBeerProvider = StateProvider<String?>((ref) => null);
+final lastInsertedBeerProvider = NotifierProvider<LastIntersetBeerNotifier, String?>(LastIntersetBeerNotifier.new);
+
+/// The last inserted beer notifier.
+class LastIntersetBeerNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+}

@@ -45,14 +45,14 @@ class _ModalBarrier extends StatefulWidget {
 class _ModalBarrierState extends State<_ModalBarrier> with SingleTickerProviderStateMixin {
   /// The animation controller.
   late AnimationController controller = AnimationController(
-    duration: context.theme.dialogStyle.entranceExitDuration,
+    duration: context.theme.dialogRouteStyle.motion.entranceDuration,
     vsync: this,
   )..forward();
 
   @override
   Widget build(BuildContext context) => FAnimatedModalBarrier(
     onDismiss: null,
-    filter: context.theme.dialogStyle.barrierFilter,
+    filter: context.theme.dialogRouteStyle.barrierFilter,
     animation: controller.view,
   );
 

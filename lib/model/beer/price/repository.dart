@@ -35,9 +35,15 @@ class BeerPriceRepository extends Repository<BeerPrice> with DatabaseRepository<
 final beerPricesFromBeerProvider = AsyncNotifierProvider.autoDispose.family<BeerPriceFromBeerNotifier, List<BeerPrice>, String>(BeerPriceFromBeerNotifier.new);
 
 /// Allows to display the prices of a given beer.
-class BeerPriceFromBeerNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, String> {
+class BeerPriceFromBeerNotifier extends AsyncNotifier<List<BeerPrice>> {
+  /// The UUID of the beer.
+  final String beerUuid;
+
+  /// Creates a new beer prices from beer notifier instance.
+  BeerPriceFromBeerNotifier(this.beerUuid);
+
   @override
-  FutureOr<List<BeerPrice>> build(String beerUuid) async {
+  FutureOr<List<BeerPrice>> build() async {
     List<BeerPrice> prices = await ref.watch(
       beerPriceRepositoryProvider.future,
     );
@@ -49,14 +55,18 @@ class BeerPriceFromBeerNotifier extends AutoDisposeFamilyAsyncNotifier<List<Beer
 }
 
 /// The beer prices from bar provider.
-final beerPricesFromBarProvider = AsyncNotifierProvider.autoDispose.family<BeerPriceFromBarNotifier, List<BeerPrice>, String>(
-  BeerPriceFromBarNotifier.new,
-);
+final beerPricesFromBarProvider = AsyncNotifierProvider.autoDispose.family<BeerPriceFromBarNotifier, List<BeerPrice>, String>(BeerPriceFromBarNotifier.new);
 
 /// Allows to display the prices of a given bar.
-class BeerPriceFromBarNotifier extends AutoDisposeFamilyAsyncNotifier<List<BeerPrice>, String> {
+class BeerPriceFromBarNotifier extends AsyncNotifier<List<BeerPrice>> {
+  /// The UUID of the bar.
+  final String barUuid;
+
+  /// Creates a new beer prices from bar notifier instance.
+  BeerPriceFromBarNotifier(this.barUuid);
+
   @override
-  FutureOr<List<BeerPrice>> build(String barUuid) async {
+  FutureOr<List<BeerPrice>> build() async {
     List<BeerPrice> prices = await ref.watch(
       beerPriceRepositoryProvider.future,
     );

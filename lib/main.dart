@@ -1,9 +1,7 @@
 import 'package:beerstory/i18n/translations.g.dart';
-import 'package:beerstory/model/migration/migrator.dart';
 import 'package:beerstory/pages/routes.dart';
 import 'package:beerstory/pages/scaffold.dart';
 import 'package:beerstory/utils/brightness_listener.dart';
-import 'package:beerstory/widgets/waiting_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -94,42 +92,40 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> with BrightnessLis
       debugShowCheckedModeBanner: false,
       builder: (context, child) => FTheme(
         data: themeData.copyWith(
-          headerStyles: themeData.headerStyles.copyWith(
-            rootStyle: (style) => style.copyWith(
-              titleTextStyle: style.titleTextStyle.copyWith(
+          headerStyles: (headerStyles) => headerStyles.copyWith(
+            rootStyle: (rootStyle) => rootStyle.copyWith(
+              titleTextStyle: rootStyle.titleTextStyle.copyWith(
                 fontFamily: 'BirdsOfParadise',
                 height: 1.15,
               ),
             ),
-            nestedStyle: (style) => style.copyWith(
-              titleTextStyle: style.titleTextStyle.copyWith(
+            nestedStyle: (nestedStyle) => nestedStyle.copyWith(
+              titleTextStyle: nestedStyle.titleTextStyle.copyWith(
                 fontFamily: 'BirdsOfParadise',
                 fontSize: 24,
                 height: 1.15,
               ),
             ),
           ),
-          textFieldStyle: themeData.textFieldStyle.copyWith(
-            contentTextStyle: themeData.textFieldStyle.contentTextStyle.map(
+          textFieldStyle: (textFieldStyle) => textFieldStyle.copyWith(
+            contentTextStyle: textFieldStyle.contentTextStyle.map(
               (style) => style.copyWith(
                 color: themeData.colors.foreground,
               ),
             ),
           ),
-          dateFieldStyle: themeData.dateFieldStyle.copyWith(
-            iconStyle: themeData.dateFieldStyle.iconStyle.copyWith(
+          dateFieldStyle: (dateFieldStyle) => dateFieldStyle.copyWith(
+            iconStyle: dateFieldStyle.iconStyle.copyWith(
               color: themeData.colors.primary,
             ),
-            textFieldStyle: themeData.dateFieldStyle.textFieldStyle
-                .copyWith(
-                  contentTextStyle: themeData.dateFieldStyle.textFieldStyle.contentTextStyle.map(
-                    (style) => style.copyWith(
-                      fontSize: themeData.typography.base.fontSize ?? style.fontSize,
-                      color: themeData.colors.foreground,
-                    ),
-                  ),
-                )
-                .call,
+            textFieldStyle: (textFieldStyle) => textFieldStyle.copyWith(
+              contentTextStyle: textFieldStyle.contentTextStyle.map(
+                (style) => style.copyWith(
+                  fontSize: themeData.typography.base.fontSize ?? style.fontSize,
+                  color: themeData.colors.foreground,
+                ),
+              ),
+            ),
           ),
         ),
         child: child!,
@@ -142,46 +138,10 @@ class _BeerstoryAppState extends ConsumerState<_BeerstoryApp> with BrightnessLis
         ...GlobalMaterialLocalizations.delegates,
       ],
       routes: {
-        kHomeRoute: (context) => const _MigratorWidget(
-          child: HomeRouteScaffold(),
-        ),
+        kHomeRoute: (context) => const HomeRouteScaffold(),
         kHistoryRoute: (context) => const HistoryRouteScaffold(),
         kSettingsRoute: (context) => const SettingsRouteScaffold(),
       },
     );
   }
-}
-
-/// Allows to use the [Migrator] class and to report changes to the user.
-class _MigratorWidget extends ConsumerStatefulWidget {
-  /// The child widget.
-  final Widget child;
-
-  /// Creates a new migrator widget instance.
-  const _MigratorWidget({
-    required this.child,
-  });
-
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _MigratorWidgetState();
-}
-
-/// The migrator widget state.
-class _MigratorWidgetState extends ConsumerState<_MigratorWidget> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (await Migrator.needsMigration(ref) && mounted) {
-        showWaitingOverlay(
-          context,
-          future: Migrator.migrate(ref),
-          message: translations.misc.migration,
-        );
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

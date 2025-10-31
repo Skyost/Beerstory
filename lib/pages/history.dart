@@ -117,7 +117,7 @@ class _DateGroupData extends GroupData<HistoryEntry> {
         TextSpan(
           text: translations.history.page.quantity(
             prefix: result.moreThanQuantity ? '+' : '',
-            quantity: NumberFormat.formatDouble(trueQuantity!),
+            quantity: NumberFormat.formatDouble(trueQuantity),
           ),
         ),
       ],

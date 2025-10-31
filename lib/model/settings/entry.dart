@@ -13,7 +13,7 @@ final sharedPreferencesProvider = FutureProvider.autoDispose<SharedPreferencesWi
 );
 
 /// Represents a settings entry, which can be user configured (directly or not).
-class SettingsEntry<T> extends AutoDisposeAsyncNotifier<T> {
+class SettingsEntry<T> extends AsyncNotifier<T> {
   /// The preferences key.
   @protected
   final String key;

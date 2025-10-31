@@ -17,6 +17,7 @@ import 'package:beerstory/widgets/repository/repository_object.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:forui/forui.dart';
 
 /// Allows to display the prices of a beer.

@@ -18,12 +18,12 @@ class CenteredProgressIndicator extends ConsumerStatefulWidget {
 class _CenteredProgressIndicatorState extends ConsumerState<CenteredProgressIndicator> with BrightnessListener<CenteredProgressIndicator> {
   @override
   Widget build(BuildContext context) => Center(
-    child: FProgress.circularIcon(
-      style: currentBrightness == Brightness.dark
-          ? (style) => style.copyWith(
-              color: Colors.white,
-            )
-          : null,
+    child: FCircularProgress(
+      style: (style) => style.copyWith(
+        iconStyle: style.iconStyle.copyWith(
+          color: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : null,
+        ),
+      ),
     ),
   );
 }
