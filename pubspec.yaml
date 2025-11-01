@@ -1,6 +1,6 @@
 name: beerstory
 description: Save your favorite beers and find them back instantly !
-version: 2.0.1+9
+version: 2.0.2+10
 publish_to: none
 repository: https://github.com/Skyost/Beerstory
 

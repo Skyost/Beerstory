@@ -1,5 +1,14 @@
 # 📰 Beerstory Changelog
 
+## v2.0.2
+Released on November 1, 2025.
+
+* **FIX**: Fixed a problem with paddings. ([#09b2eb0](https://github.com/Skyost/Beerstory/commit/09b2eb0))
+* **FIX**: Fixed a problem with some beer names. ([#b8e1460](https://github.com/Skyost/Beerstory/commit/b8e1460))
+* **FIX**: Fixed beer prices that was not deleting correctly. ([#df1bde3](https://github.com/Skyost/Beerstory/commit/df1bde3))
+* **CHORE**: Updated dependencies. ([#99f26fd](https://github.com/Skyost/Beerstory/commit/99f26fd))
+
+
 ## v2.0.1
 Released on August 6, 2025.
 
