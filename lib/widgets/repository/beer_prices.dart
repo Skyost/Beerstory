@@ -187,6 +187,7 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
       }
       return LayoutBuilder(
         builder: (context, constraints) => ListView(
+          padding: context.theme.scaffoldStyle.childPadding,
           controller: scrollController,
           children: [
             Container(

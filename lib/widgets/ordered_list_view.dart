@@ -31,6 +31,9 @@ class OrderedListView<T> extends StatefulWidget {
   /// The empty widget builder.
   final Widget Function(BuildContext, String?)? emptyWidgetBuilder;
 
+  /// The list padding.
+  final EdgeInsets? padding;
+
   /// Creates a new ordered listview instance.
   const OrderedListView({
     super.key,
@@ -40,6 +43,7 @@ class OrderedListView<T> extends StatefulWidget {
     this.groupObjects,
     this.comparator,
     this.emptyWidgetBuilder,
+    this.padding,
   });
 
   @override
@@ -117,6 +121,7 @@ class _OrderedListViewState<T> extends State<OrderedListView<T>> {
     }
 
     return ListView(
+      padding: widget.padding ?? context.theme.scaffoldStyle.childPadding,
       controller: scrollController,
       children: [
         if (showSearchBox) _createSearchBox(context),

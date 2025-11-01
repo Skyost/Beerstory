@@ -90,7 +90,9 @@ class _WaitingDialogState extends State<_WaitingDialog> {
         children: [
           const Padding(
             padding: EdgeInsets.only(right: 24),
-            child: CenteredProgressIndicator(),
+            child: CenteredProgressIndicator(
+              center: false,
+            ),
           ),
           Expanded(
             child: Text(widget.message ?? translations.misc.loading),

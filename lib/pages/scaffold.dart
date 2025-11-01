@@ -82,6 +82,7 @@ class _HomeRouteScaffoldState extends ConsumerState<HomeRouteScaffold> with Sing
     int beerCount = ref.watch(beerRepositoryProvider.select((beers) => beers.value?.length ?? 0));
 
     return FScaffold(
+      childPad: false,
       header: FHeader.nested(
         title: Text(pageTitle),
         prefixes: [
@@ -294,6 +295,7 @@ class HistoryRouteScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FScaffold(
+    childPad: false,
     header: FHeader.nested(
       title: Text(translations.history.page.name),
       prefixes: [
@@ -491,6 +493,7 @@ class SettingsRouteScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FScaffold(
+    childPad: false,
     header: FHeader.nested(
       title: Text(translations.settings.page.name),
       prefixes: [

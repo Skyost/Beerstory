@@ -28,6 +28,7 @@ class SettingsScaffoldBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
+    padding: context.theme.scaffoldStyle.childPadding,
     children: [
       Padding(
         padding: const EdgeInsets.only(bottom: kSpace),

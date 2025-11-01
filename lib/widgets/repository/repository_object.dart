@@ -175,6 +175,7 @@ abstract class RepositoryObjectDetailsWidget<T extends RepositoryObject> extends
   Widget buildChild(BuildContext context, WidgetRef ref, T? object) {
     List<Widget> children = buildChildren(context, ref, object!);
     return ListView(
+      padding: context.theme.scaffoldStyle.childPadding,
       controller: scrollController,
       children: [
         for (int i = 0; i < children.length; i++)
