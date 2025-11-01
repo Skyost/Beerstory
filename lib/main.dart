@@ -26,6 +26,7 @@ Future<void> main() async {
       child: TranslationProvider(
         child: _BeerstoryApp(),
       ),
+      retry: (retryCount, error) => null,
     ),
   );
 }

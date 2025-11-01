@@ -419,7 +419,11 @@ class BeerImageWidget extends StatelessWidget {
       return '?';
     }
 
-    List<String> parts = text.split(' ');
+    List<String> parts = text.split(' ')..removeWhere((part) => part.isEmpty);
+    if (parts.isEmpty) {
+      return '?';
+    }
+
     if (parts.length == 1) {
       List<String> otherSplit = text.split('-');
       if (otherSplit.length > 1 && otherSplit[1].isNotEmpty) {
