@@ -171,7 +171,7 @@ abstract class PricesDetailsWidget<T extends HasName> extends DetailsWidget<Beer
                 if (editedPrice is! FormDialogResultSaved<BeerPrice> || !context.mounted) {
                   return;
                 }
-                if (editedPrice is DeletedBeerPrice) {
+                if (editedPrice.value is DeletedBeerPrice) {
                   await deleteObject(context, ref, editedPrice.value);
                 } else if (editedPrice.value != beerPrice) {
                   await editObject(context, ref, editedPrice.value);
